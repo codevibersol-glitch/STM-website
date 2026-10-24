@@ -1,0 +1,13 @@
+node_modules/
+.ssr/
+test-results/
+playwright-report/
+.wrangler/
+*.log
+# Raw captures of the game and the dashboard (npm run shots). They can show names and chat: never published.
+shots-src/
+# dist/ is built from this code (npm run build): Cloudflare Pages builds it on every push, and a local build is the
+# folder to upload by hand. It is not kept in git.
+dist/
+# Screenshots of the site for review (npm run screenshots): regenerated, not code.
+screenshots/

@@ -1,0 +1,35 @@
+{
+  "widths": [480, 960, 1440],
+  "maxWidth": 1600,
+  "quality": { "avif": 52, "webp": 76, "jpeg": 80 },
+  "dashboard": {
+    "url": "http://localhost:5000",
+    "viewport": { "width": 1440, "height": 900 },
+    "readySelector": ".mop-topbar",
+    "hide": [
+      ".mop-brand-mark",
+      ".mop-brand-text > span",
+      ".mop-topbar-actions .btn-group",
+      ".mop-topbar-actions small.text-info",
+      ".mop-banner-alerts"
+    ],
+    "hideText": [
+      { "selector": ".mop-meta", "pattern": "Quest" },
+      { "selector": ".mop-banner-why", "pattern": "." },
+      { "selector": ".mop-news-item", "pattern": "Quest|Must-do|RXP|guide" }
+    ],
+    "pages": [
+      { "id": "dashboard", "path": "/", "minPace": 1500, "avoidText": ["losing"], "maxWaitMs": 240000, "clip": { "x": 0, "y": 0, "width": 1440, "height": 732 } },
+      { "id": "character", "path": "/character/overview", "clip": { "x": 0, "y": 0, "width": 1440, "height": 740 } },
+      { "id": "map", "path": "/world", "settleMs": 6000, "clip": { "x": 0, "y": 0, "width": 1440, "height": 860 } }
+    ]
+  },
+  "ingame": [
+    {
+      "id": "ingame-panel",
+      "file": "ingame-20261024-234518.png",
+      "crop": { "left": 0, "top": 6, "width": 1100, "height": 654 },
+      "blur": [{ "left": 44, "top": 22, "width": 112, "height": 24, "sigma": 8 }]
+    }
+  ]
+}

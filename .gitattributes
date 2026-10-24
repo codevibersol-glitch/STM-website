@@ -1,0 +1,4 @@
+# Store text with LF in git (the build runs on Linux); Windows scripts keep CRLF when checked out.
+* text=auto
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

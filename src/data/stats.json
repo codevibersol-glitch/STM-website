@@ -1,0 +1,70 @@
+{
+  "label": "measured October 2026, WoW: Forever beta, two characters",
+  "stats": [
+    {
+      "id": "xp-median",
+      "marker": "a",
+      "prefix": "",
+      "value": "6,961",
+      "unit": "XP/h",
+      "label": "in a typical hour (the median) at levels 27–29, from kills alone; 77% of hours topped 6,000",
+      "short": "in a typical hour at levels 27–29",
+      "source": "Human Warrior, 13 October 2026: STM's pace meter, experience from kills per hour of play, measured every 10 minutes over the past hour (101 readings). Quest experience comes on top."
+    },
+    {
+      "id": "xp-best",
+      "marker": "b",
+      "prefix": "",
+      "value": "10,428",
+      "unit": "XP/h",
+      "label": "in the best full hour so far, at level 25",
+      "source": "STM's pace meter, Rogue, 18 October 2026, 15:28 to 16:28."
+    },
+    {
+      "id": "hours",
+      "marker": "c",
+      "prefix": "about",
+      "value": "100",
+      "count": 100,
+      "unit": "h",
+      "label": "of play from level 1 to 26",
+      "source": "Rogue, 13 to 18 October 2026: the bot's running time in its fight log (102.9 h), with pauses of over 20 minutes left out."
+    },
+    {
+      "id": "kills",
+      "marker": "d",
+      "prefix": "",
+      "value": "4,566",
+      "unit": "",
+      "label": "kills on the way to level 26, in under five days",
+      "source": "The Rogue's fight log, 13 to 18 October 2026."
+    },
+    {
+      "id": "reach",
+      "marker": "e",
+      "prefix": "level",
+      "value": "29",
+      "unit": "",
+      "label": "the highest level measured so far (the Warrior). STM is in beta and built to go on to max level",
+      "source": "Human Warrior, 13 October 2026: STM's pace meter readings reach level 29, in the WoW: Forever beta."
+    },
+    {
+      "id": "deaths",
+      "marker": "f",
+      "prefix": "",
+      "value": "572",
+      "unit": "",
+      "label": "deaths, each analysed automatically, with fixes made from them",
+      "source": "STM's death reports, 2 to 18 October 2026."
+    },
+    {
+      "id": "tests",
+      "marker": "g",
+      "prefix": "",
+      "value": "3,382",
+      "unit": "",
+      "label": "automated tests check STM's behaviour",
+      "source": "STM's test suite, counted on 18 October 2026."
+    }
+  ]
+}

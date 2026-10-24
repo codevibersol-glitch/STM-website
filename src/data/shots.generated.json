@@ -1,0 +1,42 @@
+{
+  "dashboard": {
+    "hash": "6bff322c",
+    "width": 1440,
+    "height": 732,
+    "widths": [
+      480,
+      960,
+      1440
+    ]
+  },
+  "character": {
+    "hash": "7e98d0dc",
+    "width": 1440,
+    "height": 740,
+    "widths": [
+      480,
+      960,
+      1440
+    ]
+  },
+  "map": {
+    "hash": "7245fb68",
+    "width": 1440,
+    "height": 860,
+    "widths": [
+      480,
+      960,
+      1440
+    ]
+  },
+  "ingame-panel": {
+    "hash": "01d1228d",
+    "width": 1100,
+    "height": 654,
+    "widths": [
+      480,
+      960,
+      1100
+    ]
+  }
+}
