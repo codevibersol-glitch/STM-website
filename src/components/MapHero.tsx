@@ -1,44 +1,51 @@
 import { useEffect, useRef, useState } from 'react';
-import { HERO } from '../data/copy';
-import type { RuneScene } from '../hero/scene';
+import type { MapScene } from '../hero/scene';
 import { PREFS_EVENT, motionReduced } from '../lib/prefs';
-import { RunePoster } from './RuneArt';
+import { MapPoster } from './MapPoster';
 
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+/** The 3D map loads only where it pays off: a wide screen, motion allowed. Phones keep the still poster. */
+const MIN_WIDTH = 768;
 
 /**
- * The hero picture. The SVG poster is always there (no JavaScript, reduced motion, no WebGL);
- * after the first paint the three.js scene is loaded on top of it and fades in.
+ * True when the browser can create a WebGL context. Without one, three.js only logs errors (and the scene's file
+ * would be downloaded for nothing), so the still poster stays.
  */
-export function RuneHero() {
-  const figureRef = useRef<HTMLElement>(null);
+function webglAvailable(): boolean {
+  try {
+    const probe = document.createElement('canvas');
+    const gl = probe.getContext('webgl2') ?? probe.getContext('webgl');
+    if (!gl) return false;
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The hero's background: the map. The SVG poster is always there (no JavaScript, reduced motion, phones, no WebGL);
+ * after the first paint the three.js scene is loaded over it and fades in.
+ */
+export function MapHero() {
+  const boxRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [live, setLive] = useState(false);
 
   useEffect(() => {
-    const figure = figureRef.current;
+    const box = boxRef.current;
     const canvas = canvasRef.current;
-    if (!figure || !canvas) return;
-    const pin = figure.closest<HTMLElement>('[data-hero-pin]');
-    const sticky = figure.closest<HTMLElement>('[data-hero-sticky]');
-    let scene: RuneScene | null = null;
+    if (!box || !canvas) return;
+    let scene: MapScene | null = null;
     let loading = false;
     let cancelled = false;
     let visible = true;
 
-    // Pinned (wide screens): progress runs over the pin's extra scroll height.
-    // Otherwise: from the picture's centre entering the lower part of the screen to the upper third.
-    const progress = () => {
-      const vh = window.innerHeight;
-      if (pin && sticky && getComputedStyle(sticky).position === 'sticky') {
-        const travel = pin.offsetHeight - vh;
-        return travel > 0 ? clamp01(-pin.getBoundingClientRect().top / travel) : 0;
-      }
-      const r = figure.getBoundingClientRect();
-      const centre = r.top + r.height / 2;
-      return clamp01((vh * 0.88 - centre) / (vh * 0.5));
+    let webgl: boolean | null = null;
+    const allowed = () => {
+      if (motionReduced() || window.innerWidth < MIN_WIDTH) return false;
+      webgl ??= webglAvailable();
+      return webgl;
     };
-    const update = () => scene?.setProgress(progress());
     const play = () => {
       if (!scene) return;
       if (visible && !document.hidden) scene.start();
@@ -46,24 +53,23 @@ export function RuneHero() {
     };
 
     const load = async () => {
-      if (loading || scene || cancelled || motionReduced()) return;
+      if (loading || scene || cancelled || !allowed()) return;
       loading = true;
       try {
         const mod = await import('../hero/scene');
-        if (cancelled || motionReduced()) return;
-        const created = await mod.createRuneScene(canvas, window.innerWidth < 768 ? 3400 : 6200);
-        if (cancelled || motionReduced()) {
-          created?.dispose();
-          return;
-        }
-        scene = created;
+        if (cancelled || !allowed()) return;
+        scene = mod.createMapScene(canvas);
       } catch {
         scene = null;
       } finally {
         loading = false;
       }
       if (!scene) return;
-      update();
+      if (cancelled || !allowed()) {
+        scene.dispose();
+        scene = null;
+        return;
+      }
       play();
       setLive(true);
     };
@@ -85,7 +91,7 @@ export function RuneHero() {
       visible = entries.some((e) => e.isIntersecting);
       play();
     });
-    io.observe(figure);
+    io.observe(box);
 
     // The 3D scene is decoration: it loads on the visitor's first touch, scroll, mouse move or key,
     // or a few seconds after the page has loaded - never in the way of the page becoming usable.
@@ -104,8 +110,6 @@ export function RuneHero() {
     if (document.readyState === 'complete') begin();
     else window.addEventListener('load', begin, { once: true });
 
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
     window.addEventListener('pointermove', onPointer, { passive: true });
     window.addEventListener(PREFS_EVENT, onPrefs);
     document.addEventListener('visibilitychange', play);
@@ -114,8 +118,6 @@ export function RuneHero() {
       window.clearTimeout(timer);
       for (const type of WAKE) window.removeEventListener(type, wake);
       window.removeEventListener('load', begin);
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener(PREFS_EVENT, onPrefs);
       document.removeEventListener('visibilitychange', play);
@@ -125,16 +127,11 @@ export function RuneHero() {
   }, []);
 
   return (
-    <figure ref={figureRef} className={live ? 'rune-figure is-live' : 'rune-figure'}>
-      <div className="rune-stage" aria-hidden="true">
-        <div className="rune-halo" />
-        {/* The poster turns as one GPU layer; the round clip keeps its corners from widening the page. */}
-        <div className="rune-poster-clip">
-          <RunePoster idPrefix="hero" className="rune-poster" />
-        </div>
-        <canvas ref={canvasRef} className="rune-canvas" width="600" height="600" />
-      </div>
-      <figcaption className="rune-caption">{HERO.caption}</figcaption>
-    </figure>
+    <div ref={boxRef} className={live ? 'hero-map is-live' : 'hero-map'} aria-hidden="true">
+      <div className="hero-aura" />
+      <MapPoster idPrefix="hero" className="hero-poster" />
+      <canvas ref={canvasRef} className="hero-canvas" />
+      <div className="hero-vignette" />
+    </div>
   );
 }

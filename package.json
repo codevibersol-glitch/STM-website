@@ -19,8 +19,8 @@
     "deploy": "wrangler pages deploy dist --project-name stm-website --branch main"
   },
   "dependencies": {
+    "@fontsource-variable/space-grotesk": "^5.3.0",
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
-    "@fontsource/marcellus": "^5.3.0",
     "@fontsource/opendyslexic": "^5.3.0",
     "motion": "^14.3.0",
     "react": "^19.3.1",

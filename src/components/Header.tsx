@@ -2,8 +2,8 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { HEADER_CTA, NAV } from '../data/copy';
 import { A11yToolbar } from './A11yToolbar';
 import { Icon } from './Icon';
-import { RuneMark } from './RuneArt';
 import { TelegramLink } from './TelegramLink';
+import { Wordmark } from './Wordmark';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,9 +33,8 @@ export function Header() {
     <header className="site-header" data-menu={menuOpen ? 'open' : 'closed'}>
       <div className="wrap header-row">
         <a href="#top" className="wordmark">
-          <RuneMark className="wordmark-mark" />
-          <span>STM</span>
-          <span className="sr-only">, back to the top</span>
+          <Wordmark className="wordmark-mark" label={null} />
+          <span className="sr-only">STM, back to the top</span>
         </a>
         <nav id={navId} className="site-nav" aria-label="Main">
           <ul>

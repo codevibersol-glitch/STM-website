@@ -25,10 +25,10 @@ import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
+import { MapHero } from './MapHero';
 import { TiltCard, useCountUp } from './Motion';
-import { RuneMark, RuneRule } from './RuneArt';
-import { RuneHero } from './RuneHero';
 import { TelegramLink } from './TelegramLink';
+import { Wordmark } from './Wordmark';
 
 interface SectionHeadProps {
   id: string;
@@ -37,10 +37,9 @@ interface SectionHeadProps {
   intro?: string;
 }
 
-function SectionHead({ id, eyebrow, title, intro }: SectionHeadProps) {
+export function SectionHead({ id, eyebrow, title, intro }: SectionHeadProps) {
   return (
     <div className="section-head" data-reveal>
-      <RuneRule />
       <p className="eyebrow">{eyebrow}</p>
       <h2 id={id} className="section-title">
         {title}
@@ -70,38 +69,37 @@ function ProofLine() {
 
 export function Hero() {
   return (
-    <section id="top" className="hero-pin" data-hero-pin aria-labelledby="hero-title">
-      <div className="hero-sticky" data-hero-sticky>
-        <div className="wrap hero-grid">
-          <div className="hero-copy">
-            <p className="kicker">
-              <Icon name="key" />
-              {HERO.kicker}
-            </p>
-            <h1 id="hero-title" className="hero-title">
-              {HERO.titleBefore}
-              <span className="gradient-text">{HERO.titleKeyword}</span>
-              {HERO.titleAfter}
-            </h1>
-            <p className="hero-lead">{HERO.lead}</p>
-            <div className="hero-ctas">
-              <TelegramLink className="btn btn-gold btn-lg btn-shimmer">
-                <Icon name="plane" />
-                {HERO.primaryCta}
-              </TelegramLink>
-              <a className="btn btn-ghost btn-lg" href="#how">
-                {HERO.secondaryCta}
-              </a>
-            </div>
-            <ul className="trust" aria-label="At a glance">
-              {HERO.trust.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-            <ProofLine />
+    <section id="top" className="hero" aria-labelledby="hero-title">
+      <MapHero />
+      <div className="wrap hero-inner">
+        <div className="hero-copy">
+          <p className="kicker">
+            <span className="kicker-dot" aria-hidden="true" />
+            {HERO.kicker}
+          </p>
+          <h1 id="hero-title" className="hero-title">
+            {HERO.titleBefore}
+            <span className="gradient-text">{HERO.titleKeyword}</span>
+            {HERO.titleAfter}
+          </h1>
+          <p className="hero-lead">{HERO.lead}</p>
+          <div className="hero-ctas">
+            <TelegramLink className="btn btn-gold btn-lg">
+              <Icon name="plane" />
+              {HERO.primaryCta}
+            </TelegramLink>
+            <a className="btn btn-ghost btn-lg" href="#how-it-works">
+              {HERO.secondaryCta}
+            </a>
           </div>
-          <RuneHero />
+          <ul className="trust" aria-label="At a glance">
+            {HERO.trust.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          <ProofLine />
         </div>
+        <p className="hero-caption">{HERO.caption}</p>
       </div>
     </section>
   );
@@ -505,9 +503,8 @@ export function Footer() {
       <div className="wrap footer-grid">
         <div>
           <a href="#top" className="wordmark">
-            <RuneMark className="wordmark-mark" />
-            <span>STM</span>
-            <span className="sr-only">, back to the top</span>
+            <Wordmark className="wordmark-mark" label={null} />
+            <span className="sr-only">STM, back to the top</span>
           </a>
           <p className="footer-tagline">{FOOTER.tagline}</p>
           <p className="footer-contact">

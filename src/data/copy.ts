@@ -6,13 +6,13 @@ import { LAUNCH_DAY } from './pricing';
 import { BETA_LABEL, BETA_REACH } from './site';
 import { SHOTS } from './shots';
 
-// Seven links, as before: at the largest text size an eighth makes the header wrap to three rows, and the
-// accessibility menu then no longer fits on a laptop screen. "How it helps" is still one scroll away, from the hero button.
+// Seven links at most: at the largest text size an eighth makes the header wrap to three rows, and the
+// accessibility menu then no longer fits on a laptop screen (a guardrail test checks the count).
 const NAV_ITEMS = [
-  { href: '#who', label: "Who it's for" },
+  { href: '#how-it-works', label: 'How it works' },
   // The pictures section exists only once its picture files do (npm run shots).
   ...(SHOTS.length > 0 ? [{ href: '#see', label: 'See it' }] : []),
-  { href: '#features', label: 'Features' },
+  { href: '#who', label: "Who it's for" },
   { href: '#results', label: 'Results' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#faq', label: 'FAQ' },
@@ -30,12 +30,12 @@ export const HERO = {
   lead:
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
-  secondaryCta: 'See how it helps',
+  secondaryCta: 'See how it works',
   trust: ['Every WoW version', 'Pre-sale until launch', 'No tracking', 'Telegram only'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
-  caption: 'A circle of runes reforms into a hand and a key: the game, opened up for you.',
+  caption: 'The map behind this page: a route bending round mob camps, the way STM walks.',
 };
 
 export const WHO = {

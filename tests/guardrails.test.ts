@@ -6,6 +6,12 @@ import { COMMITMENT, FEEDBACK, HERO, HOW, NAV, PRICING_COPY, TIME_BACK, WHO } fr
 import { FAQ } from '../src/data/faq';
 import { FEATURES } from '../src/data/features';
 import { GALLERY, GALLERY_COPY } from '../src/data/gallery';
+import { HOW_COPY, LOOP, MODELS, UNDER_THE_HOOD } from '../src/data/how';
+import { SAMPLE_TAG } from '../src/demos/DemoFrame';
+import { findRoute } from '../src/demos/pathfind';
+import { CALM, decide, START } from '../src/demos/planner';
+import { AREAS, CAP_ABOVE, LEVELS, plan as gridPlan } from '../src/demos/scorer';
+import { COMMANDS } from '../src/demos/telegram';
 import {
   BETA_LABEL,
   BETA_REACH,
@@ -45,6 +51,11 @@ function textOf(markup: string): string {
     .trim();
 }
 const text = textOf(html);
+/** The working models (src/demos) run on sample data, inside frames marked data-demo. */
+const DEMO_FRAME = /<div[^>]*\bdata-demo(?:="[^"]*")?[\s>][\s\S]*?<i data-demo-end(?:="[^"]*")?[^>]*><\/i><\/div>/g;
+const demoFrames = [...html.matchAll(DEMO_FRAME)].map((m) => m[0]);
+/** The page without the models: where every number must be a measured one. */
+const textOutsideDemos = textOf(html.replace(DEMO_FRAME, ' '));
 const allData = JSON.stringify({
   COMMITMENT,
   FEEDBACK,
@@ -63,6 +74,10 @@ const allData = JSON.stringify({
   VERSIONS_COPY,
   GALLERY,
   GALLERY_COPY,
+  HOW_COPY,
+  LOOP,
+  MODELS,
+  UNDER_THE_HOOD,
 });
 
 describe('Telegram is the only channel', () => {
@@ -155,7 +170,7 @@ describe('honest claims', () => {
     expect(section).not.toMatch(/<form|<input/i);
   });
 
-  it('takes every number on the page from stats.json', () => {
+  it('takes every number on the page from stats.json (outside the sample-data models)', () => {
     const allowed = new Set<string>([String(__BUILD_YEAR__)]);
     for (const m of JSON.stringify(stats).matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
     // Prices and dates come from pricing.ts (as stored, and as formatted on the page).
@@ -164,7 +179,7 @@ describe('honest claims', () => {
     const off = saving(plan('presale').price, plan('launch').price);
     if (off !== null) allowed.add(String(off));
     // Digits inside a word (the credit "Xian55" is a name) are not numbers.
-    const found = [...text.matchAll(/(?<![A-Za-z\d])\d[\d,]*/g)].map((m) => m[0].replace(/,$/, ''));
+    const found = [...textOutsideDemos.matchAll(/(?<![A-Za-z\d])\d[\d,]*/g)].map((m) => m[0].replace(/,$/, ''));
     expect(found.length).toBeGreaterThan(5);
     for (const n of found) expect(allowed.has(n), `number "${n}" is not from stats.json`).toBe(true);
   });
@@ -313,9 +328,69 @@ describe('one app, every version, in beta', () => {
   });
 });
 
+describe('how STM works: the working models', () => {
+  it('renders the section on the server, with the loop and all six models', () => {
+    expect(html).toContain('id="how-it-works"');
+    for (const m of MODELS) expect(html, m.id).toContain(`id="model-${m.id}"`);
+    expect(demoFrames).toHaveLength(MODELS.length);
+    for (const step of LOOP) expect(text).toContain(step.text);
+    for (const item of UNDER_THE_HOOD) expect(text).toContain(item.text);
+  });
+
+  it('labels every model as sample data, so no reader takes its digits for measurements', () => {
+    for (const frame of demoFrames) expect(textOf(frame)).toContain(SAMPLE_TAG);
+    // Outside the frames, "sample data" never appears: the measured numbers stand on their own.
+    expect(textOutsideDemos).not.toContain(SAMPLE_TAG);
+  });
+
+  it("offers only the bot's real Telegram commands", () => {
+    expect([...COMMANDS]).toEqual(['/status', '/stop', '/resume']);
+    expect(html).not.toContain('/pause');
+  });
+
+  it('keeps the header to seven links (an eighth pushes the accessibility menu off a laptop screen at the largest text)', () => {
+    expect(NAV.length).toBeLessThanOrEqual(7);
+  });
+
+  it("goals: the cheapest goal that can run wins, and a tie goes to the profile's order", () => {
+    expect(decide(START).chosen.id).toBe('flee');
+    expect(decide({ ...START, guardInReach: false }).chosen.id).toBe('fight');
+    expect(decide(CALM).chosen.id).toBe('route');
+    const tie = decide({ ...CALM, bagsFull: true, weaponBroken: true });
+    expect(tie.chosen.id).toBe('repair');
+    expect(tie.others.find((o) => o.goal.id === 'sell')?.reason).toMatch(/same cost/);
+  });
+
+  it('score: the winner is the best score, never above the cap and never in deep water', () => {
+    const winners = new Set<string>();
+    for (const level of LEVELS) {
+      const p = gridPlan(level);
+      winners.add(p.winner.area.id);
+      expect(p.winner.area.deepWater, `level ${level}`).toBeFalsy();
+      expect(p.winner.area.min, `level ${level}`).toBeLessThanOrEqual(level + CAP_ABOVE);
+      expect(p.winner.score).toBe(Math.max(...p.ranked.map((r) => r.score)));
+    }
+    // The levels move the winner, and the deep-water lesson shows: it would score more, and is refused.
+    expect(winners.size).toBeGreaterThan(2);
+    const at24 = gridPlan(24);
+    const crocs = at24.ranked.find((r) => r.area.id === AREAS.find((a) => a.deepWater)?.id);
+    expect(crocs?.wouldScore).toBeGreaterThan(at24.winner.score);
+    expect(crocs?.refusal).toMatch(/deep water/);
+  });
+
+  it('maps: the priced path keeps to the road and round the camps; the straight one pulls', () => {
+    const around = findRoute('around');
+    const through = findRoute('through');
+    expect(around.pulls).toBe(0);
+    expect(through.pulls).toBeGreaterThan(0);
+    expect(around.yards).toBeGreaterThan(through.yards);
+    expect(around.onRoad).toBeGreaterThan(0.5);
+  });
+});
+
 describe('content without JavaScript', () => {
   it('renders every section, the whole FAQ and the feedback template on the server', () => {
-    const ids = ['top', 'versions', 'who', 'how', 'features', 'results', 'time-back', 'pricing', 'accessibility', 'faq', 'feedback'];
+    const ids = ['top', 'versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'pricing', 'accessibility', 'faq', 'feedback'];
     if (SHOTS.length > 0) ids.push('see');
     for (const id of ids) {
       expect(html).toContain(`id="${id}"`);

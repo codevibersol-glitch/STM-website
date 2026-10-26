@@ -31,13 +31,13 @@ export const CREDITS = 'Built on the work of julianperrott and Xian55.';
 export const RISK_ANSWER =
   "STM is third-party software and isn't approved by Blizzard. Automating gameplay may go against the game's terms of use and could put your account at risk. You decide whether to use it.";
 
-export const THEME_COLOR = '#0A0A18';
+export const THEME_COLOR = '#060709';
 
 export const OG_IMAGE = {
   path: '/og.png',
   width: 1200,
   height: 630,
-  alt: 'STM, the WoW accessibility addon: a glowing circle of runes on a midnight sky, with the words "Play the adventure. Skip the grind."',
+  alt: 'STM, the WoW accessibility addon and leveling tool: a map with a route bending round mob camps, and the words "Play the adventure. Skip the grind."',
 } as const;
 
 /** Visually hidden suffix for every link that opens Telegram in a new tab. */

@@ -1,4 +1,5 @@
-import { RuneMark, RunePoster } from './components/RuneArt';
+import { MapPoster } from './components/MapPoster';
+import { Wordmark } from './components/Wordmark';
 import { SKIP_LINK } from './data/copy';
 import { CREDITS, TRADEMARK_NOTICE } from './data/site';
 
@@ -9,22 +10,16 @@ export function NotFound() {
       <a className="skip-link" href="#main">
         {SKIP_LINK}
       </a>
-      <div className="aurora" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
       <header className="site-header">
         <div className="wrap header-row">
           <a href="/" className="wordmark">
-            <RuneMark className="wordmark-mark" />
-            <span>STM</span>
-            <span className="sr-only">, home page</span>
+            <Wordmark className="wordmark-mark" label={null} />
+            <span className="sr-only">STM, home page</span>
           </a>
         </div>
       </header>
       <main id="main" className="notfound" tabIndex={-1}>
-        <RunePoster idPrefix="lost" className="notfound-art" />
+        <MapPoster idPrefix="lost" className="notfound-art" />
         <p className="eyebrow">Page not found</p>
         <h1 className="section-title">This path is not on the map</h1>
         <p className="section-intro">The page you were looking for does not exist, or it has moved. The way home is one click away.</p>

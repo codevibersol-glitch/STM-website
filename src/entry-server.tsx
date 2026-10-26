@@ -4,7 +4,8 @@ import { StrictMode } from 'react';
 import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import { App } from './App';
 import { NotFound } from './NotFound';
-import { RuneMark, RunePoster } from './components/RuneArt';
+import { MapPoster } from './components/MapPoster';
+import { Wordmark } from './components/Wordmark';
 
 export { PREFS_SCRIPT, headTags, resolveSiteUrl, structuredData } from './seo/head';
 export { copyDeck } from './seo/copyDeck';
@@ -23,10 +24,12 @@ export function renderNotFound(): string {
   return renderToStaticMarkup(<NotFound />);
 }
 
+/** The hero map as a still SVG, for the share image. */
 export function posterMarkup(idPrefix = 'art'): string {
-  return renderToStaticMarkup(<RunePoster idPrefix={idPrefix} />);
+  return renderToStaticMarkup(<MapPoster idPrefix={idPrefix} />);
 }
 
+/** The STM wordmark as SVG, for the share image. */
 export function markMarkup(): string {
-  return renderToStaticMarkup(<RuneMark />);
+  return renderToStaticMarkup(<Wordmark label={null} />);
 }

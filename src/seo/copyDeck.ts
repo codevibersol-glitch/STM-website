@@ -20,6 +20,7 @@ import {
 import { FAQ } from '../data/faq';
 import { FEATURES } from '../data/features';
 import { GALLERY_COPY } from '../data/gallery';
+import { HOW_COPY, LOOP, MODELS, UNDER_THE_HOOD } from '../data/how';
 import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { SHOTS } from '../data/shots';
 import { CREDITS, SITE_DESCRIPTION, SITE_TITLE, TELEGRAM_URL, TRADEMARK_NOTICE } from '../data/site';
@@ -62,6 +63,30 @@ export function copyDeck(): string {
     '',
     `- ${VERSIONS.join(' · ')}`,
     `- ${VERSIONS_COPY.soonLabel}: ${COMING_SOON.map((c) => c.name).join(' · ')}`,
+    '',
+    `## ${HOW_COPY.title}`,
+    '',
+    `_${HOW_COPY.eyebrow}_ - ${HOW_COPY.intro}`,
+    '',
+    `${HOW_COPY.loopLabel}:`,
+    '',
+    ...LOOP.map((s) => `- **${s.title}** - ${s.text}`),
+    '',
+    ...MODELS.flatMap((m) => [
+      `### ${m.kicker}: ${m.title}`,
+      '',
+      m.body,
+      '',
+      ...m.points.map((p) => `- ${p}`),
+      '',
+      '_With a working model (demo, sample data)._',
+      '',
+    ]),
+    `### ${HOW_COPY.hoodTitle}`,
+    '',
+    HOW_COPY.hoodIntro,
+    '',
+    ...UNDER_THE_HOOD.map((h) => `- **${h.title}** - ${h.text}`),
     '',
     ...(SHOTS.length > 0
       ? [

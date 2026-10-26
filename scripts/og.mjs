@@ -1,4 +1,4 @@
-// Draws the share image and the icons from the site's own art (the rune circle and the STM mark)
+// Draws the share image and the icons from the site's own art (the hero map and the STM wordmark)
 // with Playwright's Chromium, into public/:
 //   og.png (1200x630), icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png, favicon.ico
 // Run after a build (it reads .ssr/):  npm run build && npm run og && npm run build
@@ -13,60 +13,50 @@ const pub = join(root, 'public');
 const ssr = await import(pathToFileURL(join(root, '.ssr', 'entry-server.js')).href);
 
 // Fonts go in as data URLs: a page made with setContent may not load local files.
-const fontFiles = new Map();
-for (const [pkg, file] of [
-  ['marcellus', 'marcellus-latin-400-normal.woff2'],
-  ['atkinson-hyperlegible', 'atkinson-hyperlegible-latin-700-normal.woff2'],
-]) {
-  const data = await readFile(join(root, 'node_modules', '@fontsource', pkg, 'files', file));
-  fontFiles.set(file, `data:font/woff2;base64,${data.toString('base64')}`);
-}
-const font = (_pkg, file) => fontFiles.get(file);
+const dataUrl = async (...path) => `data:font/woff2;base64,${(await readFile(join(root, 'node_modules', ...path))).toString('base64')}`;
 const fonts = `
-  @font-face { font-family: Marcellus; src: url(${font('marcellus', 'marcellus-latin-400-normal.woff2')}) format('woff2'); }
-  @font-face { font-family: Atkinson; font-weight: 700; src: url(${font('atkinson-hyperlegible', 'atkinson-hyperlegible-latin-700-normal.woff2')}) format('woff2'); }
+  @font-face { font-family: Grotesk; font-weight: 300 700; src: url(${await dataUrl('@fontsource-variable', 'space-grotesk', 'files', 'space-grotesk-latin-wght-normal.woff2')}) format('woff2'); }
+  @font-face { font-family: Atkinson; font-weight: 700; src: url(${await dataUrl('@fontsource', 'atkinson-hyperlegible', 'files', 'atkinson-hyperlegible-latin-700-normal.woff2')}) format('woff2'); }
 `;
 const favicon = await readFile(join(pub, 'favicon.svg'), 'utf8');
+// The page's colours, as the site defines them (src/styles/index.css).
+const tokens = '--c-accent: #c6ff3a; --c-danger: #ff6b5e; --c-ink: #060709; --c-ink-2: #0a0c0f; --c-text: #f2f4f6;';
 
 const ogHtml = `<!doctype html><html><head><meta charset="utf-8"><style>
 ${fonts}
-html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #0a0a18; }
-.bg { position: absolute; inset: 0;
-  background: radial-gradient(ellipse 55% 75% at 80% 50%, rgba(139,92,246,.42), transparent 62%),
-              radial-gradient(ellipse 45% 60% at 0% 0%, rgba(46,230,197,.2), transparent 62%),
-              radial-gradient(ellipse 40% 50% at 30% 110%, rgba(232,194,106,.14), transparent 60%), #0a0a18; }
-.stars { position: absolute; inset: 0; opacity: .6;
-  background-image: radial-gradient(1.5px 1.5px at 8% 20%, #fff, transparent), radial-gradient(1px 1px at 40% 12%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 52% 80%, #fff, transparent), radial-gradient(1px 1px at 25% 64%, #fff, transparent),
-    radial-gradient(1px 1px at 94% 8%, #fff, transparent), radial-gradient(1.5px 1.5px at 60% 36%, #fff, transparent); }
-.art { position: absolute; right: 18px; top: 3px; width: 624px; height: 624px; }
-.art svg { width: 100%; height: 100%; }
-.text { position: absolute; left: 72px; top: 0; bottom: 0; width: 520px; display: flex; flex-direction: column; justify-content: center; }
-.mark { display: flex; align-items: center; gap: 18px; font-family: Marcellus; font-size: 48px; letter-spacing: .2em; color: #f5f2ff; }
-.mark svg { width: 64px; height: 64px; }
-.kw { margin-top: 34px; font-family: Atkinson; font-weight: 700; font-size: 25px; letter-spacing: .08em; text-transform: uppercase; color: #2ee6c5; }
-h1 { margin: 14px 0 0; font-family: Marcellus; font-weight: 400; font-size: 58px; line-height: 1.1; color: #f5f2ff; white-space: nowrap; }
-h1 span { background: linear-gradient(100deg, #f6dc96, #e8c26a 45%, #2ee6c5); -webkit-background-clip: text; color: transparent; }
-.foot { margin-top: 36px; font-family: Atkinson; font-weight: 700; font-size: 22px; color: #cbc6e6; white-space: nowrap; }
-.foot b { color: #e8c26a; }
+:root { ${tokens} }
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #060709; }
+.map { position: absolute; inset: 0; }
+.map svg { width: 100%; height: 100%; }
+.shade { position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgb(6 7 9 / .96) 0%, rgb(6 7 9 / .7) 46%, rgb(6 7 9 / 0) 78%),
+              linear-gradient(180deg, rgb(6 7 9 / .2) 0%, rgb(6 7 9 / 0) 40%, rgb(6 7 9 / .6) 100%); }
+.text { position: absolute; left: 72px; top: 0; bottom: 0; width: 640px; display: flex; flex-direction: column; justify-content: center; }
+.mark { color: #f2f4f6; }
+.mark svg { width: 174px; height: 60px; }
+.kw { margin-top: 34px; font-family: Atkinson; font-weight: 700; font-size: 21px; letter-spacing: .08em; text-transform: uppercase; color: #c6ff3a; }
+h1 { margin: 14px 0 0; font-family: Grotesk; font-weight: 600; font-size: 66px; line-height: 1.02; letter-spacing: -0.035em; color: #f2f4f6; }
+h1 span { color: #c6ff3a; }
+.foot { margin-top: 36px; font-family: Atkinson; font-weight: 700; font-size: 22px; color: #a3abb6; white-space: nowrap; }
+.foot b { color: #c6ff3a; }
 </style></head><body>
-<div class="bg"></div><div class="stars"></div>
-<div class="art">${ssr.posterMarkup('og')}</div>
+<div class="map">${ssr.posterMarkup('og')}</div>
+<div class="shade"></div>
 <div class="text">
-  <div class="mark">${favicon}STM</div>
-  <div class="kw">The WoW accessibility addon</div>
+  <div class="mark">${ssr.markMarkup()}</div>
+  <div class="kw">The WoW accessibility addon and leveling tool</div>
   <h1>Play the adventure.<br><span>Skip the grind.</span></h1>
   <div class="foot">In beta · Telegram <b>@HugeKush</b></div>
 </div>
 </body></html>`;
 
-/** The mark on midnight ink. `inset` is the share of the square left empty around it. */
+/** The favicon's S on ink. `inset` is the share of the square left empty around it. */
 const iconHtml = (size, inset, rounded) => `<!doctype html><html><head><style>
 html, body { margin: 0; width: ${size}px; height: ${size}px; overflow: hidden; background: transparent; }
-.box { width: ${size}px; height: ${size}px; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, #1b1640, #0a0a18 70%);
+.box { width: ${size}px; height: ${size}px; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, #151b22, #060709 70%);
   border-radius: ${rounded ? Math.round(size * 0.22) : 0}px; }
 .box svg { width: ${Math.round(size * (1 - inset * 2))}px; height: ${Math.round(size * (1 - inset * 2))}px; }
-.box svg rect { fill: transparent; }
+.box svg rect:first-child { fill: transparent; }
 </style></head><body><div class="box">${favicon}</div></body></html>`;
 
 function ico(pngs) {

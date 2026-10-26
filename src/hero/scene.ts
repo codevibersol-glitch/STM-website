@@ -1,206 +1,192 @@
-// The hero's three.js scene, loaded only after the first paint and only when motion is allowed.
-// Glowing particles draw the rune circle, turning slowly; scroll progress (0..1) reassembles them
-// into a hand offering a key.
+// The hero's three.js scene, loaded only after the first paint, on wide screens, and only when motion is allowed
+// (see MapHero.tsx): a low-poly navmesh landscape, three mob camps and the route bending round them, with an agent
+// walking it. The camera drifts a little and follows the pointer.
 
 import {
   AdditiveBlending,
-  BufferAttribute,
-  BufferGeometry,
+  AmbientLight,
+  CatmullRomCurve3,
+  CircleGeometry,
+  ConeGeometry,
+  DirectionalLight,
+  Fog,
+  LineBasicMaterial,
+  LineSegments,
+  Mesh,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
   PerspectiveCamera,
-  Points,
+  PlaneGeometry,
+  PointLight,
+  RingGeometry,
   Scene,
-  ShaderMaterial,
+  SphereGeometry,
+  TubeGeometry,
+  Vector3,
   WebGLRenderer,
+  WireframeGeometry,
+  type BufferGeometry,
+  type Material,
 } from 'three';
-import { buildParticles } from './shapes';
+import { CAMERA, CAMPS, heightAt, sampleRoute, WORLD } from './terrain';
 
-export interface RuneScene {
-  /** 0 = rune circle, 1 = hand and key. Eased towards, never jumped to. */
-  setProgress(p: number): void;
-  /** -1..1 each, for a slight parallax tilt. */
+export interface MapScene {
+  /** -1..1 each, for a slight camera parallax. */
   setPointer(x: number, y: number): void;
   start(): void;
   stop(): void;
   dispose(): void;
 }
 
-const VERTEX = /* glsl */ `
-attribute vec3 aEnd;
-attribute vec3 aColorA;
-attribute vec3 aColorB;
-attribute float aSeed;
-uniform float uTime;
-uniform float uProgress;
-uniform float uSize;
-varying vec3 vColor;
-varying float vAlpha;
+const ACCENT = 0xc6ff3a;
+const DANGER = 0xff6b5e;
+const BG = 0x060709;
 
-vec2 rot(vec2 p, float a) { float c = cos(a), s = sin(a); return vec2(c * p.x - s * p.y, s * p.x + c * p.y); }
-
-void main() {
-  float delay = aSeed * 0.4;
-  float t = clamp((uProgress - delay) / 0.6, 0.0, 1.0);
-  t = t * t * (3.0 - 2.0 * t);
-
-  vec3 s = position;
-  s.xy = rot(s.xy, -uTime * 0.06);
-  vec3 e = aEnd;
-  e.xy += vec2(sin(uTime * 0.9 + aSeed * 31.0), cos(uTime * 0.8 + aSeed * 17.0)) * 0.006;
-
-  vec3 p = mix(s, e, t);
-  float mid = sin(t * 3.14159265);
-  float a = aSeed * 6.2831853 + uTime * 0.4;
-  p.xy += vec2(cos(a), sin(a)) * mid * (0.18 + aSeed * 0.3);
-  p.z += mid * (aSeed - 0.5) * 0.9;
-
-  vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  gl_Position = projectionMatrix * mv;
-  float twinkle = 0.7 + 0.3 * sin(uTime * 1.7 + aSeed * 47.0);
-  gl_PointSize = uSize * (0.55 + aSeed * 0.9) * (0.85 + 0.3 * twinkle) * (3.4 / -mv.z);
-  vColor = mix(aColorA, aColorB, t);
-  vAlpha = 0.45 + 0.55 * twinkle;
-}
-`;
-
-const FRAGMENT = /* glsl */ `
-varying vec3 vColor;
-varying float vAlpha;
-void main() {
-  float d = length(gl_PointCoord - 0.5);
-  float glow = smoothstep(0.5, 0.0, d);
-  glow *= glow;
-  float core = smoothstep(0.16, 0.0, d);
-  float a = (glow * 0.85 + core * 0.6) * vAlpha;
-  gl_FragColor = vec4(vColor * a, a);
-}
-`;
-
-function webglWorks(canvas: HTMLCanvasElement): boolean {
-  try {
-    return !!(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
-  } catch {
-    return false;
+/** Lays a flat XZ geometry (centred at 0) onto the terrain around (cx, cz). */
+function drape(geometry: BufferGeometry, cx: number, cz: number, lift: number): BufferGeometry {
+  geometry.rotateX(-Math.PI / 2);
+  const pos = geometry.attributes.position!;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) + cx;
+    const z = pos.getZ(i) + cz;
+    pos.setXYZ(i, x, heightAt(x, z) + lift, z);
   }
+  pos.needsUpdate = true;
+  return geometry;
 }
 
-/** Gives the browser a turn between the heavy steps, so starting the scene never blocks a tap. */
-const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
-
-export async function createRuneScene(canvas: HTMLCanvasElement, count: number): Promise<RuneScene | null> {
-  // Probe a throwaway canvas: getContext on the real one would fix its context type.
-  if (!webglWorks(document.createElement('canvas'))) return null;
-
-  const set = buildParticles(count);
-  await yieldToMain();
-
+export function createMapScene(canvas: HTMLCanvasElement): MapScene | null {
   let renderer: WebGLRenderer;
   try {
-    renderer = new WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'low-power' });
+    renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   } catch {
     return null;
   }
-  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setClearColor(BG, 0);
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(38, 1, 0.1, 20);
-  camera.position.set(0, 0, 3.45);
+  scene.fog = new Fog(BG, 17, 46);
+  const camera = new PerspectiveCamera(CAMERA.fov, 1, 0.1, 80);
+  const base = new Vector3(...CAMERA.position);
+  const target = new Vector3(...CAMERA.target);
+  camera.position.copy(base);
+  camera.lookAt(target);
 
-  const geometry = new BufferGeometry();
-  geometry.setAttribute('position', new BufferAttribute(set.start, 3));
-  geometry.setAttribute('aEnd', new BufferAttribute(set.end, 3));
-  geometry.setAttribute('aColorA', new BufferAttribute(set.startColor, 3));
-  geometry.setAttribute('aColorB', new BufferAttribute(set.endColor, 3));
-  geometry.setAttribute('aSeed', new BufferAttribute(set.seed, 1));
-
-  const uniforms = {
-    uTime: { value: 0 },
-    uProgress: { value: 0 },
-    uSize: { value: 6 },
+  const disposables: { dispose(): void }[] = [];
+  const track = <T extends BufferGeometry | Material>(thing: T): T => {
+    disposables.push(thing);
+    return thing;
   };
-  const material = new ShaderMaterial({
-    vertexShader: VERTEX,
-    fragmentShader: FRAGMENT,
-    uniforms,
-    transparent: true,
-    depthWrite: false,
-    depthTest: false,
-    blending: AdditiveBlending,
-  });
-  const points = new Points(geometry, material);
-  points.frustumCulled = false;
-  scene.add(points);
 
-  let target = 0;
-  let pointerX = 0;
-  let pointerY = 0;
-  let running = false;
-  let frame = 0;
-  let last = performance.now();
-  let width = 0;
-  let height = 0;
+  // Terrain: a faceted surface plus a faint wireframe, the "navmesh" look.
+  const ground = track(new PlaneGeometry(WORLD.width, WORLD.depth, 72, 46));
+  ground.rotateX(-Math.PI / 2);
+  const gpos = ground.attributes.position!;
+  for (let i = 0; i < gpos.count; i++) gpos.setY(i, heightAt(gpos.getX(i), gpos.getZ(i)));
+  ground.computeVertexNormals();
+  const faceted = track(ground.toNonIndexed());
+  faceted.computeVertexNormals();
+  scene.add(new Mesh(faceted, track(new MeshLambertMaterial({ color: 0x151b22, flatShading: true }))));
+  const wire = track(new WireframeGeometry(ground));
+  scene.add(new LineSegments(wire, track(new LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.13 }))));
+
+  scene.add(new AmbientLight(0x9fb3c8, 0.7));
+  const sun = new DirectionalLight(0xcfdcff, 1.5);
+  sun.position.set(-8, 12, 6);
+  scene.add(sun);
+
+  // Camps: a draped disc, a ring and the mobs.
+  const mobs: { mesh: Mesh; y: number; phase: number }[] = [];
+  const mobGeo = track(new ConeGeometry(0.13, 0.36, 6));
+  const mobMat = track(new MeshBasicMaterial({ color: DANGER }));
+  for (const camp of CAMPS) {
+    const disc = track(drape(new CircleGeometry(camp.r, 48), camp.x, camp.z, 0.06));
+    scene.add(new Mesh(disc, track(new MeshBasicMaterial({ color: DANGER, transparent: true, opacity: 0.1, depthWrite: false }))));
+    const ring = track(drape(new RingGeometry(camp.r - 0.07, camp.r, 72), camp.x, camp.z, 0.08));
+    scene.add(new Mesh(ring, track(new MeshBasicMaterial({ color: DANGER, transparent: true, opacity: 0.6, depthWrite: false }))));
+    camp.mobs.forEach(([x, z], i) => {
+      const mesh = new Mesh(mobGeo, mobMat);
+      const y = heightAt(x, z) + 0.24;
+      mesh.position.set(x, y, z);
+      scene.add(mesh);
+      mobs.push({ mesh, y, phase: i * 1.7 + camp.x });
+    });
+  }
+
+  // The route and its glow.
+  const curve = new CatmullRomCurve3(sampleRoute(90).map(([x, y, z]) => new Vector3(x, y, z)));
+  scene.add(new Mesh(track(new TubeGeometry(curve, 420, 0.05, 6)), track(new MeshBasicMaterial({ color: ACCENT }))));
+  scene.add(
+    new Mesh(
+      track(new TubeGeometry(curve, 420, 0.2, 8)),
+      track(new MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.14, blending: AdditiveBlending, depthWrite: false })),
+    ),
+  );
+
+  // The agent: a bright core, a halo and a light that tints the facets it passes.
+  const agentMat = track(new MeshBasicMaterial({ color: 0xf6ffe0, transparent: true }));
+  const haloMat = track(new MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.22, blending: AdditiveBlending, depthWrite: false }));
+  const agent = new Mesh(track(new SphereGeometry(0.17, 20, 14)), agentMat);
+  const halo = new Mesh(track(new SphereGeometry(0.5, 20, 14)), haloMat);
+  const glow = new PointLight(ACCENT, 7, 7, 1.7);
+  scene.add(agent, halo, glow);
 
   const resize = () => {
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(1, Math.round(rect.width));
-    const h = Math.max(1, Math.round(rect.height));
-    if (w === width && h === height) return;
-    width = w;
-    height = h;
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    renderer.setPixelRatio(ratio);
+    const { clientWidth: w, clientHeight: h } = canvas;
+    if (w === 0 || h === 0) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    uniforms.uSize.value = Math.max(3.2, Math.min(w, h) / 105) * ratio;
   };
-  const observer = new ResizeObserver(resize);
-  observer.observe(canvas);
   resize();
-  // Compiles the shaders off the main thread where the browser can (KHR_parallel_shader_compile).
-  try {
-    await renderer.compileAsync(scene, camera);
-  } catch {
-    // Older drivers: the first render compiles them instead.
-  }
-  await yieldToMain();
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
 
-  const tick = (now: number) => {
-    if (!running) return;
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    uniforms.uTime.value += dt;
-    const p = uniforms.uProgress.value;
-    uniforms.uProgress.value = p + (target - p) * Math.min(1, dt * 4.5);
-    points.rotation.y += (pointerX * 0.22 - points.rotation.y) * Math.min(1, dt * 3);
-    points.rotation.x += (-pointerY * 0.16 - points.rotation.x) * Math.min(1, dt * 3);
+  const pointer = { x: 0, y: 0 };
+  let frame = 0;
+  let running = false;
+  const started = performance.now();
+  const render = (now: number) => {
+    frame = 0;
+    // A rAF timestamp can be a little earlier than the performance.now() taken at mount; never let time go negative.
+    const t = Math.max(0, now - started) / 1000;
+    const u = (t * 0.032) % 1;
+    const p = curve.getPointAt(u);
+    agent.position.copy(p);
+    halo.position.copy(p);
+    glow.position.set(p.x, p.y + 0.8, p.z);
+    const edge = Math.min(u / 0.04, (1 - u) / 0.04, 1);
+    agentMat.opacity = edge;
+    haloMat.opacity = 0.22 * edge;
+    for (const mob of mobs) mob.mesh.position.y = mob.y + Math.sin(t * 2 + mob.phase) * 0.05;
+
+    camera.position.set(base.x + Math.sin(t * 0.09) * 1.1 + pointer.x * 0.7, base.y - pointer.y * 0.3, base.z);
+    camera.lookAt(target);
     renderer.render(scene, camera);
-    frame = requestAnimationFrame(tick);
+    if (running) frame = requestAnimationFrame(render);
   };
 
   return {
-    setProgress(p) {
-      target = Math.min(1, Math.max(0, p));
-    },
     setPointer(x, y) {
-      pointerX = x;
-      pointerY = y;
+      pointer.x = x;
+      pointer.y = y;
     },
     start() {
       if (running) return;
       running = true;
-      last = performance.now();
-      frame = requestAnimationFrame(tick);
+      frame = requestAnimationFrame(render);
     },
     stop() {
       running = false;
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
     },
     dispose() {
       running = false;
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      geometry.dispose();
-      material.dispose();
+      if (frame) cancelAnimationFrame(frame);
+      ro.disconnect();
+      for (const thing of disposables) thing.dispose();
       renderer.dispose();
     },
   };

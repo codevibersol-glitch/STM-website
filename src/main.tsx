@@ -1,7 +1,8 @@
 // Fonts are self-hosted (bundled from @fontsource) and only the Latin subsets are shipped.
 import '@fontsource/atkinson-hyperlegible/latin-400.css';
 import '@fontsource/atkinson-hyperlegible/latin-700.css';
-import '@fontsource/marcellus/latin-400.css';
+// Headings. The variable font covers every weight in one file; the browser fetches only the Latin part here.
+import '@fontsource-variable/space-grotesk/wght.css';
 // Declared for the toolbar's dyslexia-friendly font; the browser only downloads it once it is chosen.
 import '@fontsource/opendyslexic/latin-400.css';
 import '@fontsource/opendyslexic/latin-700.css';

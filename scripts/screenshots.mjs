@@ -1,6 +1,7 @@
 // Screenshots of the built site into screenshots/ (the pictures' own captures are made by shots.mjs):
 //   full-390.png, full-768.png, full-1440.png  - the whole page (reduced motion, so every part is shown)
-//   hero-<width>-runes.png / -hand-key.png     - the live 3D hero at load, and after scrolling
+//   hero-1440-map.png                          - the live 3D map hero (wide screens only)
+//   hero-390-poster.png                        - the still map phones see
 // Run after a build:  npm run build && npm run screenshots
 
 import { chromium } from '@playwright/test';
@@ -46,30 +47,24 @@ try {
     }
   }
   if (!only.length || only.includes('hero')) {
-    for (const [width, height] of [
-      [1440, 900],
-      [390, 844],
-    ]) {
-      const context = await browser.newContext({ viewport: { width, height } });
+    {
+      const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
       const page = await context.newPage();
       await page.goto(base, { waitUntil: 'networkidle' });
-      await page.waitForSelector('.rune-figure.is-live', { timeout: 20000 });
-      await page.waitForTimeout(1800);
-      await page.screenshot({ path: join(out, `hero-${width}-runes.png`) });
-      await page.evaluate(() => {
-        const pin = document.querySelector('[data-hero-pin]');
-        const sticky = document.querySelector('[data-hero-sticky]');
-        if (pin && sticky && getComputedStyle(sticky).position === 'sticky') {
-          window.scrollTo(0, pin.offsetHeight - window.innerHeight);
-        } else {
-          const r = document.querySelector('.rune-figure').getBoundingClientRect();
-          window.scrollBy(0, r.top + r.height / 2 - window.innerHeight * 0.32);
-        }
-      });
-      await page.waitForTimeout(3200);
-      await page.screenshot({ path: join(out, `hero-${width}-hand-key.png`) });
+      await page.waitForSelector('.hero-map.is-live', { timeout: 20000 });
+      await page.waitForTimeout(2500);
+      await page.screenshot({ path: join(out, 'hero-1440-map.png') });
       await context.close();
-      console.log(`  hero-${width}-runes.png, hero-${width}-hand-key.png`);
+      console.log('  hero-1440-map.png');
+    }
+    {
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+      const page = await context.newPage();
+      await page.goto(base, { waitUntil: 'networkidle' });
+      await page.evaluate(() => document.fonts.ready);
+      await page.screenshot({ path: join(out, 'hero-390-poster.png') });
+      await context.close();
+      console.log('  hero-390-poster.png');
     }
   }
 } finally {

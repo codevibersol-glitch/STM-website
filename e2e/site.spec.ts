@@ -22,14 +22,25 @@ function watchErrors(page: Page): string[] {
   return errors;
 }
 
-/** Scrolls to the bottom in steps, so every reveal and observer fires, then back to the top. */
+/**
+ * Scrolls to the bottom in steps, so every reveal and observer fires. The jumps are instant (the page scrolls
+ * smoothly otherwise, and a check made mid-glide would see a section half faded in), and the last one waits until the
+ * scroll position and the scroll-driven reveals have settled.
+ */
 async function scrollThrough(page: Page) {
   await page.evaluate(async () => {
+    const frame = () => new Promise((r) => requestAnimationFrame(() => r(null)));
     for (let y = 0; y < document.body.scrollHeight; y += Math.round(window.innerHeight * 0.6)) {
-      window.scrollTo(0, y);
+      window.scrollTo({ top: y, behavior: 'instant' });
       await new Promise((r) => setTimeout(r, 90));
     }
-    window.scrollTo(0, document.body.scrollHeight);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' });
+    let last = -1;
+    while (window.scrollY !== last) {
+      last = window.scrollY;
+      await frame();
+      await frame();
+    }
     await new Promise((r) => setTimeout(r, 400));
   });
 }
@@ -45,7 +56,7 @@ test('loads with no console errors or CSP violations, and the 3D hero starts', a
   const errors = watchErrors(page);
   const response = await page.goto('/');
   expect(response?.headers()['content-security-policy']).toContain("default-src 'self'");
-  await expect(page.locator('.rune-figure.is-live')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.hero-map.is-live')).toBeVisible({ timeout: 20_000 });
   await scrollThrough(page);
   expect(errors).toEqual([]);
 });
@@ -55,7 +66,7 @@ test('is readable without JavaScript', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('WoW accessibility addon and leveling tool');
-  const ids = ['versions', 'who', 'how', 'features', 'results', 'time-back', 'accessibility', 'faq', 'feedback'];
+  const ids = ['versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'accessibility', 'faq', 'feedback'];
   if (Object.keys(SHOTS).length > 0) ids.push('see');
   for (const id of ids) {
     await expect(page.locator(`#${id} h2`)).toBeVisible();
@@ -115,15 +126,15 @@ test('keeps everything on screen at 200% zoom with the largest text', async ({ b
   await context.close();
 });
 
-test('with reduced motion: no 3D scene, no hidden reveals, the still rune poster instead', async ({ browser }) => {
+test('with reduced motion: no 3D scene, no hidden reveals, the still map instead', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
   await page.goto('/');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(1500);
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
-  await expect(page.locator('.rune-figure')).not.toHaveClass(/is-live/);
-  await expect(page.locator('.rune-poster')).toBeVisible();
+  await expect(page.locator('.hero-map')).not.toHaveClass(/is-live/);
+  await expect(page.locator('.hero-poster')).toBeVisible();
   const hidden = await page.evaluate(
     () => [...document.querySelectorAll('[data-reveal]')].filter((el) => getComputedStyle(el).opacity !== '1').length,
   );
@@ -214,6 +225,52 @@ test('one app for every version: plain names, what is coming soon, and the beta 
   expect(await soon.count()).toBeGreaterThan(0);
   for (const item of await soon.all()) await expect(item).toContainText('Coming soon');
   await expect(versions.locator('.card')).toHaveCount(0);
+});
+
+test('the goals model: switching the guard off turns a flee into a fight', async ({ page }) => {
+  await page.goto('/');
+  const model = page.locator('#model-planner');
+  await model.scrollIntoViewIfNeeded();
+  await expect(model.getByTestId('planner-why')).toContainText('Flee to a guard');
+  const guard = model.getByRole('button', { name: 'A guard is reachable alive' });
+  await expect(guard).toHaveAttribute('aria-pressed', 'true');
+  await guard.click();
+  await expect(guard).toHaveAttribute('aria-pressed', 'false');
+  await expect(model.getByTestId('planner-why')).toContainText('Fight');
+});
+
+test('the score model: another level moves the winner', async ({ page }) => {
+  await page.goto('/');
+  const model = page.locator('#model-scorer');
+  await model.scrollIntoViewIfNeeded();
+  const winner = model.getByTestId('scorer-winner');
+  const before = await winner.textContent();
+  await model.getByRole('button', { name: 'Level 16' }).click();
+  await expect(winner).toContainText('At level 16');
+  expect(await winner.textContent()).not.toBe(before);
+  await expect(model.locator('[data-winner]')).toHaveCount(1);
+});
+
+test('the maps model: the straight line costs pulls, the priced path none', async ({ page }) => {
+  await page.goto('/');
+  const model = page.locator('#model-map');
+  await model.scrollIntoViewIfNeeded();
+  await expect(model.getByTestId('map-pulls')).toHaveText('0');
+  await model.getByRole('button', { name: 'Straight through' }).click();
+  await expect(model.getByTestId('map-pulls')).not.toHaveText('0');
+});
+
+test('the Telegram model answers /status, /stop and /resume', async ({ page }) => {
+  await page.goto('/');
+  const model = page.locator('#model-telegram');
+  await model.scrollIntoViewIfNeeded();
+  const log = model.getByTestId('chat-log');
+  await model.getByRole('button', { name: '/status' }).click();
+  await expect(log).toContainText('Running');
+  await model.getByRole('button', { name: '/stop' }).click();
+  await expect(log).toContainText('every key released');
+  await model.getByRole('button', { name: '/resume' }).click();
+  await expect(log).toContainText('Started again');
 });
 
 test('the pictures load, fit the screen and cause no CSP errors', async ({ browser }) => {

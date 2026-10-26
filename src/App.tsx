@@ -1,4 +1,5 @@
 import { Header } from './components/Header';
+import { HowItWorks } from './components/HowItWorks';
 import {
   Commitment,
   Faq,
@@ -25,15 +26,11 @@ export function App() {
       <a className="skip-link" href="#main">
         {SKIP_LINK}
       </a>
-      <div className="aurora" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
       <Header />
       <main id="main" tabIndex={-1}>
         <Hero />
         <Versions />
+        <HowItWorks />
         <Gallery />
         <Who />
         <How />

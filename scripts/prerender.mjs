@@ -26,9 +26,9 @@ for (const marker of ['<!--app-html-->', `<script>${ssr.PREFS_SCRIPT}</script>`]
 }
 
 // Preload the two faces of the first screen's text (headline and body), so it settles quickly.
-// Bold and the rune capitals follow on their own; on slow phones they would only compete.
+// Bold body text follows on its own; on slow phones it would only compete.
 const assets = await readdir(join(dist, 'assets'));
-const fontPatterns = [/^marcellus-latin-400-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/];
+const fontPatterns = [/^space-grotesk-latin-wght-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/];
 const preloads = fontPatterns
   .map((re) => assets.find((a) => re.test(a)))
   .filter(Boolean)
@@ -67,6 +67,7 @@ const notFound = `<!doctype html>
       path: '/404.html',
       title: 'Page not found – STM',
       description: 'This page does not exist. Head back to STM, the WoW accessibility addon and leveling tool.',
+      // (The 404 page has the same look: no inline script of its own.)
       notFound: true,
     })}
     ${stylesheets.join('\n    ')}
