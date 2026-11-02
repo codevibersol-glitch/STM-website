@@ -31,7 +31,7 @@ export const HERO = {
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
   secondaryCta: 'See how it works',
-  trust: ['Every WoW version', 'Pre-sale until launch', 'No tracking', 'Telegram only'],
+  trust: ['Every WoW version', 'Every race and class', 'Pre-sale until launch', 'No tracking', 'Telegram only'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
@@ -77,7 +77,7 @@ export const HOW = {
     },
     {
       title: "Choose your character's plan",
-      text: 'Pick your class profile and what matters to you: leveling, gathering or crafting. Questing is coming soon.',
+      text: 'Pick any race and any class, and what matters to you: leveling, gathering or crafting. Questing is coming soon.',
     },
     {
       title: 'Watch, take over, or check from your phone',
@@ -95,16 +95,17 @@ export const FEATURES_COPY = {
 export const RESULTS_COPY = {
   eyebrow: 'Results',
   title: 'Measured, not promised',
-  intro: "Real numbers from STM's own logs. STM is in beta, so these are the levels measured so far.",
+  intro:
+    "Real numbers from STM's own logs. STM is in beta and ready for the launch, for every race and every class. These are the levels measured so far. The hours to 60 carry that pace forward.",
   sourcesTitle: 'Sources',
 };
 
 export const TIME_BACK = {
   eyebrow: 'Time back',
   title: 'Hours of leveling, off your hands',
-  before: 'Levels 1 to 26 took STM',
-  after: 'of play on one character. That is time you do not have to spend at the keyboard repeating the same fights.',
-  note: 'Your time will differ with your class, the realm and how you play.',
+  before: 'Levels 1 to 39 took STM',
+  after: 'of play on one Warrior. That is time you do not have to spend at the keyboard repeating the same fights.',
+  note: 'The hours to 60, at this same pace, are in the Results. Your time will differ with your class, the realm and how you play.',
   unitWord: 'hours',
 };
 

@@ -19,6 +19,7 @@ export const VERSIONS_COPY = {
   eyebrow: 'Every version',
   title: 'One app for every version of the game',
   intro: 'STM controls them all from one app, so you never look for a different tool for a different version of World of Warcraft.',
+  ready: 'It is ready for the launch, for every race and every class.',
   listLabel: 'Versions STM controls',
   soonLabel: 'Coming soon',
 };

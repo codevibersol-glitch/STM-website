@@ -12,7 +12,7 @@ export const FEATURES: readonly Feature[] = [
     id: 'leveling',
     icon: 'compass',
     title: 'Hands-free leveling, all the way to max level',
-    text: 'STM walks to enemies and fights them, so your character levels while your hands rest. Questing is coming soon.',
+    text: 'STM walks to enemies and fights them, for every race and every class, so your character levels while your hands rest. Questing is coming soon.',
   },
   {
     id: 'rotation',

@@ -66,7 +66,7 @@ export const PRICING: Pricing = {
   includes: [
     'Every feature on this page: leveling, combat that retreats from a lost fight, resting, looting, selling, repairing, gathering and crafting',
     'The in-game NOW and NEXT panel, the dashboard on your PC, and Telegram control from your phone',
-    'Beta access today: STM is ready to use, with setup help on Telegram',
+    'Ready for the launch: every race and every class, with setup help on Telegram',
   ],
   steps: [
     `Message ${TELEGRAM_HANDLE} on Telegram and say which plan you want.`,

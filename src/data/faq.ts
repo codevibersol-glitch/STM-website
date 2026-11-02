@@ -28,7 +28,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'beta',
     q: 'What does beta mean?',
-    a: 'STM is in beta: it already runs and plays, and we are still improving it. It is built to play from the first level up to max level. Some stretches are better tested than others, and the Results section shows exactly which levels have been measured. If you meet a rough edge, tell us on Telegram.',
+    a: 'STM is in beta: it already runs and plays, and we are still improving it. It is ready for the launch, for every race and every class, and it is built to play from the first level up to max level. The Results section shows the levels measured so far, and the hours on to 60 at the measured pace. Some stretches are better tested than others. If you meet a rough edge, tell us on Telegram.',
   },
   {
     id: 'cost',

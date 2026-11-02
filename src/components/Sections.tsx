@@ -130,7 +130,9 @@ export function Versions() {
           </ul>
           <p className="beta-line">
             <span className="chip chip-beta">{BETA_LABEL}</span>
-            <span>STM plays {BETA_REACH}.</span>
+            <span>
+              STM plays {BETA_REACH}. {VERSIONS_COPY.ready}
+            </span>
           </p>
         </div>
       </div>

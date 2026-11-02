@@ -185,7 +185,7 @@ describe('honest claims', () => {
   });
 
   it('labels the results exactly as the brief asks', () => {
-    expect(stats.label).toBe('measured October 2026, WoW: Forever beta, two characters');
+    expect(stats.label).toBe('measured October and November 2026, WoW: Forever beta, Warrior, Rogue and Mage');
     expect(text).toContain(stats.label);
   });
 

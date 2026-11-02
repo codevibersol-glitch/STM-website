@@ -1,65 +1,74 @@
 {
-  "label": "measured October 2026, WoW: Forever beta, two characters",
+  "label": "measured October and November 2026, WoW: Forever beta, Warrior, Rogue and Mage",
   "stats": [
     {
       "id": "xp-median",
       "marker": "a",
       "prefix": "",
-      "value": "6,961",
+      "value": "13,170",
       "unit": "XP/h",
-      "label": "in a typical hour (the median) at levels 27–29, from kills alone; 77% of hours topped 6,000",
-      "short": "in a typical hour at levels 27–29",
-      "source": "Human Warrior, 13 October 2026: STM's pace meter, experience from kills per hour of play, measured every 10 minutes over the past hour (101 readings). Quest experience comes on top."
+      "label": "in a typical hour (the median) at levels 36–38, from kills alone; 92% of hours topped 6,000",
+      "short": "in a typical hour at levels 36–38",
+      "source": "Warrior, 1 November 2026: STM's pace meter, experience from kills per hour of play, measured every 10 minutes over the past hour (62 readings). Quest experience comes on top."
     },
     {
       "id": "xp-best",
       "marker": "b",
       "prefix": "",
-      "value": "10,428",
+      "value": "18,256",
       "unit": "XP/h",
-      "label": "in the best full hour so far, at level 25",
-      "source": "STM's pace meter, Rogue, 18 October 2026, 15:28 to 16:28."
+      "label": "in the best full hour so far, at level 36",
+      "source": "STM's pace meter, Warrior, 1 November 2026, 07:08 to 08:08."
     },
     {
       "id": "hours",
       "marker": "c",
       "prefix": "about",
-      "value": "100",
-      "count": 100,
+      "value": "150",
+      "count": 150,
       "unit": "h",
-      "label": "of play from level 1 to 26",
-      "source": "Rogue, 13 to 18 October 2026: the bot's running time in its fight log (102.9 h), with pauses of over 20 minutes left out."
+      "label": "of play from level 1 to 39",
+      "source": "Warrior, 24 October to 2 November 2026: the bot's running time in its fight log from level 1 until the first fight at level 39 (153.7 h), with pauses of over 20 minutes left out."
+    },
+    {
+      "id": "to-60",
+      "marker": "d",
+      "prefix": "about",
+      "value": "380",
+      "unit": "h",
+      "label": "of play from level 1 to 60 at the pace measured in the 30s, from kills alone",
+      "source": "Warrior, 24 October to 2 November 2026: 153.7 h of play from level 1 to 39, pauses of over 20 minutes left out. Classic experience from 39 to 60 is 3,016,000. At the median 13,170 XP/h from kills at levels 36–38, that remaining stretch is 229 h, 383 h in all, shown as about 380. Quest experience comes on top. Levels past 39 are a projection from that pace, not a measured run."
     },
     {
       "id": "kills",
-      "marker": "d",
+      "marker": "e",
       "prefix": "",
-      "value": "4,566",
+      "value": "7,436",
       "unit": "",
-      "label": "kills on the way to level 26, in under five days",
-      "source": "The Rogue's fight log, 13 to 18 October 2026."
+      "label": "kills on the way to level 39, in under ten days",
+      "source": "The Warrior's fight log, 24 October to 2 November 2026."
     },
     {
       "id": "reach",
-      "marker": "e",
+      "marker": "f",
       "prefix": "level",
-      "value": "29",
+      "value": "39",
       "unit": "",
-      "label": "the highest level measured so far (the Warrior). STM is in beta and built to go on to max level",
-      "source": "Human Warrior, 13 October 2026: STM's pace meter readings reach level 29, in the WoW: Forever beta."
+      "label": "the highest level measured so far (the Warrior). STM is in beta, ready for the launch, and built to go on to max level",
+      "source": "Warrior, 2 November 2026: the fight log reaches level 39, in the WoW: Forever beta."
     },
     {
       "id": "deaths",
-      "marker": "f",
+      "marker": "g",
       "prefix": "",
-      "value": "572",
+      "value": "680",
       "unit": "",
       "label": "deaths, each analysed automatically, with fixes made from them",
-      "source": "STM's death reports, 2 to 18 October 2026."
+      "source": "STM's death reports, 2 to 23 October 2026."
     },
     {
       "id": "tests",
-      "marker": "g",
+      "marker": "h",
       "prefix": "",
       "value": "3,382",
       "unit": "",
