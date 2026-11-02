@@ -13,6 +13,7 @@ import {
   PRICING_COPY,
   RESULTS_COPY,
   TIME_BACK,
+  UPDATES,
   WHO,
 } from '../data/copy';
 import { FAQ } from '../data/faq';
@@ -20,7 +21,7 @@ import { FEATURES } from '../data/features';
 import { GALLERY_COPY } from '../data/gallery';
 import { PRICING, billingWords, formatPrice, plan, presaleOver, saving } from '../data/pricing';
 import { SHOTS, type PlacedShot } from '../data/shots';
-import { BETA_LABEL, BETA_REACH, CREDITS, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
+import { BETA_LABEL, BETA_REACH, CREDITS, KLAVIYO_FORM_ID, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
 import { CopyTemplate } from './CopyTemplate';
@@ -499,6 +500,25 @@ export function Feedback() {
   );
 }
 
+/** Optional email list. The form itself is drawn by Klaviyo into the container div. */
+export function Updates() {
+  return (
+    <section id="updates" className="section" aria-labelledby="updates-title">
+      <div className="wrap">
+        <div className="signup">
+          <SectionHead id="updates-title" eyebrow={UPDATES.eyebrow} title={UPDATES.title} intro={UPDATES.intro} />
+          <div className="signup-form">
+            <div className={`klaviyo-form-${KLAVIYO_FORM_ID}`} />
+          </div>
+          <p className="signup-fallback">
+            {UPDATES.fallback} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="site-footer">
@@ -538,14 +558,14 @@ export function Footer() {
 
 /**
  * The phone-only Telegram button. It appears once the hero's own Telegram button has scrolled away
- * above, and steps aside again for the pricing and feedback sections and the footer, which have their
- * own - so it never sits on top of the first screen or of a buy button.
+ * above, and steps aside again for the pricing, feedback and email sections and the footer, which have
+ * their own - so it never sits on top of the first screen, a buy button or the signup form.
  */
 export function FloatingTelegram() {
   const [hidden, setHidden] = useState(true);
   useEffect(() => {
     const hero = document.querySelector('.hero-ctas');
-    const others = ['#pricing', '#feedback', '.site-footer'].map((s) => document.querySelector(s)).filter((el): el is Element => el !== null);
+    const others = ['#pricing', '#feedback', '#updates', '.site-footer'].map((s) => document.querySelector(s)).filter((el): el is Element => el !== null);
     if (!hero || !('IntersectionObserver' in window)) return;
     let heroPassed = false;
     const othersOnScreen = new Map<Element, boolean>();

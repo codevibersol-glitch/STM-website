@@ -52,6 +52,30 @@ async function axe(page: Page) {
   return results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
 }
 
+test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) => {
+  const errors = watchErrors(page);
+  const klaviyo = page.waitForResponse(
+    (r) => r.url().startsWith('https://static.klaviyo.com/onsite/js/RsQHMM/klaviyo.js') && r.request().resourceType() === 'script',
+  );
+  const response = await page.goto('/');
+  const csp = response?.headers()['content-security-policy'] ?? '';
+  expect(csp).toContain('https://static.klaviyo.com');
+  expect(csp).toContain('https://static-tracking.klaviyo.com');
+  expect(csp).toContain('https://a.klaviyo.com');
+  expect(csp).toContain('https://fast.a.klaviyo.com');
+  expect(csp).toContain('https://static-forms.klaviyo.com');
+  expect(csp).toContain("form-action 'none'");
+  expect((await klaviyo).ok()).toBe(true);
+  await expect(page.locator('#updates-title')).toHaveText('Get STM updates');
+  await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(1);
+  await page.locator('#updates').scrollIntoViewIfNeeded();
+  // The loader then pulls the form and its modules. Klaviyo's analytics beacon can fail CORS on
+  // localhost (their server, not our CSP). Only a Content-Security-Policy refusal fails this test.
+  await page.waitForTimeout(2500);
+  expect(errors.filter((e) => /content security policy/i.test(e))).toEqual([]);
+  await expect(page.locator('#updates').getByRole('textbox', { name: 'Email address' })).toBeVisible();
+});
+
 test('loads with no console errors or CSP violations, and the 3D hero starts', async ({ page }) => {
   const errors = watchErrors(page);
   const response = await page.goto('/');
@@ -66,7 +90,7 @@ test('is readable without JavaScript', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('WoW accessibility addon and leveling tool');
-  const ids = ['versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'accessibility', 'faq', 'feedback'];
+  const ids = ['versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'accessibility', 'faq', 'feedback', 'updates'];
   if (Object.keys(SHOTS).length > 0) ids.push('see');
   for (const id of ids) {
     await expect(page.locator(`#${id} h2`)).toBeVisible();

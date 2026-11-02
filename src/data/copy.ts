@@ -31,7 +31,7 @@ export const HERO = {
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
   secondaryCta: 'See how it works',
-  trust: ['Every WoW version', 'Every race and class', 'Pre-sale until launch', 'No tracking', 'Telegram only'],
+  trust: ['Every WoW version', 'Every race and class', 'Pre-sale until launch', 'Telegram + email updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
@@ -133,7 +133,7 @@ export const COMMITMENT = {
   points: [
     'Text size, high contrast, reduced motion and a dyslexia-friendly font',
     'Full keyboard use, visible focus and screen-reader labels',
-    'No tracking, no cookies, no sign-up',
+    'No account needed. The email list is optional.',
   ],
   cta: 'Shape the roadmap on Telegram',
 };
@@ -169,12 +169,19 @@ export const FEEDBACK = {
   copiedAnnouncement: 'Feedback template copied. Paste it into Telegram.',
   copyFailed: 'Select the template and copy it',
   send: 'Send it on Telegram',
-  note: 'This page sends nothing by itself. You write and send the message in Telegram.',
+  note: 'You write and send this message in Telegram. The page does not send the template for you.',
+};
+
+export const UPDATES = {
+  eyebrow: 'Email',
+  title: 'Get STM updates',
+  intro: 'Optional. Launch news and tips by email. Payment and support stay on Telegram.',
+  fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
-  privacy: 'No tracking. No sign-up.',
+  privacy: 'No account needed. Email updates are optional.',
   contact: 'Talk to us on Telegram:',
 };
 

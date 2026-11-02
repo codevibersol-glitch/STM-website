@@ -13,6 +13,7 @@ import {
   Pricing,
   Results,
   TimeBack,
+  Updates,
   Versions,
   Who,
 } from './components/Sections';
@@ -41,6 +42,7 @@ export function App() {
         <Commitment />
         <Faq />
         <Feedback />
+        <Updates />
       </main>
       <Footer />
       <FloatingTelegram />

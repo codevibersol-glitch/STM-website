@@ -2,9 +2,17 @@
 
 export const BRAND = 'STM';
 
-/** The only contact, and the only outbound link on the site. */
+/** The only contact the site itself writes, and the only outbound link in its own markup. */
 export const TELEGRAM_HANDLE = '@HugeKush';
 export const TELEGRAM_URL = 'https://t.me/HugeKush';
+
+/**
+ * Klaviyo embedded signup (form "STM website signup"). The public company id is safe to ship.
+ * klaviyo.js sets the __kla_id cookie and records visits; the privacy copy has to say so.
+ */
+export const KLAVIYO_COMPANY_ID = 'RsQHMM';
+export const KLAVIYO_FORM_ID = 'WL7BMB';
+export const KLAVIYO_SCRIPT_SRC = `https://static.klaviyo.com/onsite/js/${KLAVIYO_COMPANY_ID}/klaviyo.js`;
 
 /** Used when SITE_URL is not set (or is not a valid http/https address). */
 export const DEFAULT_SITE_URL = 'https://stm-website.pages.dev';

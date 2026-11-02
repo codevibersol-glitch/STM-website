@@ -2000,6 +2000,51 @@ html[data-font="dyslexic"] {
     }
   }
 
+  /* ------------------------------------------------------------------------------- email signup
+     A short band above the footer. Klaviyo draws the form into .klaviyo-form-*; the white card,
+     the field label and the success text are theirs. This layout only frames that card. */
+
+  #updates {
+    /* The form script measures this box. content-visibility would leave it unlaid-out until scroll. */
+    content-visibility: visible;
+    padding: clamp(2.75rem, 2rem + 2vw, 4.5rem) 0;
+  }
+  .signup {
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+  .signup .section-head {
+    margin-bottom: 1.5rem;
+  }
+  .signup-form {
+    display: flex;
+    justify-content: center;
+    min-height: 2.5rem;
+  }
+  .signup-form > div {
+    width: min(100%, 28.5rem);
+  }
+  /* Site headings are light, for the dark page. Klaviyo paints this card white and sets the
+     black on a parent, so our h2 color would win and fail contrast. Keep the card's headings dark. */
+  .signup-form :is(h1, h2, h3, h4) {
+    color: #111;
+  }
+  html[data-contrast="high"] .signup-form :is(h1, h2, h3, h4) {
+    color: #000;
+  }
+  .signup-fallback {
+    margin: 1rem 0 0;
+    color: var(--c-muted);
+    text-align: center;
+  }
+  .js .signup-fallback {
+    display: none;
+  }
+  html[data-contrast="high"] .signup-form > div {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
   /* Sections below the first screen are only laid out and painted as they come near. */
   .section {
     content-visibility: auto;

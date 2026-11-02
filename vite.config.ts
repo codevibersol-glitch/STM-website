@@ -23,7 +23,7 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
-    // Fonts and images stay files: the Content-Security-Policy allows only the site's own files.
+    // Fonts and images stay files. The page's own font files are served from this site.
     assetsInlineLimit: 0,
     chunkSizeWarningLimit: 800,
   },

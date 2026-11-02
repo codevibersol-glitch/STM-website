@@ -1,8 +1,9 @@
 // Guardrails for the brief's non-negotiables. They run on the server render, so they see exactly
 // what search engines and visitors without JavaScript see.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { COMMITMENT, FEEDBACK, HERO, HOW, NAV, PRICING_COPY, TIME_BACK, WHO } from '../src/data/copy';
+import { COMMITMENT, FEEDBACK, FOOTER, HERO, HOW, NAV, PRICING_COPY, TIME_BACK, UPDATES, WHO } from '../src/data/copy';
 import { FAQ } from '../src/data/faq';
 import { FEATURES } from '../src/data/features';
 import { GALLERY, GALLERY_COPY } from '../src/data/gallery';
@@ -21,6 +22,8 @@ import {
   RISK_ANSWER,
   SITE_DESCRIPTION,
   SITE_TITLE,
+  KLAVIYO_FORM_ID,
+  KLAVIYO_SCRIPT_SRC,
   TELEGRAM_URL,
   TRADEMARK_NOTICE,
 } from '../src/data/site';
@@ -99,12 +102,17 @@ describe('Telegram is the only channel', () => {
     }
   });
 
-  it('has no forms, email addresses, embeds or third-party resources', () => {
-    expect(html).not.toMatch(/<form|<iframe|<embed|<object|mailto:/i);
+  it('has no email addresses, embeds or third-party resources except the Klaviyo signup script', () => {
+    expect(html).not.toMatch(/<form[\s>]|<iframe|<embed|<object|mailto:/i);
     expect(html + head).not.toMatch(/@[a-z0-9-]+\.[a-z]{2,}/i);
-    const external = [...(html + head).matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map((m) => m[1]);
+    const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    expect(index).toContain(`src="${KLAVIYO_SCRIPT_SRC}"`);
+    expect(index.match(/klaviyo\.js/g)).toHaveLength(1);
+    expect(html).toContain(`class="klaviyo-form-${KLAVIYO_FORM_ID}"`);
+    const external = [...(html + head + index).matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map((m) => m[1] ?? '');
     for (const url of external) {
-      expect(url === TELEGRAM_URL || url?.startsWith(DEFAULT_SITE_URL), url).toBe(true);
+      const allowed = url === TELEGRAM_URL || url === KLAVIYO_SCRIPT_SRC || url.startsWith(DEFAULT_SITE_URL);
+      expect(allowed, `unexpected link ${url}`).toBe(true);
     }
   });
 });
@@ -125,6 +133,20 @@ describe('honest claims', () => {
     );
     expect(text).toContain(RISK_ANSWER);
     expect(FAQ.some((f) => f.a === RISK_ANSWER)).toBe(true);
+  });
+
+  it('does not claim the site has no tracking, cookies or sign-up', () => {
+    expect(text).not.toMatch(/no tracking|no cookies|no sign-up|no forms and/i);
+    expect(copyDeck()).not.toMatch(/no tracking|no cookies|no sign-up|no forms and/i);
+    expect(HERO.trust).toContain('Telegram + email updates');
+    expect(HERO.trust.join(' ')).not.toMatch(/tracking|telegram only/i);
+    expect(COMMITMENT.points).toContain('No account needed. The email list is optional.');
+    expect(FOOTER.privacy).toBe('No account needed. Email updates are optional.');
+    expect(FAQ.find((f) => f.id === 'data')?.a).toBe(
+      'Only if you choose to. The site uses Klaviyo, our email provider, which sets cookies and records visits so we can run the optional email signup. If you join the list, Klaviyo stores your email address to send you STM updates; you get a confirmation email first and every email has an unsubscribe link. Payment and support still happen only on Telegram.',
+    );
+    expect(text).toContain(UPDATES.title);
+    expect(text).toContain(UPDATES.intro);
   });
 
   it('says plainly that STM plays automatically', () => {
@@ -390,7 +412,7 @@ describe('how STM works: the working models', () => {
 
 describe('content without JavaScript', () => {
   it('renders every section, the whole FAQ and the feedback template on the server', () => {
-    const ids = ['top', 'versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'pricing', 'accessibility', 'faq', 'feedback'];
+    const ids = ['top', 'versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'pricing', 'accessibility', 'faq', 'feedback', 'updates'];
     if (SHOTS.length > 0) ids.push('see');
     for (const id of ids) {
       expect(html).toContain(`id="${id}"`);

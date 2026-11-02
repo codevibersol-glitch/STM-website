@@ -15,6 +15,7 @@ import {
   RESULTS_COPY,
   SKIP_LINK,
   TIME_BACK,
+  UPDATES,
   WHO,
 } from '../data/copy';
 import { FAQ } from '../data/faq';
@@ -172,6 +173,12 @@ export function copyDeck(): string {
     `Buttons: ${FEEDBACK.copy} (then "${FEEDBACK.copied}") · ${FEEDBACK.send}`,
     '',
     FEEDBACK.note,
+    '',
+    `## ${UPDATES.title}`,
+    '',
+    `_${UPDATES.eyebrow}_ - ${UPDATES.intro}`,
+    '',
+    UPDATES.fallback,
     '',
     '## Footer',
     '',
