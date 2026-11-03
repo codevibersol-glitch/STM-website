@@ -73,7 +73,7 @@ export function offerOf(home: string): { offers?: Record<string, unknown> } {
       priceCurrency: PRICING.currency,
       priceValidUntil: LAUNCH_DATE,
       availability: 'https://schema.org/InStock',
-      description: `Pre-sale price (${billingWords()}), until WoW: Forever launches`,
+      description: `Pre-sale price (${billingWords()}), until the pre-sale ends`,
       url: home,
     },
   };

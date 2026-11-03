@@ -113,7 +113,7 @@ export const TIME_BACK = {
 export const PRICING_COPY = {
   eyebrow: 'Pricing',
   title: 'Get STM: pre-sale until launch',
-  intro: `STM is paid software. Buy it during the pre-sale, before WoW: Forever launches on ${LAUNCH_DAY}, for the lower price.`,
+  intro: `STM is paid software. Buy it during the pre-sale, before ${LAUNCH_DAY}, for the lower price.`,
   ribbon: 'Lower price',
   ended: 'Pre-sale ended',
   priceOnTelegram: 'Price on Telegram',
@@ -173,9 +173,9 @@ export const FEEDBACK = {
 };
 
 export const UPDATES = {
-  eyebrow: 'Launch day',
-  title: 'Get the launch-day setup guide',
-  intro: `Emailed to you, plus a reminder before the pre-sale closes on ${LAUNCH_DAY}. Payment and support stay on Telegram.`,
+  eyebrow: 'Email',
+  title: 'Get a setup note by email',
+  intro: 'A short note on getting started, and a reminder before the pre-sale ends. Payment and support stay on Telegram.',
   fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 

@@ -49,7 +49,7 @@ export const PRICING: Pricing = {
       name: 'Pre-sale',
       when: `Until ${LAUNCH_DAY}`,
       price: null,
-      note: 'The lower price, until WoW: Forever launches.',
+      note: 'The lower price, until the pre-sale ends.',
       cta: 'Buy at the pre-sale price',
       highlight: true,
     },
@@ -117,5 +117,5 @@ export function costAnswer(): string {
     const per = billingWords();
     return `During the pre-sale, until ${LAUNCH_DAY}, STM costs ${pre} (${per}). From launch it costs ${full} (${per}). ${how} There is no free version.`;
   }
-  return `STM is paid, with a lower pre-sale price until WoW: Forever launches on ${LAUNCH_DAY}. Message ${TELEGRAM_HANDLE} on Telegram for the price and the payment details; you pay there and receive STM with setup help. There is no free version.`;
+  return `STM is paid, with a lower pre-sale price until ${LAUNCH_DAY}. Message ${TELEGRAM_HANDLE} on Telegram for the price and the payment details; you pay there and receive STM with setup help. There is no free version.`;
 }

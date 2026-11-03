@@ -72,8 +72,8 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).not.toMatch(/script-src [^;]*https:\/\/cloudflareinsights\.com/);
   expect(csp).toContain("form-action 'none'");
   expect((await klaviyo).ok()).toBe(true);
-  await expect(page.locator('#updates-title')).toHaveText('Get the launch-day setup guide');
-  await expect(page.locator('#updates')).toContainText('pre-sale closes');
+  await expect(page.locator('#updates-title')).toHaveText('Get a setup note by email');
+  await expect(page.locator('#updates')).toContainText('before the pre-sale ends');
   const buy = page.locator('.hero-ctas .btn-gold');
   await expect(buy).toContainText('Get STM on Telegram');
   await expect(buy).toHaveClass(/btn-lg/);
