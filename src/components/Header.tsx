@@ -7,8 +7,32 @@ import { Wordmark } from './Wordmark';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [current, setCurrent] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
   const navId = useId();
+
+  useEffect(() => {
+    const sections = NAV.map((item) => document.getElementById(item.href.slice(1))).filter((el) => el !== null);
+    if (!sections.length || !('IntersectionObserver' in window)) return;
+    const ratios = new Map<string, number>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        let best = '';
+        let bestRatio = 0;
+        for (const [id, ratio] of ratios) {
+          if (ratio > bestRatio) {
+            best = id;
+            bestRatio = ratio;
+          }
+        }
+        setCurrent(best ? `#${best}` : '');
+      },
+      { rootMargin: '-18% 0px -52% 0px', threshold: [0, 0.2, 0.45, 0.7] },
+    );
+    for (const section of sections) io.observe(section);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -40,7 +64,7 @@ export function Header() {
           <ul>
             {NAV.map((item) => (
               <li key={item.href}>
-                <a href={item.href} onClick={() => setMenuOpen(false)}>
+                <a href={item.href} aria-current={item.href === current ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
                   {item.label}
                 </a>
               </li>
