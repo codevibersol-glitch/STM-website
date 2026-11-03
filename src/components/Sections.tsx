@@ -89,13 +89,11 @@ export function Hero() {
               <Icon name="plane" />
               {HERO.primaryCta}
             </TelegramLink>
-            <a className="btn btn-ghost btn-sm" href="#updates">
-              {HERO.emailCta}
-            </a>
-            <a className="btn btn-ghost btn-lg" href="#how-it-works">
-              {HERO.secondaryCta}
-            </a>
           </div>
+          <Updates />
+          <a className="btn btn-ghost btn-lg hero-secondary" href="#how-it-works">
+            {HERO.secondaryCta}
+          </a>
           <ul className="trust" aria-label="At a glance">
             {HERO.trust.map((t) => (
               <li key={t}>{t}</li>
@@ -503,22 +501,22 @@ export function Feedback() {
   );
 }
 
-/** Optional email list. The form itself is drawn by Klaviyo into the container div. */
+/** Optional email list, high in the hero. Klaviyo draws the field into the container. */
 export function Updates() {
   return (
-    <section id="updates" className="section" aria-labelledby="updates-title">
-      <div className="wrap">
-        <div className="signup-panel">
-          <SectionHead id="updates-title" eyebrow={UPDATES.eyebrow} title={UPDATES.title} intro={UPDATES.intro} />
-          <div className="signup-form">
-            <div className={`klaviyo-form-${KLAVIYO_FORM_ID}`} />
-          </div>
-          <p className="signup-fallback">
-            {UPDATES.fallback} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink>
-          </p>
-        </div>
+    <div id="updates" className="signup-panel" aria-labelledby="updates-title">
+      <p className="eyebrow">{UPDATES.eyebrow}</p>
+      <h2 id="updates-title" className="signup-title">
+        {UPDATES.title}
+      </h2>
+      <p className="signup-reason">{UPDATES.intro}</p>
+      <div className="signup-form">
+        <div className={`klaviyo-form-${KLAVIYO_FORM_ID}`} />
       </div>
-    </section>
+      <p className="signup-fallback">
+        {UPDATES.fallback} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink>
+      </p>
+    </div>
   );
 }
 
