@@ -503,11 +503,22 @@ export function Feedback() {
 
 /** Optional email list, high in the hero. Klaviyo draws the field into the container. */
 export function Updates() {
+  const openField = () => {
+    const input = document.querySelector<HTMLInputElement>('#updates input[type="email"]');
+    if (input) {
+      input.scrollIntoView({ block: 'center' });
+      input.focus();
+      return;
+    }
+    document.getElementById('updates')?.scrollIntoView({ block: 'center' });
+  };
   return (
     <div id="updates" className="signup-panel" aria-labelledby="updates-title">
       <p className="eyebrow">{UPDATES.eyebrow}</p>
       <h2 id="updates-title" className="signup-title">
-        {UPDATES.title}
+        <button type="button" className="signup-open" onClick={openField}>
+          {UPDATES.title}
+        </button>
       </h2>
       <p className="signup-reason">{UPDATES.intro}</p>
       <div className="signup-form">

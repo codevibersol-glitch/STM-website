@@ -630,12 +630,12 @@ html[data-font="dyslexic"] {
   .hero {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
   }
   .hero-map {
     position: absolute;
     inset: 0;
     z-index: -1;
+    overflow: hidden;
   }
   .hero-aura {
     position: absolute;
@@ -690,7 +690,7 @@ html[data-font="dyslexic"] {
     .hero-inner {
       align-content: start;
       min-height: 0;
-      padding: 1.15rem 0 1.75rem;
+      padding: 0.55rem 0 1.5rem;
     }
     .hero-ctas .btn-gold {
       width: 100%;
@@ -764,8 +764,8 @@ html[data-font="dyslexic"] {
     }
     .hero-title {
       order: 2;
-      margin: 0.55rem 0;
-      font-size: 1.65rem;
+      margin: 0.4rem 0;
+      font-size: 1.5rem;
     }
     .hero-ctas {
       order: 3;
@@ -2209,9 +2209,11 @@ html[data-font="dyslexic"] {
     content-visibility: visible;
   }
   .signup-panel {
+    position: relative;
+    z-index: 1;
     max-width: 28rem;
-    margin: 1.15rem 0 0;
-    padding: 0.95rem 1rem 1.05rem;
+    margin: 0.7rem 0 0;
+    padding: 0.75rem 0.9rem 0.85rem;
     border: 1px solid transparent;
     border-radius: calc(var(--radius) * 1.05);
     background:
@@ -2219,9 +2221,21 @@ html[data-font="dyslexic"] {
       linear-gradient(180deg, rgb(198 255 58 / 0.45), rgb(255 255 255 / 0.08)) border-box;
   }
   .signup-title {
-    margin: 0.3rem 0 0.35rem;
-    font-size: 1.25rem;
-    line-height: 1.15;
+    margin: 0.2rem 0 0.25rem;
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+  .signup-open {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    text-align: inherit;
+    cursor: pointer;
   }
   .signup-reason {
     margin: 0 0 0.65rem;
@@ -2246,22 +2260,15 @@ html[data-font="dyslexic"] {
     border: 2px solid #fff;
   }
 
-  .klaviyo-form-WL7BMB,
-  .klaviyo-form-WL7BMB form,
-  .klaviyo-form-WL7BMB form div {
+  .klaviyo-form-WL7BMB form {
     background: transparent !important;
     background-color: transparent !important;
     border: 0 !important;
-    border-radius: 0 !important;
     box-shadow: none !important;
-    min-height: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-  }
-  .klaviyo-form-WL7BMB form {
-    display: block !important;
-    padding: 0 !important;
     margin: 0 !important;
+    padding: 0 !important;
     color: var(--c-text) !important;
   }
   /* Klaviyo repeats a title and a softer blurb. Our heading already says what the email is. */
@@ -2270,8 +2277,11 @@ html[data-font="dyslexic"] {
   .klaviyo-form-WL7BMB #rich-text-01M6F9YSG3QHTPZ42Z06JRHZAN {
     display: none !important;
   }
-  .klaviyo-form-WL7BMB form .needsclick {
-    padding: 0 !important;
+  .klaviyo-form-WL7BMB input,
+  .klaviyo-form-WL7BMB button {
+    touch-action: manipulation;
+    position: relative !important;
+    z-index: 1 !important;
   }
   .klaviyo-form-WL7BMB p,
   .klaviyo-form-WL7BMB label,
