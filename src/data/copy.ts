@@ -30,6 +30,7 @@ export const HERO = {
   lead:
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
+  emailCta: 'Email me updates',
   secondaryCta: 'See how it works',
   trust: ['Every WoW version', 'Every race and class', 'Pre-sale until launch', 'Telegram + email updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
@@ -173,9 +174,9 @@ export const FEEDBACK = {
 };
 
 export const UPDATES = {
-  eyebrow: 'Email',
-  title: 'Get STM updates',
-  intro: 'Optional. Launch news and tips by email. Payment and support stay on Telegram.',
+  eyebrow: 'Not ready yet?',
+  title: 'Get launch news by email',
+  intro: 'Optional. Payment and support stay on Telegram.',
   fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 

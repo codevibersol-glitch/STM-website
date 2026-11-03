@@ -147,6 +147,17 @@ describe('honest claims', () => {
     );
     expect(text).toContain(UPDATES.title);
     expect(text).toContain(UPDATES.intro);
+    expect(HERO.emailCta).toBe('Email me updates');
+    const hero = /<section id="top"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+    expect(hero).toContain('href="#updates"');
+    expect(hero).toContain(HERO.emailCta);
+    expect(hero.indexOf('btn-gold')).toBeLessThan(hero.indexOf('href="#updates"'));
+    const pricingAt = html.indexOf('id="pricing"');
+    const updatesAt = html.indexOf('id="updates"');
+    const commitmentAt = html.indexOf('id="accessibility"');
+    expect(pricingAt).toBeGreaterThan(-1);
+    expect(pricingAt).toBeLessThan(updatesAt);
+    expect(updatesAt).toBeLessThan(commitmentAt);
   });
 
   it('says plainly that STM plays automatically', () => {

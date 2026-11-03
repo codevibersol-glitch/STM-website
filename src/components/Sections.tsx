@@ -89,6 +89,9 @@ export function Hero() {
               <Icon name="plane" />
               {HERO.primaryCta}
             </TelegramLink>
+            <a className="btn btn-ghost btn-sm" href="#updates">
+              {HERO.emailCta}
+            </a>
             <a className="btn btn-ghost btn-lg" href="#how-it-works">
               {HERO.secondaryCta}
             </a>
@@ -505,7 +508,7 @@ export function Updates() {
   return (
     <section id="updates" className="section" aria-labelledby="updates-title">
       <div className="wrap">
-        <div className="signup">
+        <div className="signup-panel">
           <SectionHead id="updates-title" eyebrow={UPDATES.eyebrow} title={UPDATES.title} intro={UPDATES.intro} />
           <div className="signup-form">
             <div className={`klaviyo-form-${KLAVIYO_FORM_ID}`} />

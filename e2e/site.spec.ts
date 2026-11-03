@@ -66,7 +66,12 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).toContain('https://static-forms.klaviyo.com');
   expect(csp).toContain("form-action 'none'");
   expect((await klaviyo).ok()).toBe(true);
-  await expect(page.locator('#updates-title')).toHaveText('Get STM updates');
+  await expect(page.locator('#updates-title')).toHaveText('Get launch news by email');
+  const emailLink = page.locator('.hero-ctas a[href="#updates"]');
+  await expect(emailLink).toHaveText('Email me updates');
+  await expect(emailLink).toHaveClass(/btn-ghost/);
+  await expect(emailLink).not.toHaveClass(/btn-gold/);
+  await expect(page.locator('.hero-ctas .btn-gold')).toContainText('Get STM on Telegram');
   await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(1);
   await page.locator('#updates').scrollIntoViewIfNeeded();
   // The loader then pulls the form and its modules. Klaviyo's analytics beacon can fail CORS on

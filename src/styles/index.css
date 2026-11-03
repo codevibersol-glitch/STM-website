@@ -723,6 +723,7 @@ html[data-font="dyslexic"] {
   .hero-ctas {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0.85rem;
   }
   .trust {
@@ -2001,36 +2002,34 @@ html[data-font="dyslexic"] {
   }
 
   /* ------------------------------------------------------------------------------- email signup
-     A short band above the footer. Klaviyo draws the form into .klaviyo-form-*; the white card,
-     the field label and the success text are theirs. This layout only frames that card. */
+     Sits after Pricing, quieter than the buy buttons. Klaviyo paints a white card with inline
+     styles and its own fonts. Overrides below are !important and live in this layer so they win
+     over those inline styles and over Klaviyo's later stylesheet. */
 
   #updates {
     /* The form script measures this box. content-visibility would leave it unlaid-out until scroll. */
     content-visibility: visible;
-    padding: clamp(2.75rem, 2rem + 2vw, 4.5rem) 0;
+    padding: clamp(2.5rem, 1.5rem + 2vw, 4rem) 0;
   }
-  .signup {
+  .signup-panel {
     max-width: 36rem;
     margin: 0 auto;
+    padding: clamp(1.35rem, 1rem + 1.2vw, 2rem);
+    border: 1px solid transparent;
+    border-radius: calc(var(--radius) * 1.15);
+    background:
+      linear-gradient(180deg, #111418, #0b0d10) padding-box,
+      linear-gradient(180deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.05)) border-box;
   }
-  .signup .section-head {
-    margin-bottom: 1.5rem;
+  .signup-panel .section-head {
+    margin-bottom: 1.15rem;
+  }
+  .signup-panel .section-title {
+    font-size: clamp(1.55rem, 1.2rem + 1.2vw, 2.05rem);
   }
   .signup-form {
-    display: flex;
-    justify-content: center;
-    min-height: 2.5rem;
-  }
-  .signup-form > div {
-    width: min(100%, 28.5rem);
-  }
-  /* Site headings are light, for the dark page. Klaviyo paints this card white and sets the
-     black on a parent, so our h2 color would win and fail contrast. Keep the card's headings dark. */
-  .signup-form :is(h1, h2, h3, h4) {
-    color: #111;
-  }
-  html[data-contrast="high"] .signup-form :is(h1, h2, h3, h4) {
-    color: #000;
+    width: min(100%, 26rem);
+    margin: 0 auto;
   }
   .signup-fallback {
     margin: 1rem 0 0;
@@ -2040,9 +2039,127 @@ html[data-font="dyslexic"] {
   .js .signup-fallback {
     display: none;
   }
-  html[data-contrast="high"] .signup-form > div {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
+  html[data-contrast="high"] .signup-panel {
+    background: #000;
+    border: 2px solid #fff;
+  }
+
+  .klaviyo-form-WL7BMB,
+  .klaviyo-form-WL7BMB form,
+  .klaviyo-form-WL7BMB form div {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .klaviyo-form-WL7BMB form {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: var(--c-text) !important;
+  }
+  /* Klaviyo repeats a title the section heading already gives. */
+  .klaviyo-form-WL7BMB :is(h1, h2, h3, h4) {
+    display: none !important;
+  }
+  .klaviyo-form-WL7BMB p,
+  .klaviyo-form-WL7BMB label,
+  .klaviyo-form-WL7BMB input,
+  .klaviyo-form-WL7BMB button {
+    font-family: var(--f-body) !important;
+    letter-spacing: 0 !important;
+  }
+  .klaviyo-form-WL7BMB p {
+    margin: 0 0 0.85rem !important;
+    color: var(--c-muted) !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+  }
+  .klaviyo-form-WL7BMB label {
+    display: block !important;
+    margin: 0 0 0.4rem !important;
+    padding: 0 !important;
+    color: var(--c-text) !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+  }
+  .klaviyo-form-WL7BMB input[type='email'] {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 2.9rem !important;
+    height: auto !important;
+    margin: 0 0 0.85rem !important;
+    padding: 0.55rem 0.9rem !important;
+    border: 1px solid var(--c-line-strong) !important;
+    border-radius: 0.85rem !important;
+    background: var(--c-ink) !important;
+    background-color: var(--c-ink) !important;
+    color: var(--c-text) !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+  }
+  .klaviyo-form-WL7BMB input[type='email']::placeholder {
+    color: var(--c-muted) !important;
+    font-family: var(--f-body) !important;
+    font-size: 1rem !important;
+    opacity: 1 !important;
+  }
+  .klaviyo-form-WL7BMB input[type='email']:hover {
+    border-color: var(--c-accent) !important;
+  }
+  .klaviyo-form-WL7BMB button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 2.9rem !important;
+    height: auto !important;
+    margin: 0.15rem 0 0 !important;
+    padding: 0.7rem 1.35rem !important;
+    border: 1px solid transparent !important;
+    border-radius: 999px !important;
+    background: var(--c-accent) !important;
+    background-color: var(--c-accent) !important;
+    color: var(--c-accent-ink) !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 0 1px rgb(198 255 58 / 0.55) !important;
+  }
+  .klaviyo-form-WL7BMB input:focus-visible,
+  .klaviyo-form-WL7BMB button:focus-visible {
+    outline: 3px solid var(--c-focus) !important;
+    outline-offset: 3px !important;
+  }
+  html[data-contrast='high'] .klaviyo-form-WL7BMB p,
+  html[data-contrast='high'] .klaviyo-form-WL7BMB label {
+    color: #fff !important;
+  }
+  html[data-contrast='high'] .klaviyo-form-WL7BMB input[type='email'] {
+    border: 2px solid #fff !important;
+    background: #000 !important;
+    background-color: #000 !important;
+    color: #fff !important;
+  }
+  html[data-contrast='high'] .klaviyo-form-WL7BMB input[type='email']::placeholder {
+    color: #fff !important;
+  }
+  html[data-contrast='high'] .klaviyo-form-WL7BMB button {
+    border: 2px solid #fff !important;
+    background: #ffe14d !important;
+    background-color: #ffe14d !important;
+    color: #000 !important;
+    box-shadow: none !important;
   }
 
   /* Sections below the first screen are only laid out and painted as they come near. */

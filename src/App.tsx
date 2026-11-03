@@ -39,10 +39,10 @@ export function App() {
         <Results />
         <TimeBack />
         <Pricing />
+        <Updates />
         <Commitment />
         <Faq />
         <Feedback />
-        <Updates />
       </main>
       <Footer />
       <FloatingTelegram />
