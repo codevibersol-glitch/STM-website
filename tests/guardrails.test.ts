@@ -150,7 +150,8 @@ describe('honest claims', () => {
     const hero = /<section id="top"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
     expect(hero).toContain('id="updates"');
     expect(hero).toContain(UPDATES.title);
-    expect(hero.indexOf('btn-gold')).toBeLessThan(hero.indexOf('id="updates"'));
+    // The email sign-up panel is the hero's first action, above the gold Telegram buy button.
+    expect(hero.indexOf('id="updates"')).toBeLessThan(hero.indexOf('btn-gold'));
     expect(html.indexOf('id="updates"')).toBeLessThan(html.indexOf('id="pricing"'));
   });
 

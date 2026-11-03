@@ -95,7 +95,7 @@ test('loads with no console errors or CSP violations, and the 3D hero starts', a
   expect(errors).toEqual([]);
 });
 
-test('shows the email field above the fold on a phone, under the Telegram button', async ({ browser }) => {
+test('shows the email field above the fold on a phone, above the Telegram button', async ({ browser }) => {
   // iPhone 16 is 393px wide. About 620px stays visible once Safari's toolbars are open.
   const context = await browser.newContext({ viewport: { width: 393, height: 620 } });
   const page = await context.newPage();
@@ -108,7 +108,8 @@ test('shows the email field above the fold on a phone, under the Telegram button
   expect(fieldBox).toBeTruthy();
   expect(buyBox).toBeTruthy();
   expect(buyBox!.y).toBeGreaterThanOrEqual(0);
-  expect(buyBox!.y).toBeLessThan(fieldBox!.y);
+  // The sign-up comes first: the field sits above the gold buy button.
+  expect(fieldBox!.y).toBeLessThan(buyBox!.y);
   expect(fieldBox!.y + fieldBox!.height).toBeLessThanOrEqual(fold);
   const submit = page.locator('#updates button').first();
   const submitBox = await submit.boundingBox();

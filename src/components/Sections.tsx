@@ -84,13 +84,13 @@ export function Hero() {
             {HERO.titleAfter}
           </h1>
           <p className="hero-lead">{HERO.lead}</p>
+          <Updates />
           <div className="hero-ctas">
             <TelegramLink className="btn btn-gold btn-lg">
               <Icon name="plane" />
               {HERO.primaryCta}
             </TelegramLink>
           </div>
-          <Updates />
           <a className="btn btn-ghost btn-lg hero-secondary" href="#how-it-works">
             {HERO.secondaryCta}
           </a>
@@ -501,7 +501,7 @@ export function Feedback() {
   );
 }
 
-/** Optional email list, high in the hero. Klaviyo draws the field into the container. */
+/** Optional email list, the hero's first action, above the Telegram buy button. Klaviyo draws the field into the container. */
 export function Updates() {
   const openField = () => {
     const input = document.querySelector<HTMLInputElement>('#updates input[type="email"]');

@@ -767,10 +767,10 @@ html[data-font="dyslexic"] {
       margin: 0.4rem 0;
       font-size: 1.5rem;
     }
-    .hero-ctas {
+    #updates {
       order: 3;
     }
-    #updates {
+    .hero-ctas {
       order: 4;
     }
     .hero-lead {
@@ -817,17 +817,17 @@ html[data-font="dyslexic"] {
     .hero-lead {
       grid-row: 3;
     }
+    #updates {
+      grid-row: 4;
+    }
     .hero-ctas {
       grid-column: 1;
-      grid-row: 4;
+      grid-row: 5;
     }
     .hero-secondary {
       grid-column: 2;
-      grid-row: 4;
-      justify-self: start;
-    }
-    #updates {
       grid-row: 5;
+      justify-self: start;
     }
     .trust {
       grid-row: 6;
@@ -2200,7 +2200,7 @@ html[data-font="dyslexic"] {
   }
 
   /* ------------------------------------------------------------------------------- email signup
-     In the hero, under the Telegram button. Klaviyo paints a white card with inline styles.
+     In the hero, above the Telegram buy button. Klaviyo paints a white card with inline styles.
      Overrides are !important and live in this layer so they win over those styles. The
      subscribe control stays an outline button so the gold buy button remains the main action. */
 
@@ -2214,7 +2214,7 @@ html[data-font="dyslexic"] {
     display: flex;
     flex-direction: column;
     max-width: 28rem;
-    margin: 0.7rem 0 0;
+    margin: 0.7rem 0 1rem;
     padding: 0.75rem 0.9rem 0.85rem;
     border: 1px solid transparent;
     border-radius: calc(var(--radius) * 1.05);

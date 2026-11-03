@@ -6,7 +6,9 @@ const PORT = 4174;
 // npm run test:e2e builds first.
 export default defineConfig({
   testDir: 'e2e',
-  timeout: 60_000,
+  // The axe scans need room: alone one takes ~14 s, but with a worker per CPU they overlap and
+  // blow a 60 s budget without anything actually being wrong.
+  timeout: 120_000,
   fullyParallel: true,
   reporter: [['list']],
   use: {
