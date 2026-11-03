@@ -96,13 +96,13 @@ test('loads with no console errors or CSP violations, and the 3D hero starts', a
 });
 
 test('shows the email field above the fold on a phone, under the Telegram button', async ({ browser }) => {
-  // iPhone 16 is 393px wide. 680px is the visible height once Safari's toolbars are open.
-  const context = await browser.newContext({ viewport: { width: 393, height: 680 } });
+  // iPhone 16 is 393px wide. About 620px stays visible once Safari's toolbars are open.
+  const context = await browser.newContext({ viewport: { width: 393, height: 620 } });
   const page = await context.newPage();
   await page.goto('/');
   const field = page.locator('#updates input[type="email"]');
   await expect(field).toBeVisible();
-  const fold = 680;
+  const fold = 620;
   const fieldBox = await field.boundingBox();
   const buyBox = await page.locator('.hero-ctas .btn-gold').boundingBox();
   expect(fieldBox).toBeTruthy();

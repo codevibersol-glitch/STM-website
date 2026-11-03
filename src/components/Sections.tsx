@@ -506,8 +506,8 @@ export function Updates() {
   const openField = () => {
     const input = document.querySelector<HTMLInputElement>('#updates input[type="email"]');
     if (input) {
-      input.scrollIntoView({ block: 'center' });
-      input.focus();
+      input.focus({ preventScroll: true });
+      input.scrollIntoView({ block: 'nearest' });
       return;
     }
     document.getElementById('updates')?.scrollIntoView({ block: 'center' });
