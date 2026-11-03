@@ -108,15 +108,17 @@ await writeFile(join(dist, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: $
 //   img     d3k81ch9hvuctc.cloudfront.net is Klaviyo's form-image host.
 //   frame   geo.captcha-delivery.com is the DataDome check some submissions get.
 // The signup is a fetch to a.klaviyo.com, not a navigation, so form-action stays 'none'.
+// Cloudflare Web Analytics injects beacon.min.js from static.cloudflareinsights.com and posts
+// to cloudflareinsights.com. Nothing else in that policy changes.
 const scriptHash = createHash('sha256').update(ssr.PREFS_SCRIPT).digest('base64');
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'sha256-${scriptHash}' https://static.klaviyo.com https://static-tracking.klaviyo.com`,
+  `script-src 'self' 'sha256-${scriptHash}' https://static.klaviyo.com https://static-tracking.klaviyo.com https://static.cloudflareinsights.com`,
   "style-src 'self' 'unsafe-inline' https://static.klaviyo.com https://fonts.googleapis.com",
   "style-src-attr 'unsafe-inline'",
   "img-src 'self' https://d3k81ch9hvuctc.cloudfront.net",
   "font-src 'self' https://fonts.gstatic.com",
-  "connect-src 'self' https://a.klaviyo.com https://fast.a.klaviyo.com https://static-forms.klaviyo.com",
+  "connect-src 'self' https://a.klaviyo.com https://fast.a.klaviyo.com https://static-forms.klaviyo.com https://cloudflareinsights.com",
   "manifest-src 'self'",
   "worker-src 'self'",
   "object-src 'none'",

@@ -64,6 +64,12 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).toContain('https://a.klaviyo.com');
   expect(csp).toContain('https://fast.a.klaviyo.com');
   expect(csp).toContain('https://static-forms.klaviyo.com');
+  expect(csp).toContain("script-src 'self'");
+  expect(csp).toContain('https://static.cloudflareinsights.com');
+  expect(csp).toContain('https://cloudflareinsights.com');
+  expect(csp).toMatch(/script-src [^;]*https:\/\/static\.cloudflareinsights\.com/);
+  expect(csp).toMatch(/connect-src [^;]*https:\/\/cloudflareinsights\.com/);
+  expect(csp).not.toMatch(/script-src [^;]*https:\/\/cloudflareinsights\.com/);
   expect(csp).toContain("form-action 'none'");
   expect((await klaviyo).ok()).toBe(true);
   await expect(page.locator('#updates-title')).toHaveText('Get launch news by email');
