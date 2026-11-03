@@ -143,21 +143,15 @@ describe('honest claims', () => {
     expect(COMMITMENT.points).toContain('No account needed. The email list is optional.');
     expect(FOOTER.privacy).toBe('No account needed. Email updates are optional.');
     expect(FAQ.find((f) => f.id === 'data')?.a).toBe(
-      'Only if you choose to. The site uses Klaviyo, our email provider, which sets cookies and records visits so we can run the optional email signup. If you join the list, Klaviyo stores your email address to send you STM updates; you get a confirmation email first and every email has an unsubscribe link. Payment and support still happen only on Telegram.',
+      'Only if you choose to. The site uses Klaviyo, our email provider, which sets cookies and records visits so we can run the optional email signup. If you join the list, Klaviyo stores your email address to send you STM updates, and every email has an unsubscribe link. Payment and support still happen only on Telegram.',
     );
     expect(text).toContain(UPDATES.title);
     expect(text).toContain(UPDATES.intro);
-    expect(HERO.emailCta).toBe('Email me updates');
     const hero = /<section id="top"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
-    expect(hero).toContain('href="#updates"');
-    expect(hero).toContain(HERO.emailCta);
-    expect(hero.indexOf('btn-gold')).toBeLessThan(hero.indexOf('href="#updates"'));
-    const pricingAt = html.indexOf('id="pricing"');
-    const updatesAt = html.indexOf('id="updates"');
-    const commitmentAt = html.indexOf('id="accessibility"');
-    expect(pricingAt).toBeGreaterThan(-1);
-    expect(pricingAt).toBeLessThan(updatesAt);
-    expect(updatesAt).toBeLessThan(commitmentAt);
+    expect(hero).toContain('id="updates"');
+    expect(hero).toContain(UPDATES.title);
+    expect(hero.indexOf('btn-gold')).toBeLessThan(hero.indexOf('id="updates"'));
+    expect(html.indexOf('id="updates"')).toBeLessThan(html.indexOf('id="pricing"'));
   });
 
   it('says plainly that STM plays automatically', () => {

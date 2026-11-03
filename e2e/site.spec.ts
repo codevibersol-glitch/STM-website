@@ -72,12 +72,11 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).not.toMatch(/script-src [^;]*https:\/\/cloudflareinsights\.com/);
   expect(csp).toContain("form-action 'none'");
   expect((await klaviyo).ok()).toBe(true);
-  await expect(page.locator('#updates-title')).toHaveText('Get launch news by email');
-  const emailLink = page.locator('.hero-ctas a[href="#updates"]');
-  await expect(emailLink).toHaveText('Email me updates');
-  await expect(emailLink).toHaveClass(/btn-ghost/);
-  await expect(emailLink).not.toHaveClass(/btn-gold/);
-  await expect(page.locator('.hero-ctas .btn-gold')).toContainText('Get STM on Telegram');
+  await expect(page.locator('#updates-title')).toHaveText('Get the launch-day setup guide');
+  await expect(page.locator('#updates')).toContainText('pre-sale closes');
+  const buy = page.locator('.hero-ctas .btn-gold');
+  await expect(buy).toContainText('Get STM on Telegram');
+  await expect(buy).toHaveClass(/btn-lg/);
   await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(1);
   await page.locator('#updates').scrollIntoViewIfNeeded();
   // The loader then pulls the form and its modules. Klaviyo's analytics beacon can fail CORS on
@@ -94,6 +93,27 @@ test('loads with no console errors or CSP violations, and the 3D hero starts', a
   await expect(page.locator('.hero-map.is-live')).toBeVisible({ timeout: 20_000 });
   await scrollThrough(page);
   expect(errors).toEqual([]);
+});
+
+test('shows the email field above the fold on a phone, under the Telegram button', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await page.goto('/');
+  const field = page.locator('#updates input[type="email"]');
+  await expect(field).toBeVisible();
+  const fold = 844;
+  const fieldBox = await field.boundingBox();
+  const buyBox = await page.locator('.hero-ctas .btn-gold').boundingBox();
+  expect(fieldBox).toBeTruthy();
+  expect(buyBox).toBeTruthy();
+  expect(buyBox!.y).toBeGreaterThanOrEqual(0);
+  expect(buyBox!.y).toBeLessThan(fieldBox!.y);
+  expect(fieldBox!.y + fieldBox!.height).toBeLessThanOrEqual(fold);
+  const submit = page.locator('#updates button').first();
+  const submitBox = await submit.boundingBox();
+  expect(submitBox).toBeTruthy();
+  expect(submitBox!.y + submitBox!.height).toBeLessThanOrEqual(fold);
+  await context.close();
 });
 
 test('is readable without JavaScript', async ({ browser }) => {

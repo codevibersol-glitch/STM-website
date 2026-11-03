@@ -13,7 +13,6 @@ import {
   Pricing,
   Results,
   TimeBack,
-  Updates,
   Versions,
   Who,
 } from './components/Sections';
@@ -39,7 +38,6 @@ export function App() {
         <Results />
         <TimeBack />
         <Pricing />
-        <Updates />
         <Commitment />
         <Faq />
         <Feedback />
