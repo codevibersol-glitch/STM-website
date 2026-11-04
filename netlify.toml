@@ -1,0 +1,15 @@
+# Netlify deployment for the STM website.
+# Netlify reads the generated dist/_headers file (CSP, caching, security headers) itself,
+# so only the build settings live here.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[context.production.environment]
+  # The deployed site once it is on Netlify. The Vite build reads SITE_URL for the canonical
+  # link, sitemap, og:image and structured data; Cloudflare Pages did the same via its env var.
+  SITE_URL = "https://stm-website.netlify.app"
