@@ -12,4 +12,4 @@
 [context.production.environment]
   # The deployed site once it is on Netlify. The Vite build reads SITE_URL for the canonical
   # link, sitemap, og:image and structured data; Cloudflare Pages did the same via its env var.
-  SITE_URL = "https://stm-website.netlify.app"
+  SITE_URL = "https://stm-addon.netlify.app"
