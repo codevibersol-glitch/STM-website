@@ -179,6 +179,16 @@ export const UPDATES = {
   fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 
+export const FIGHTER = {
+  eyebrow: 'Fighter',
+  title: 'Build your fighter',
+  intro: 'Pick a spec, take the armour set you trust, and hold the fight with the talents you choose.',
+  spec: 'Spec',
+  armour: 'Armour set',
+  talents: 'Talents',
+  build: 'The build',
+};
+
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
   privacy: 'No account needed. Email updates are optional.',

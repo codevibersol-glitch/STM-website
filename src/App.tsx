@@ -5,6 +5,7 @@ import {
   Faq,
   Features,
   Feedback,
+  Fighter,
   FloatingTelegram,
   Footer,
   Gallery,
@@ -38,6 +39,7 @@ export function App() {
         <Results />
         <TimeBack />
         <Pricing />
+        <Fighter />
         <Commitment />
         <Faq />
         <Feedback />

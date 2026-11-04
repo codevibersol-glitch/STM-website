@@ -1880,6 +1880,28 @@ html[data-font="dyslexic"] {
     color: var(--c-teal);
   }
 
+  /* ------------------------------------------------------------------------------ fighter (phase one)
+
+     The build-your-fighter builder: armour sets, specs, talents and the build summary. */
+
+  .fighter-sets,
+  .fighter-specs,
+  .fighter-talents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0 0 1.25rem;
+  }
+  .fighter-specs {
+    margin-top: 1.1rem;
+  }
+  .fighter-summary {
+    margin: 0;
+    color: var(--c-muted);
+    font-size: 0.95rem;
+  }
+
   /* ---------------------------------------------------------------------------------- FAQ */
 
   .faq {

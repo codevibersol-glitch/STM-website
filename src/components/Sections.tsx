@@ -19,11 +19,13 @@ import {
 import { FAQ } from '../data/faq';
 import { FEATURES } from '../data/features';
 import { GALLERY_COPY } from '../data/gallery';
+import { FIGHTER } from '../data/copy';
 import { PRICING, billingWords, formatPrice, plan, presaleOver, saving } from '../data/pricing';
 import { SHOTS, type PlacedShot } from '../data/shots';
 import { BETA_LABEL, BETA_REACH, CREDITS, KLAVIYO_FORM_ID, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
+import { FIGHTER_SPECS, FIGHTER_TIER_SETS, type FighterState } from '../data/talents';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
 import { MapHero } from './MapHero';
@@ -410,6 +412,85 @@ export function Pricing() {
               <span>{PRICING_COPY.note}</span>
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Phase one of the fighter work: choose a spec, take an armour set, and hold a build. Phase two wires
+ * this build into the duel; for now the builder holds the state in the browser and shows the hold.
+ */
+export function Fighter() {
+  const [state, setState] = useState<FighterState>({
+    specId: FIGHTER_SPECS[0]!.id,
+    tierSetId: FIGHTER_TIER_SETS[0]!.id,
+    talentIds: [...FIGHTER_SPECS[0]!.tree.talents.map((t) => t.id)],
+  });
+
+  const spec = FIGHTER_SPECS.find((s) => s.id === state.specId) ?? FIGHTER_SPECS[0]!;
+  const tierSet = FIGHTER_TIER_SETS.find((t) => t.id === state.tierSetId) ?? FIGHTER_TIER_SETS[0]!;
+  const talents = spec ? spec.tree.talents.filter((t) => state.talentIds.includes(t.id)) : [];
+
+  const chooseSpec = (id: string) => {
+    const next = FIGHTER_SPECS.find((s) => s.id === id);
+    if (!next) return;
+    setState({ specId: id, tierSetId: state.tierSetId, talentIds: [...next.tree.talents.map((t) => t.id)] });
+  };
+
+  const toggleTalent = (id: string) => {
+    setState((b) => ({ ...b, talentIds: b.talentIds.includes(id) ? b.talentIds.filter((x) => x !== id) : [...b.talentIds, id] }));
+  };
+
+  const chooseSet = (id: string) => setState((b) => ({ ...b, tierSetId: id }));
+
+  return (
+    <section id="fighter" className="section" aria-labelledby="fighter-title">
+      <div className="wrap">
+        <SectionHead id="fighter-title" eyebrow={FIGHTER.eyebrow} title={FIGHTER.title} intro={FIGHTER.intro} />
+        <div className="fighter" data-reveal>
+          <div className="fighter-sets">
+            <p className="fighter-label">{FIGHTER.armour}</p>
+            {FIGHTER_TIER_SETS.map((set) => (
+              <button
+                key={set.id}
+                type="button"
+                className="btn btn-ghost"
+                aria-pressed={state.tierSetId === set.id}
+                onClick={() => chooseSet(set.id)}
+              >
+                {set.name}
+              </button>
+            ))}
+          </div>
+          <div className="fighter-specs">
+            <p className="fighter-label">{FIGHTER.spec}</p>
+            {FIGHTER_SPECS.map((s) => (
+              <button key={s.id} type="button" className="btn btn-ghost" aria-pressed={state.specId === s.id} onClick={() => chooseSpec(s.id)}>
+                {s.name}
+              </button>
+            ))}
+          </div>
+          <div className="fighter-talents">
+            <p className="fighter-label">{FIGHTER.talents}</p>
+            {spec
+              ? spec.tree.talents.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    aria-pressed={state.talentIds.includes(t.id)}
+                    onClick={() => toggleTalent(t.id)}
+                  >
+                    {t.name}
+                  </button>
+                ))
+              : null}
+          </div>
+          <p className="fighter-summary">
+            {spec ? spec.name : ''} with the {tierSet.name} armour set, holding {talents.length > 0 ? 'the chosen talents' : 'no chosen talents'}.
+          </p>
         </div>
       </div>
     </section>
