@@ -6,7 +6,7 @@ import { App } from './App';
 import { NotFound } from './NotFound';
 import { MapPoster } from './components/MapPoster';
 import { Wordmark } from './components/Wordmark';
-import { BuilderPage, CharactersPage, FaqPage, PricingPage, ResultsPage } from './components/Pages';
+import { normalizePath } from './routes';
 
 export { PREFS_SCRIPT, headTags, resolveSiteUrl, structuredData } from './seo/head';
 export { copyDeck } from './seo/copyDeck';
@@ -14,11 +14,9 @@ export { TELEGRAM_URL, SITE_TITLE, OG_IMAGE } from './data/site';
 export { LAUNCH_DATE, formatDay } from './data/pricing';
 
 export function renderApp(path = '/'): string {
-  const page =
-    path === '/builder' ? <BuilderPage /> : path === '/characters' ? <CharactersPage /> : path === '/pricing' ? <PricingPage /> : path === '/faq' ? <FaqPage /> : path === '/results' ? <ResultsPage /> : <App path={path} />;
   return renderToString(
     <StrictMode>
-      {page}
+      <App path={normalizePath(path)} />
     </StrictMode>,
   );
 }

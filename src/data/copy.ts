@@ -3,25 +3,40 @@
 
 import type { IconName } from '../components/Icon';
 import { BETA_LABEL, BETA_REACH } from './site';
-import { SHOTS } from './shots';
 
 // Seven links at most: at the largest text size an eighth makes the header wrap to three rows, and the
 // accessibility menu then no longer fits on a laptop screen (a guardrail test checks the count).
+// Each one is its own page. The home page is the short door into them, not a long scroll of every section.
 const NAV_ITEMS = [
-  { href: '#how-it-works', label: 'How it works' },
-  // The pictures section exists only once its picture files do (npm run shots).
-  ...(SHOTS.length > 0 ? [{ href: '#see', label: 'See it' }] : []),
-  { href: '#who', label: "Who it's for" },
+  { href: '/play', label: 'Play' },
+  { href: '/builder', label: 'Builder' },
+  { href: '/characters', label: 'Characters' },
   { href: '/results', label: 'Results' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/characters', label: 'Characters' },
+  { href: '/guide', label: 'Guide' },
 ] as const;
 export interface NavItem {
   readonly href: string;
   readonly label: string;
 }
 export const NAV: readonly NavItem[] = NAV_ITEMS;
+
+/** The home page after the hero: one card per page, so the rest of the site is not one long scroll. */
+export const DOORS = {
+  eyebrow: 'The site',
+  title: 'Open the WoW accessibility addon and leveling tool',
+  intro: 'Each part of STM is its own page. Pick one and stay there.',
+  items: [
+    { href: '/play', title: 'Play', text: 'Six working models: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
+    { href: '/builder', title: 'Builder', text: 'Pick a spec, an armour set and the talents that hold the fight.' },
+    { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
+    { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
+    { href: '/pricing', title: 'Pricing', text: 'Three plans. You buy on Telegram.' },
+    { href: '/faq', title: 'Questions', text: 'What STM does, the account risk, and how buying works.' },
+    { href: '/guide', title: 'Guide', text: 'Who it is for, every version it plays, and how to send feedback.' },
+  ],
+} as const;
 
 export const HEADER_CTA = 'Buy on Telegram';
 

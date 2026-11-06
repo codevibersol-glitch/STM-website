@@ -21,9 +21,11 @@ async function boot(): Promise<void> {
   ]);
   const root = document.getElementById('root');
   if (!root) return;
+  // The prerender wrote this URL's page. Hydrate that page, not the home page.
+  const path = window.location.pathname;
   const app = (
     <StrictMode>
-      <App />
+      <App path={path} />
     </StrictMode>
   );
   // The build prerenders the page, so it is hydrated - as a transition, which React splits into

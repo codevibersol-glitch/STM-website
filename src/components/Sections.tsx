@@ -7,6 +7,7 @@ import {
   FEATURES_COPY,
   FEEDBACK,
   FOOTER,
+  DOORS,
   HERO,
   HOW,
   NAV,
@@ -77,7 +78,7 @@ function ProofLine() {
         </strong>{' '}
         {head.short ?? head.label}
       </span>
-      <a href="#results">{HERO.proofLink}</a>
+      <a href="/results">{HERO.proofLink}</a>
     </p>
   );
 }
@@ -105,7 +106,7 @@ export function Hero() {
               {HERO.primaryCta}
             </TelegramLink>
           </div>
-          <a className="btn btn-ghost btn-lg hero-secondary" href="#how-it-works">
+          <a className="btn btn-ghost btn-lg hero-secondary" href="/play">
             {HERO.secondaryCta}
           </a>
           <ul className="trust" aria-label="At a glance">
@@ -116,6 +117,27 @@ export function Hero() {
           <ProofLine />
         </div>
         <p className="hero-caption">{HERO.caption}</p>
+      </div>
+    </section>
+  );
+}
+
+/** The home page's way into the rest of the site: one card, one page. */
+export function Doors() {
+  return (
+    <section id="doors" className="section" aria-labelledby="doors-title">
+      <div className="wrap">
+        <SectionHead id="doors-title" eyebrow={DOORS.eyebrow} title={DOORS.title} intro={DOORS.intro} />
+        <ul className="cards cards-4">
+          {DOORS.items.map((item) => (
+            <li key={item.href}>
+              <a className="card door" href={item.href}>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -710,9 +732,9 @@ export function Footer({ nav = NAV }: { nav?: readonly NavItem[] }) {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div>
-          <a href="#top" className="wordmark">
+          <a href="/" className="wordmark">
             <Wordmark className="wordmark-mark" label={null} />
-            <span className="sr-only">STM, back to the top</span>
+            <span className="sr-only">STM, home</span>
           </a>
           <p className="footer-tagline">{FOOTER.tagline}</p>
           <p className="footer-contact">
@@ -743,27 +765,38 @@ export function Footer({ nav = NAV }: { nav?: readonly NavItem[] }) {
 }
 
 /**
- * The phone-only Telegram button. It appears once the hero's own Telegram button has scrolled away
- * above, and steps aside again for the pricing, feedback and email sections and the footer, which have
- * their own - so it never sits on top of the first screen, a buy button or the signup form.
+ * The phone-only Telegram button. It stays off the first screen, and steps aside for the pricing,
+ * feedback and email sections and the footer, which have their own - so it never sits on top of the
+ * first screen, a buy button or the signup form.
  */
 export function FloatingTelegram() {
   const [hidden, setHidden] = useState(true);
   useEffect(() => {
-    const hero = document.querySelector('.hero-ctas');
-    const others = ['#pricing', '#feedback', '#updates', '.site-footer'].map((s) => document.querySelector(s)).filter((el): el is Element => el !== null);
-    if (!hero || !('IntersectionObserver' in window)) return;
-    let heroPassed = false;
-    const othersOnScreen = new Map<Element, boolean>();
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.target === hero) heroPassed = !e.isIntersecting && e.boundingClientRect.bottom < 0;
-        else othersOnScreen.set(e.target, e.isIntersecting);
-      }
-      setHidden(!heroPassed || [...othersOnScreen.values()].some(Boolean));
-    });
-    for (const el of [hero, ...others]) io.observe(el);
-    return () => io.disconnect();
+    const blockers = ['#pricing', '#feedback', '#updates', '.site-footer']
+      .map((s) => document.querySelector(s))
+      .filter((el): el is Element => el !== null);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const past = window.scrollY > window.innerHeight * 0.85;
+      const blocked = blockers.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top < window.innerHeight && r.bottom > 0;
+      });
+      setHidden(!past || blocked);
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
   return (
     <aside className="fab-wrap js-only" aria-label="Quick contact" data-hidden={hidden ? 'true' : undefined}>

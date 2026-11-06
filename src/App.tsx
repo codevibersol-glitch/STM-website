@@ -1,42 +1,47 @@
+import { useEffect } from 'react';
 import { Header } from './components/Header';
-import { HowItWorks } from './components/HowItWorks';
-import { BuilderPage, CharactersPage, FaqPage, PricingPage, ResultsPage } from './components/Pages';
-import { Commitment, Faq, Feedback, FloatingTelegram, Footer, Gallery, Hero, How, Pricing, Results, TimeBack, Versions, Who, Features } from './components/Sections';
+import { BuilderPage, CharactersPage, FaqPage, GuidePage, PlayPage, PricingPage, ResultsPage } from './components/Pages';
+import { Doors, FloatingTelegram, Footer, Hero } from './components/Sections';
 import { SKIP_LINK } from './data/copy';
+import { normalizePath } from './routes';
 
 // Scroll reveals ([data-reveal]) are pure CSS scroll-driven animations - see index.css.
 
 export interface AppProps {
-  /** The page being rendered: "/" for the home page, one of the section pages below. */
+  /** The page being rendered: "/" for the home page, or one of the section routes. */
   path?: string;
 }
 
+/** Marks the root once this page's React tree has committed, so tests can tell hydration finished. */
+function useReady() {
+  useEffect(() => {
+    document.getElementById('root')?.setAttribute('data-ready', 'true');
+  }, []);
+}
+
 export function App({ path = '/' }: AppProps) {
-  if (path === '/builder') return <BuilderPage />;
-  if (path === '/characters') return <CharactersPage />;
-  if (path === '/pricing') return <PricingPage />;
-  if (path === '/faq') return <FaqPage />;
-  if (path === '/results') return <ResultsPage />;
+  useReady();
+  const route = normalizePath(path);
+  if (route === '/play') return <PlayPage path={route} />;
+  if (route === '/builder') return <BuilderPage path={route} />;
+  if (route === '/characters') return <CharactersPage path={route} />;
+  if (route === '/pricing') return <PricingPage path={route} />;
+  if (route === '/faq') return <FaqPage path={route} />;
+  if (route === '/results') return <ResultsPage path={route} />;
+  if (route === '/guide') return <GuidePage path={route} />;
+  return <HomePage />;
+}
+
+function HomePage() {
   return (
     <>
       <a className="skip-link" href="#main">
         {SKIP_LINK}
       </a>
-      <Header />
+      <Header path="/" />
       <main id="main" tabIndex={-1}>
         <Hero />
-        <Versions />
-        <HowItWorks />
-        <Gallery />
-        <Who />
-        <How />
-        <Features />
-        <Results />
-        <TimeBack />
-        <Pricing />
-        <Commitment />
-        <Faq />
-        <Feedback />
+        <Doors />
       </main>
       <Footer />
       <FloatingTelegram />

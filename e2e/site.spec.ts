@@ -125,18 +125,39 @@ test('is readable without JavaScript', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('WoW accessibility addon and leveling tool');
-  const ids = ['versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'accessibility', 'faq', 'feedback', 'updates'];
-  if (Object.keys(SHOTS).length > 0) ids.push('see');
-  for (const id of ids) {
-    await expect(page.locator(`#${id} h2`)).toBeVisible();
+  await expect(page.locator('#doors h2')).toBeVisible();
+  await expect(page.locator('#updates h2')).toBeVisible();
+  await expect(page.locator('.proof')).toContainText('XP/h');
+  await expect(page.locator('#how-it-works')).toHaveCount(0);
+  await expect(page.locator('#pricing')).toHaveCount(0);
+  const pages = [
+    ['/play', '#how-it-works'],
+    ['/guide', '#versions'],
+    ['/guide', '#who'],
+    ['/guide', '#features'],
+    ['/guide', '#feedback'],
+    ['/results', '#results'],
+    ['/results', '#time-back'],
+    ['/pricing', '#pricing'],
+    ['/faq', '#faq'],
+  ] as const;
+  for (const [path, id] of pages) {
+    await page.goto(path);
+    await expect(page.locator(`${id} h2`)).toBeVisible();
   }
+  if (Object.keys(SHOTS).length > 0) {
+    await page.goto('/guide');
+    await expect(page.locator('#see h2')).toBeVisible();
+  }
+  await page.goto('/guide');
   await expect(page.locator('.template-text')).toContainText('What would help most:');
+  await page.goto('/faq');
   await expect(page.locator('#faq-risk .faq-answer')).toBeVisible();
   await page.locator('#faq-what summary').click();
   await expect(page.locator('#faq-what .faq-answer')).toBeVisible();
   const hours = STATS.stats.find((s) => s.id === 'hours');
+  await page.goto('/results');
   await expect(page.locator('.timeback-lead')).toContainText(`${hours?.prefix} ${hours?.value} hours`);
-  await expect(page.locator('.proof')).toContainText('XP/h');
   await context.close();
 });
 
@@ -203,6 +224,7 @@ test('with reduced motion: no 3D scene, no hidden reveals, the still map instead
 
 test('the accessibility menu works by keyboard and remembers the choices', async ({ page }) => {
   await page.goto('/');
+  await expect(page.locator('#root')).toHaveAttribute('data-ready', 'true', { timeout: 10000 });
   const toggle = page.getByRole('button', { name: 'Accessibility' });
   await toggle.focus();
   await page.keyboard.press('Enter');
@@ -254,7 +276,7 @@ test('still works when the browser blocks storage', async ({ page }) => {
 test('the copy button copies the feedback template and says so', async ({ browser }) => {
   const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
   const page = await context.newPage();
-  await page.goto('/');
+  await page.goto('/guide');
   const button = page.getByRole('button', { name: 'Copy feedback template' });
   await button.scrollIntoViewIfNeeded();
   await button.click();
@@ -281,6 +303,7 @@ test('every link off the site is Telegram or Discord, in a new tab, without the 
 test('one app for every version: plain names, what is coming soon, and the beta status', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.kicker')).toContainText('In beta');
+  await page.goto('/guide');
   const versions = page.locator('#versions');
   await expect(versions.locator('h2')).toBeVisible();
   expect(await versions.locator('.version-list li').count()).toBeGreaterThan(0);
@@ -291,7 +314,7 @@ test('one app for every version: plain names, what is coming soon, and the beta 
 });
 
 test('the goals model: switching the guard off turns a flee into a fight', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/play');
   const model = page.locator('#model-planner');
   await model.scrollIntoViewIfNeeded();
   await expect(model.getByTestId('planner-why')).toContainText('Flee to a guard');
@@ -303,7 +326,7 @@ test('the goals model: switching the guard off turns a flee into a fight', async
 });
 
 test('the score model: another level moves the winner', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/play');
   const model = page.locator('#model-scorer');
   await model.scrollIntoViewIfNeeded();
   const winner = model.getByTestId('scorer-winner');
@@ -315,7 +338,7 @@ test('the score model: another level moves the winner', async ({ page }) => {
 });
 
 test('the maps model: the straight line costs pulls, the priced path none', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/play');
   const model = page.locator('#model-map');
   await model.scrollIntoViewIfNeeded();
   await expect(model.getByTestId('map-pulls')).toHaveText('0');
@@ -324,7 +347,7 @@ test('the maps model: the straight line costs pulls, the priced path none', asyn
 });
 
 test('the Telegram model answers /status, /stop and /resume', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/play');
   const model = page.locator('#model-telegram');
   await model.scrollIntoViewIfNeeded();
   const log = model.getByTestId('chat-log');
@@ -341,7 +364,7 @@ test('the pictures load, fit the screen and cause no CSP errors', async ({ brows
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   const errors = watchErrors(page);
-  await page.goto('/');
+  await page.goto('/guide');
   await scrollThrough(page);
   const images = page.locator('#see img');
   expect(await images.count()).toBe(Object.keys(SHOTS).length);
@@ -357,7 +380,7 @@ test('the pictures load, fit the screen and cause no CSP errors', async ({ brows
 });
 
 test('the pricing section offers the plans, bought on Telegram', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/pricing');
   await expect(page.locator('#pricing .plan')).toHaveCount(PRICING.plans.length);
   const links = page.locator('#pricing .plan a');
   await expect(links).toHaveCount(PRICING.plans.length);
@@ -369,17 +392,23 @@ test('the pricing section offers the plans, bought on Telegram', async ({ page }
   await expect(page.locator('#pricing')).toContainText('There is no card form on this site');
 });
 
-test('the section pages render their own content', async ({ page }) => {
+test('the section pages stay themselves after JavaScript loads', async ({ page }) => {
   const cases = [
+    ['/play', '#how-it-works'],
     ['/builder', '#fighter'],
+    ['/characters', '#characters'],
     ['/pricing', '#pricing'],
     ['/faq', '#faq'],
     ['/results', '#results'],
+    ['/guide', '#versions'],
   ] as const;
   for (const [path, selector] of cases) {
     const response = await page.goto(path);
     expect(response?.status(), path).toBe(200);
+    await expect(page.locator('#root')).toHaveAttribute('data-ready', 'true', { timeout: 10000 });
     await expect(page.locator(selector).first()).toBeVisible();
+    await expect(page.locator('#hero-title')).toHaveCount(0);
+    await expect(page.locator('#doors')).toHaveCount(0);
   }
 });
 
@@ -401,7 +430,7 @@ test('the phone menu opens, closes with Escape and gives focus back', async ({ b
 test('the phone Telegram button stays off the first screen and steps aside for the footer', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  await page.goto('/');
+  await page.goto('/guide');
   const fab = page.getByRole('link', { name: 'Message STM on Telegram (opens in a new tab)' });
   await page.waitForTimeout(500);
   await expect(fab).toBeHidden();

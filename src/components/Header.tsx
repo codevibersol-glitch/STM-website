@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { HEADER_CTA, NAV, type NavItem } from '../data/copy';
+import { normalizePath } from '../routes';
 import { A11yToolbar } from './A11yToolbar';
 import { Icon } from './Icon';
 import { TelegramLink } from './TelegramLink';
 import { Wordmark } from './Wordmark';
-export function Header({ homeHref = '#top', nav = NAV }: { homeHref?: string; nav?: readonly NavItem[] }) {
+export function Header({ homeHref = '/', nav = NAV, path = '/' }: { homeHref?: string; nav?: readonly NavItem[]; path?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [current, setCurrent] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -57,13 +58,17 @@ export function Header({ homeHref = '#top', nav = NAV }: { homeHref?: string; na
       <div className="wrap header-row">
         <a href={homeHref} className="wordmark">
           <Wordmark className="wordmark-mark" label={null} />
-          <span className="sr-only">STM, back to the top</span>
+          <span className="sr-only">STM, home</span>
         </a>
         <nav id={navId} className="site-nav" aria-label="Main">
           <ul>
             {nav.map((item) => (
               <li key={item.href}>
-                <a href={item.href} aria-current={item.href === current ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
+                <a
+                  href={item.href}
+                  aria-current={normalizePath(item.href) === normalizePath(path) ? 'page' : item.href === current ? 'location' : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
                   {item.label}
                 </a>
               </li>

@@ -34,8 +34,18 @@ import stats from '../src/data/stats.json';
 import { stat } from '../src/data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../src/data/versions';
 import { copyDeck, headTags, renderApp, renderNotFound, resolveSiteUrl, structuredData } from '../src/entry-server';
+import { normalizePath } from '../src/routes';
 
-const html = renderApp();
+const home = renderApp('/');
+const play = renderApp('/play');
+const guide = renderApp('/guide');
+const resultsPage = renderApp('/results');
+const pricingPage = renderApp('/pricing');
+const faqPage = renderApp('/faq');
+const builderPage = renderApp('/builder');
+const charactersPage = renderApp('/characters');
+/** Every shipped page, so a claim has to be true somewhere on the site, not only on the home scroll. */
+const html = [home, play, guide, resultsPage, pricingPage, faqPage, builderPage, charactersPage].join('\n');
 const head = headTags(DEFAULT_SITE_URL);
 const notFound = renderNotFound();
 
@@ -57,7 +67,7 @@ function textOf(markup: string): string {
 const text = textOf(html);
 /** The working models (src/demos) run on sample data, inside frames marked data-demo. */
 const DEMO_FRAME = /<div[^>]*\bdata-demo(?:="[^"]*")?[\s>][\s\S]*?<i data-demo-end(?:="[^"]*")?[^>]*><\/i><\/div>/g;
-const demoFrames = [...html.matchAll(DEMO_FRAME)].map((m) => m[0]);
+const demoFrames = [...play.matchAll(DEMO_FRAME)].map((m) => m[0]);
 /** The page without the models: where every number must be a measured one. */
 const textOutsideDemos = textOf(html.replace(DEMO_FRAME, ' '));
 const allData = JSON.stringify({
@@ -89,7 +99,7 @@ describe('Telegram is the only channel', () => {
   const hrefs = anchors.map((a) => /href="([^"]*)"/.exec(a)?.[1] ?? '');
 
   it('links only to the page itself, Telegram or Discord', () => {
-    const internalHrefs = ['/', '/builder', '/characters', '/pricing', '/faq', '/results'];
+    const internalHrefs = ['/', '/play', '/builder', '/characters', '/pricing', '/faq', '/results', '/guide'];
     for (const href of hrefs) {
       const internal = href.startsWith('#') || internalHrefs.includes(href);
       expect(internal || href === TELEGRAM_URL || href === DISCORD_URL, `unexpected link ${href}`).toBe(true);
@@ -154,7 +164,9 @@ describe('honest claims', () => {
     expect(hero).toContain(UPDATES.title);
     // The email sign-up panel is the hero's first action, above the gold Telegram buy button.
     expect(hero.indexOf('id="updates"')).toBeLessThan(hero.indexOf('btn-gold'));
-    expect(html.indexOf('id="updates"')).toBeLessThan(html.indexOf('id="pricing"'));
+    // Pricing lives on its own page. The home page keeps the email field and does not scroll through the plans.
+    expect(home).not.toContain('id="pricing"');
+    expect(pricingPage).toContain('id="pricing"');
   });
 
   it('says plainly that STM plays automatically', () => {
@@ -193,7 +205,7 @@ describe('honest claims', () => {
   });
 
   it('sells on Telegram only: every plan button is the Telegram link', () => {
-    const section = /<section id="pricing"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+    const section = /<section id="pricing"[\s\S]*?<\/section>/.exec(pricingPage)?.[0] ?? '';
     const links = [...section.matchAll(/<a\s[^>]*href="([^"]*)"/g)].map((m) => m[1]);
     expect(links.length).toBe(PRICING.plans.length);
     for (const href of links) expect(href).toBe(TELEGRAM_URL);
@@ -301,8 +313,8 @@ describe('search', () => {
 });
 
 describe('one app, every version, in beta', () => {
-  const versions = /<section id="versions"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
-  const hero = textOf(/<section id="top"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '');
+  const versions = /<section id="versions"[\s\S]*?<\/section>/.exec(guide)?.[0] ?? '';
+  const hero = textOf(/<section id="top"[\s\S]*?<\/section>/.exec(home)?.[0] ?? '');
 
   it('says STM is both a leveling tool and an accessibility tool, in the title, the headline and the lead', () => {
     expect(SITE_TITLE).toMatch(/Accessibility Addon and Leveling Tool/);
@@ -343,7 +355,7 @@ describe('one app, every version, in beta', () => {
   });
 
   it('shows a picture only with alt text, a size, lazy loading and a file of its own', () => {
-    const imgs = [...html.matchAll(/<img\s[^>]*>/g)].map((m) => m[0]);
+    const imgs = [...guide.matchAll(/<img\s[^>]*>/g)].map((m) => m[0]);
     expect(imgs).toHaveLength(SHOTS.length);
     for (const img of imgs) {
       expect(img).toMatch(/alt="[^"]{12,}"/);
@@ -352,14 +364,15 @@ describe('one app, every version, in beta', () => {
       expect(img).toContain('loading="lazy"');
       expect(img).toMatch(/src="\/shots\/[\w-]+\.jpg"/);
     }
-    if (SHOTS.length > 0) expect(textOf(html)).toContain(GALLERY_COPY.note);
+    if (SHOTS.length > 0) expect(textOf(guide)).toContain(GALLERY_COPY.note);
   });
 });
 
 describe('how STM works: the working models', () => {
   it('renders the section on the server, with the loop and all six models', () => {
-    expect(html).toContain('id="how-it-works"');
-    for (const m of MODELS) expect(html, m.id).toContain(`id="model-${m.id}"`);
+    expect(play).toContain('id="how-it-works"');
+    expect(home).not.toContain('id="how-it-works"');
+    for (const m of MODELS) expect(play, m.id).toContain(`id="model-${m.id}"`);
     expect(demoFrames).toHaveLength(MODELS.length);
     for (const step of LOOP) expect(text).toContain(step.text);
     for (const item of UNDER_THE_HOOD) expect(text).toContain(item.text);
@@ -373,7 +386,7 @@ describe('how STM works: the working models', () => {
 
   it("offers only the bot's real Telegram commands", () => {
     expect([...COMMANDS]).toEqual(['/status', '/stop', '/resume']);
-    expect(html).not.toContain('/pause');
+    expect(play).not.toContain('/pause');
   });
 
   it('keeps the header to seven links (an eighth pushes the accessibility menu off a laptop screen at the largest text)', () => {
@@ -416,6 +429,35 @@ describe('how STM works: the working models', () => {
   });
 });
 
+describe('pages stay themselves', () => {
+  it('hydrates a pretty url and its html file as the same route', () => {
+    expect(normalizePath('/builder')).toBe('/builder');
+    expect(normalizePath('/builder/')).toBe('/builder');
+    expect(normalizePath('/builder.html')).toBe('/builder');
+    expect(normalizePath('/index.html')).toBe('/');
+    expect(normalizePath('/')).toBe('/');
+  });
+
+  it('keeps the home page to the hero and the doors', () => {
+    expect(home).toContain('id="top"');
+    expect(home).toContain('id="doors"');
+    expect(home).toContain('id="updates"');
+    for (const id of ['how-it-works', 'versions', 'who', 'features', 'results', 'pricing', 'faq', 'feedback', 'fighter']) {
+      expect(home, id).not.toContain(`id="${id}"`);
+    }
+  });
+
+  it('renders each section on its own page', () => {
+    expect(builderPage).toContain('id="fighter"');
+    expect(builderPage).not.toContain('id="hero-title"');
+    expect(charactersPage).toContain('id="characters"');
+    expect(faqPage).toContain('id="faq"');
+    expect(resultsPage).toContain('id="results"');
+    expect(resultsPage).toContain('id="time-back"');
+    expect(play).toContain('id="how-it-works"');
+  });
+});
+
 describe('content without JavaScript', () => {
   it('renders every section, the whole FAQ and the feedback template on the server', () => {
     const ids = ['top', 'versions', 'how-it-works', 'who', 'how', 'features', 'results', 'time-back', 'pricing', 'accessibility', 'faq', 'feedback', 'updates'];
@@ -423,7 +465,9 @@ describe('content without JavaScript', () => {
     for (const id of ids) {
       expect(html).toContain(`id="${id}"`);
     }
-    expect(NAV.some((n) => n.href === '#see')).toBe(SHOTS.length > 0);
+    expect(NAV.every((n) => n.href.startsWith('/'))).toBe(true);
+    expect(guide).toContain('id="versions"');
+    if (SHOTS.length > 0) expect(guide).toContain('id="see"');
     for (const f of FAQ) expect(text).toContain(f.a);
     expect(text).toContain('What would help most:');
   });

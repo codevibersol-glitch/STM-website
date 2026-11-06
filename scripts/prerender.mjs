@@ -57,6 +57,10 @@ await writeFile(join(dist, 'index.html'), page);
 
 // The section pages: each one renders its own section, with its own title and description.
 const pageMeta = {
+  '/play': {
+    title: 'Play · STM',
+    description: 'Working models of how STM plays: the route, the score, the map, the dashboard, the fight review and Telegram.',
+  },
   '/builder': {
     title: 'Builder · STM',
     description:
@@ -66,6 +70,10 @@ const pageMeta = {
   '/pricing': { title: 'Pricing · STM', description: 'The STM plans: FLEX, GO and Founder, from the basic bot features to full access. Buy on Telegram.' },
   '/faq': { title: 'FAQ · STM', description: 'The STM FAQ: what the addon is, how it plays, what it costs, how to buy and how to give feedback.' },
   '/results': { title: 'Results · STM', description: 'The measured results of STM: XP per hour, hours of play, kills and analysed deaths in WoW.' },
+  '/guide': {
+    title: 'Guide · STM',
+    description: 'Who STM is for, every WoW version it plays, and how the accessibility addon and leveling tool helps.',
+  },
 };
 const withHead = (html, meta, path) =>
   html
@@ -116,7 +124,7 @@ await writeFile(
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-${['/builder', '/pricing', '/faq', '/results'].map((route) => `  <url>
+${Object.keys(pageMeta).map((route) => `  <url>
     <loc>${siteUrl}${route}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>

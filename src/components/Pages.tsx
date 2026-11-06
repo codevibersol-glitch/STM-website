@@ -1,65 +1,92 @@
 import type { ReactNode } from 'react';
-import { Characters, Faq, Fighter, Footer, Pricing, Results } from './Sections';
+import { HowItWorks } from './HowItWorks';
+import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
 import { Header } from './Header';
-import { SKIP_LINK, type NavItem } from '../data/copy';
+import { SKIP_LINK } from '../data/copy';
 
-/** The frame every page shares: skip link, header, main, footer. The pages put one or two sections in it. */
-export function PageShell({ nav, children }: { nav?: readonly NavItem[]; children: ReactNode }) {
+/** The frame every page shares: skip link, the same site nav, main, footer. */
+export function PageShell({ path, children }: { path: string; children: ReactNode }) {
   return (
     <>
       <a className="skip-link" href="#main">
         {SKIP_LINK}
       </a>
-      <Header homeHref="/" nav={nav} />
+      <Header homeHref="/" path={path} />
       <main id="main" tabIndex={-1}>
         {children}
       </main>
-      <Footer nav={nav} />
+      <Footer />
+      <FloatingTelegram />
     </>
   );
 }
 
-/** The fighter builder, on its own page: the whole build-your-fighter flow. */
-export function BuilderPage() {
+/** The six working models, on their own page. */
+export function PlayPage({ path }: { path: string }) {
   return (
-    <PageShell nav={[{ href: '#fighter', label: 'Fighter' }]}>
+    <PageShell path={path}>
+      <HowItWorks />
+    </PageShell>
+  );
+}
+
+/** The fighter builder, on its own page: the whole build-your-fighter flow. */
+export function BuilderPage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
       <Fighter />
     </PageShell>
   );
 }
 
 /** The character models, on their own page: gear, talents and spells on the dashboard. */
-export function CharactersPage() {
+export function CharactersPage({ path }: { path: string }) {
   return (
-    <PageShell nav={[{ href: '#characters', label: 'Characters' }]}>
+    <PageShell path={path}>
       <Characters />
     </PageShell>
   );
 }
 
 /** The buying plans, on their own page. */
-export function PricingPage() {
+export function PricingPage({ path }: { path: string }) {
   return (
-    <PageShell nav={[{ href: '#pricing', label: 'Pricing' }]}>
+    <PageShell path={path}>
       <Pricing />
     </PageShell>
   );
 }
 
 /** The questions and answers, on their own page. */
-export function FaqPage() {
+export function FaqPage({ path }: { path: string }) {
   return (
-    <PageShell nav={[{ href: '#faq', label: 'FAQ' }]}>
+    <PageShell path={path}>
       <Faq />
     </PageShell>
   );
 }
 
 /** The measured results, on their own page. */
-export function ResultsPage() {
+export function ResultsPage({ path }: { path: string }) {
   return (
-    <PageShell nav={[{ href: '#results', label: 'Results' }]}>
+    <PageShell path={path}>
       <Results />
+      <TimeBack />
+    </PageShell>
+  );
+}
+
+/** Who it is for, the versions, the pictures and the feedback template. */
+export function GuidePage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
+      <Versions />
+      <Gallery />
+      <Who />
+      <How />
+      <Features />
+      <Commitment />
+      <Feedback />
     </PageShell>
   );
 }

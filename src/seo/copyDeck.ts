@@ -2,6 +2,7 @@
 
 import {
   COMMITMENT,
+  DOORS,
   FAB_LABEL,
   FAQ_COPY,
   FEATURES_COPY,
@@ -58,6 +59,12 @@ export function copyDeck(): string {
     `- Trust line: ${HERO.trust.join(' · ')}`,
     `- Proof line: ${HERO.proofLead} ${stat('xp-median').value} ${stat('xp-median').unit} ${stat('xp-median').short ?? ''} · ${HERO.proofLink}`,
     `- Picture caption: ${HERO.caption}`,
+    '',
+    `## ${DOORS.title}`,
+    '',
+    `_${DOORS.eyebrow}_ - ${DOORS.intro}`,
+    '',
+    ...DOORS.items.map((d) => `- **${d.title}** (${d.href}) - ${d.text}`),
     '',
     `## ${VERSIONS_COPY.title}`,
     '',
