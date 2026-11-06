@@ -200,7 +200,7 @@ test('with reduced motion: no 3D scene, no hidden reveals, the still map instead
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
   await expect(page.locator('.hero-map')).not.toHaveClass(/is-live/);
   await expect(page.locator('.hero-film video')).toHaveCount(0);
-  await expect(page.locator('.hero-film')).toContainText('Not gameplay');
+  await expect(page.locator('.hero-film-play')).toHaveCount(0);
   await expect(page.locator('.hero-poster')).toBeVisible();
   const hidden = await page.evaluate(
     () => [...document.querySelectorAll('[data-reveal]')].filter((el) => getComputedStyle(el).opacity !== '1').length,

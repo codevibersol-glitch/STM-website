@@ -3,7 +3,6 @@ import { PREFS_EVENT, motionReduced } from '../lib/prefs';
 
 const FILM = '/media/hero-film.mp4';
 const POSTER = '/media/hero-film-poster.jpg';
-const LABEL = 'Promotional animation made with Grok Imagine. Not gameplay, and not a picture of STM.';
 
 function savesData(): boolean {
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -60,16 +59,13 @@ export function HeroFilm() {
           <source src={FILM} type="video/mp4" />
         </video>
       ) : (
-        <img className="hero-film-frame" src={POSTER} width={848} height={480} alt="" />
+        <img className="hero-film-frame" src={POSTER} width={848} height={480} alt="A cloaked figure on a forest path" />
       )}
-      <figcaption className="hero-film-caption">
-        <p>{LABEL}{hold ? ' The film stays a still while motion is reduced or data saver is on.' : ''}</p>
-        {hold ? null : (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={playing ? pause : play}>
-            {playing ? 'Pause the film' : 'Play the film'}
-          </button>
-        )}
-      </figcaption>
+      {hold ? null : (
+        <button type="button" className="hero-film-play" onClick={playing ? pause : play}>
+          {playing ? 'Pause' : 'Play'}
+        </button>
+      )}
     </figure>
   );
 }
