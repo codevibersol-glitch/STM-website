@@ -1925,6 +1925,18 @@ html[data-font="dyslexic"] {
     opacity: 1;
   }
 
+  /* The fighter build's tabs: armour set, spec, talents, build. */
+  .fighter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0 0 1.25rem;
+  }
+  .fighter-panel {
+    /* The panels keep the groups' own layouts (.fighter-sets and friends). */
+  }
+
   /* ---------------------------------------------------------------------------------- FAQ */
 
   .faq {

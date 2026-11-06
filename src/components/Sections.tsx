@@ -44,6 +44,14 @@ interface SectionHeadProps {
   intro?: string;
 }
 
+const FIGHTER_TABS = [
+  { id: 'armour', label: FIGHTER.armour },
+  { id: 'spec', label: FIGHTER.spec },
+  { id: 'talents', label: FIGHTER.talents },
+  { id: 'build', label: FIGHTER.build },
+] as const;
+type FighterTabId = (typeof FIGHTER_TABS)[number]['id'];
+
 export function SectionHead({ id, eyebrow, title, intro }: SectionHeadProps) {
   return (
     <div className="section-head" data-reveal>
@@ -420,6 +428,7 @@ export function Fighter() {
     tierSetId: FIGHTER_TIER_SETS[0]!.id,
     talentIds: [...FIGHTER_SPECS[0]!.tree.talents.map((t) => t.id)],
   });
+  const [tab, setTab] = useState<FighterTabId>('armour');
 
   const spec = FIGHTER_SPECS.find((s) => s.id === state.specId) ?? FIGHTER_SPECS[0]!;
   const tierSet = FIGHTER_TIER_SETS.find((t) => t.id === state.tierSetId) ?? FIGHTER_TIER_SETS[0]!;
@@ -443,47 +452,73 @@ export function Fighter() {
         <SectionHead id="fighter-title" eyebrow={FIGHTER.eyebrow} title={FIGHTER.title} intro={FIGHTER.intro} />
         <div className="fighter" data-reveal>
           <FighterScene specId={state.specId} tierSetId={state.tierSetId} />
-          <div className="fighter-sets">
-            <p className="fighter-label">{FIGHTER.armour}</p>
-            {FIGHTER_TIER_SETS.map((set) => (
+          <div className="fighter-tabs" role="tablist" aria-label="The fighter build">
+            {FIGHTER_TABS.map((t) => (
               <button
-                key={set.id}
+                key={t.id}
                 type="button"
+                role="tab"
+                id={`fighter-tab-${t.id}`}
+                aria-selected={tab === t.id}
+                aria-controls={`fighter-panel-${t.id}`}
                 className="btn btn-ghost"
-                aria-pressed={state.tierSetId === set.id}
-                onClick={() => chooseSet(set.id)}
+                onClick={() => setTab(t.id)}
               >
-                {set.name}
+                {t.label}
               </button>
             ))}
           </div>
-          <div className="fighter-specs">
-            <p className="fighter-label">{FIGHTER.spec}</p>
-            {FIGHTER_SPECS.map((s) => (
-              <button key={s.id} type="button" className="btn btn-ghost" aria-pressed={state.specId === s.id} onClick={() => chooseSpec(s.id)}>
-                {s.name}
-              </button>
-            ))}
-          </div>
-          <div className="fighter-talents">
-            <p className="fighter-label">{FIGHTER.talents}</p>
-            {spec
-              ? spec.tree.talents.map((t) => (
+          <div className="fighter-panel" id={`fighter-panel-${tab}`} role="tabpanel" aria-labelledby={`fighter-tab-${tab}`}>
+            {tab === 'armour' ? (
+              <div className="fighter-sets">
+                <p className="fighter-label">{FIGHTER.armour}</p>
+                {FIGHTER_TIER_SETS.map((set) => (
                   <button
-                    key={t.id}
+                    key={set.id}
                     type="button"
-                    className="btn btn-ghost btn-sm"
-                    aria-pressed={state.talentIds.includes(t.id)}
-                    onClick={() => toggleTalent(t.id)}
+                    className="btn btn-ghost"
+                    aria-pressed={state.tierSetId === set.id}
+                    onClick={() => chooseSet(set.id)}
                   >
-                    {t.name}
+                    {set.name}
                   </button>
-                ))
-              : null}
+                ))}
+              </div>
+            ) : null}
+            {tab === 'spec' ? (
+              <div className="fighter-specs">
+                <p className="fighter-label">{FIGHTER.spec}</p>
+                {FIGHTER_SPECS.map((s) => (
+                  <button key={s.id} type="button" className="btn btn-ghost" aria-pressed={state.specId === s.id} onClick={() => chooseSpec(s.id)}>
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {tab === 'talents' ? (
+              <div className="fighter-talents">
+                <p className="fighter-label">{FIGHTER.talents}</p>
+                {spec
+                  ? spec.tree.talents.map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        aria-pressed={state.talentIds.includes(t.id)}
+                        onClick={() => toggleTalent(t.id)}
+                      >
+                        {t.name}
+                      </button>
+                    ))
+                  : null}
+              </div>
+            ) : null}
+            {tab === 'build' ? (
+              <p className="fighter-summary">
+                {spec ? spec.name : ''} with the {tierSet.name} armour set, holding {talents.length > 0 ? 'the chosen talents' : 'no chosen talents'}.
+              </p>
+            ) : null}
           </div>
-          <p className="fighter-summary">
-            {spec ? spec.name : ''} with the {tierSet.name} armour set, holding {talents.length > 0 ? 'the chosen talents' : 'no chosen talents'}.
-          </p>
         </div>
       </div>
     </section>
