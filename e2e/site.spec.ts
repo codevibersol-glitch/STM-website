@@ -199,6 +199,8 @@ test('with reduced motion: no 3D scene, no hidden reveals, the still map instead
   await page.waitForTimeout(1500);
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
   await expect(page.locator('.hero-map')).not.toHaveClass(/is-live/);
+  await expect(page.locator('.hero-film video')).toHaveCount(0);
+  await expect(page.locator('.hero-film')).toContainText('Not gameplay');
   await expect(page.locator('.hero-poster')).toBeVisible();
   const hidden = await page.evaluate(
     () => [...document.querySelectorAll('[data-reveal]')].filter((el) => getComputedStyle(el).opacity !== '1').length,
@@ -400,6 +402,17 @@ test('the section pages stay themselves after JavaScript loads', async ({ page }
     await expect(page.locator('#hero-title')).toHaveCount(0);
     await expect(page.locator('#doors')).toHaveCount(0);
   }
+});
+
+test('the talent planner spends a vanilla point and blocks a tauren rogue', async ({ page }) => {
+  await page.goto('/builder');
+  await page.getByRole('tab', { name: 'Talents' }).click();
+  await page.getByRole('button', { name: 'Add a point to Improved Heroic Strike' }).click();
+  await expect(page.locator('[data-planner]')).toContainText('1 of 51');
+  await page.getByRole('tab', { name: 'Class' }).click();
+  await page.getByRole('button', { name: 'Rogue', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Tauren' })).toBeDisabled();
+  await expect(page.locator('.planner-scope').first()).toContainText('not in it yet');
 });
 
 test('the phone menu opens, closes with Escape and gives focus back', async ({ browser }) => {

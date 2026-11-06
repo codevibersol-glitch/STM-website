@@ -29,7 +29,7 @@ export const DOORS = {
   intro: 'Each part of STM is its own page. Pick one and stay there.',
   items: [
     { href: '/play', title: 'Play', text: 'Six sample demos: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
-    { href: '/builder', title: 'Builder', text: 'Pick a spec, an armour set and the talents that hold the fight.' },
+    { href: '/builder', title: 'Builder', text: 'A vanilla talent planner for warrior and rogue, and an armour name for that class.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
     { href: '/pricing', title: 'Pricing', text: 'Three plans. You buy on Telegram.' },
@@ -198,8 +198,8 @@ export const UPDATES = {
 export const FIGHTER = {
   eyebrow: 'Fighter',
   title: 'Build your fighter',
-  intro: 'Pick a spec, take a vanilla armour set, and hold the fight with the talents you choose.',
-  spec: 'Spec',
+  intro: 'Choose a warrior or a rogue, spend vanilla talent points, and name a vanilla armour set. The figure is not that set.',
+  spec: 'Class',
   armour: 'Armour set',
   talents: 'Talents',
   build: 'The build',

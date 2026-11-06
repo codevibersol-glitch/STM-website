@@ -66,9 +66,10 @@ function textOf(markup: string): string {
 const text = textOf(html);
 /** The working models (src/demos) run on sample data, inside frames marked data-demo. */
 const DEMO_FRAME = /<div[^>]*\bdata-demo(?:="[^"]*")?[\s>][\s\S]*?<i data-demo-end(?:="[^"]*")?[^>]*><\/i><\/div>/g;
+const PLANNER = /<div[^>]*\bdata-planner(?:="[^"]*")?[\s>][\s\S]*?<i data-planner-end(?:="[^"]*")?[^>]*><\/i><\/div>/g;
 const demoFrames = [...play.matchAll(DEMO_FRAME)].map((m) => m[0]);
-/** The page without the models: where every number must be a measured one. */
-const textOutsideDemos = textOf(html.replace(DEMO_FRAME, ' '));
+/** Measured claims stay outside the sample demos and outside the talent planner's game ranks. */
+const textOutsideDemos = textOf(html.replace(DEMO_FRAME, ' ').replace(PLANNER, ' '));
 const allData = JSON.stringify({
   COMMITMENT,
   FEEDBACK,

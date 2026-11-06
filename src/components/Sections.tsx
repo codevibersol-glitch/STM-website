@@ -27,7 +27,7 @@ import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, EMAIL_SIGNUP, KLAVIYO_
 import type { NavItem } from '../data/copy';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
-import { FIGHTER_SPECS, setsFor, type FighterState } from '../data/talents';
+import { setsFor } from '../data/talents';
 import { DashboardDemo } from '../demos/DashboardDemo';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
@@ -36,6 +36,8 @@ import { TiltCard, useCountUp } from './Motion';
 import { TelegramLink } from './TelegramLink';
 import { DiscordLink } from './DiscordLink';
 import { FighterScene } from './FighterScene';
+import { HeroFilm } from './HeroFilm';
+import { ClassChoices, PlanSummary, TalentTrees, useFighterPlan } from './TalentPlanner';
 import { Wordmark } from './Wordmark';
 
 interface SectionHeadProps {
@@ -115,8 +117,9 @@ export function Hero() {
             ))}
           </ul>
           <ProofLine />
+          <p className="hero-caption">{HERO.caption}</p>
         </div>
-        <p className="hero-caption">{HERO.caption}</p>
+        <HeroFilm />
       </div>
     </section>
   );
@@ -445,38 +448,25 @@ export function Pricing() {
  * this build into the duel; for now the builder holds the state in the browser and shows the hold.
  */
 export function Fighter() {
-  const [state, setState] = useState<FighterState>({
-    specId: FIGHTER_SPECS[0]!.id,
-    tierSetId: setsFor(FIGHTER_SPECS[0]!.classId)[0]!.id,
-    talentIds: [...FIGHTER_SPECS[0]!.tree.talents.map((t) => t.id)],
-  });
+  const [plan, setPlan] = useFighterPlan();
+  const [tierSetId, setTierSetId] = useState(setsFor(plan.classId)[0]!.id);
   const [tab, setTab] = useState<FighterTabId>('armour');
+  const classSets = setsFor(plan.classId);
+  const tierSet = classSets.find((set) => set.id === tierSetId) ?? classSets[0]!;
+  const specId = plan.classId === 'rogue' ? 'rogue-subtlety' : 'warrior-protection';
 
-  const spec = FIGHTER_SPECS.find((s) => s.id === state.specId) ?? FIGHTER_SPECS[0]!;
-  const classSets = setsFor(spec.classId);
-  const tierSet = classSets.find((t) => t.id === state.tierSetId) ?? classSets[0]!;
-  const talents = spec ? spec.tree.talents.filter((t) => state.talentIds.includes(t.id)) : [];
+  useEffect(() => {
+    if (!classSets.some((set) => set.id === tierSetId)) setTierSetId(classSets[0]!.id);
+  }, [classSets, tierSetId]);
 
-  const chooseSpec = (id: string) => {
-    const next = FIGHTER_SPECS.find((s) => s.id === id);
-    if (!next) return;
-    const nextSets = setsFor(next.classId);
-    const tierSetId = nextSets.some((set) => set.id === state.tierSetId) ? state.tierSetId : nextSets[0]!.id;
-    setState({ specId: id, tierSetId, talentIds: [...next.tree.talents.map((t) => t.id)] });
-  };
-
-  const toggleTalent = (id: string) => {
-    setState((b) => ({ ...b, talentIds: b.talentIds.includes(id) ? b.talentIds.filter((x) => x !== id) : [...b.talentIds, id] }));
-  };
-
-  const chooseSet = (id: string) => setState((b) => ({ ...b, tierSetId: id }));
+  const chooseSet = (id: string) => setTierSetId(id);
 
   return (
     <section id="fighter" className="section" aria-labelledby="fighter-title">
       <div className="wrap">
         <SectionHead id="fighter-title" eyebrow={FIGHTER.eyebrow} title={FIGHTER.title} intro={FIGHTER.intro} />
         <div className="fighter" data-reveal>
-          <FighterScene specId={state.specId} tierSetId={state.tierSetId} />
+          <FighterScene specId={specId} tierSetId={tierSet.id} />
           <div className="fighter-tabs" role="tablist" aria-label="The fighter build">
             {FIGHTER_TABS.map((t) => (
               <button
@@ -502,7 +492,7 @@ export function Fighter() {
                     key={set.id}
                     type="button"
                     className="btn btn-ghost"
-                    aria-pressed={state.tierSetId === set.id}
+                    aria-pressed={tierSet.id === set.id}
                     onClick={() => chooseSet(set.id)}
                   >
                     {set.name}
@@ -510,38 +500,15 @@ export function Fighter() {
                 ))}
               </div>
             ) : null}
-            {tab === 'spec' ? (
-              <div className="fighter-specs">
-                <p className="fighter-label">{FIGHTER.spec}</p>
-                {FIGHTER_SPECS.map((s) => (
-                  <button key={s.id} type="button" className="btn btn-ghost" aria-pressed={state.specId === s.id} onClick={() => chooseSpec(s.id)}>
-                    {s.name}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            {tab === 'talents' ? (
-              <div className="fighter-talents">
-                <p className="fighter-label">{FIGHTER.talents}</p>
-                {spec
-                  ? spec.tree.talents.map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        aria-pressed={state.talentIds.includes(t.id)}
-                        onClick={() => toggleTalent(t.id)}
-                      >
-                        {t.name}
-                      </button>
-                    ))
-                  : null}
-              </div>
-            ) : null}
+            {tab === 'spec' ? <ClassChoices plan={plan} onChange={setPlan} /> : null}
+            {tab === 'talents' ? <TalentTrees plan={plan} onChange={setPlan} /> : null}
             {tab === 'build' ? (
-              <p className="fighter-summary">
-                {spec ? spec.name : ''} with the {tierSet.name} armour set, holding {talents.length > 0 ? 'the chosen talents' : 'no chosen talents'}.
-              </p>
+              <div className="fighter-summary">
+                <p>
+                  {tierSet.name} is the armour name on this build. The figure is a free model for the class, not that set, and not a World of Warcraft model.
+                </p>
+                <PlanSummary plan={plan} />
+              </div>
             ) : null}
           </div>
         </div>
