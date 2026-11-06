@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { FIGHTER_TIER_SETS } from '../data/talents';
 import type { FighterSceneHandle } from '../hero/fighter';
 import { PREFS_EVENT, motionReduced } from '../lib/prefs';
 
@@ -123,9 +124,11 @@ export function FighterScene({ specId, tierSetId }: { specId: string; tierSetId:
     };
   }, [specId, tierSetId]);
 
+  const set = FIGHTER_TIER_SETS.find((item) => item.id === tierSetId);
   return (
-    <div className={`fighter-scene${live ? ' is-live' : ''}`} aria-hidden="true">
-      <canvas ref={canvasRef} className="fighter-canvas" />
+    <div className={`fighter-scene${live ? ' is-live' : ''}`}>
+      <canvas ref={canvasRef} className="fighter-canvas" aria-hidden="true" />
+      <p className="fighter-set-name">{set ? `${set.name} · vanilla ${set.weight}` : ''}</p>
     </div>
   );
 }

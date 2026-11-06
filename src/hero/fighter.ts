@@ -21,6 +21,7 @@ import {
   type BufferGeometry,
   type Material,
 } from 'three';
+import { FIGHTER_TIER_SETS, type ArmorWeight } from '../data/talents';
 
 export interface FighterSceneOptions {
   specId: string;
@@ -43,14 +44,9 @@ const SKIN_TONE = 0x8a5a33;
 const STEEL = 0xcfd6dd;
 const GOLD = 0xd8c27a;
 
-const ARMOR_COLORS: Record<string, number> = {
-  resolute: 0x7d8ca3,
-  vanguard: 0x8f3b2e,
-};
-const DEFAULT_ARMOR = ARMOR_COLORS.resolute ?? 0x7d8ca3;
-
-function armorColor(tierSetId: string): number {
-  return ARMOR_COLORS[tierSetId] ?? DEFAULT_ARMOR;
+function setLook(tierSetId: string): { color: number; weight: ArmorWeight } {
+  const set = FIGHTER_TIER_SETS.find((item) => item.id === tierSetId);
+  return { color: set?.color ?? 0x8a3a2a, weight: set?.weight ?? 'plate' };
 }
 
 interface BuiltCharacter {
@@ -97,7 +93,9 @@ export function createFighterScene(canvas: HTMLCanvasElement, options: FighterSc
 
   const buildCharacter = (o: FighterSceneOptions): BuiltCharacter => {
     const ds: (BufferGeometry | Material)[] = [];
-    const armorMat = new MeshLambertMaterial({ color: armorColor(o.tierSetId) });
+    const look = setLook(o.tierSetId);
+    const plate = look.weight === 'plate';
+    const armorMat = new MeshLambertMaterial({ color: look.color });
     ds.push(armorMat);
     const legMat = new MeshLambertMaterial({ color: LEG_TONE });
     ds.push(legMat);
@@ -110,36 +108,40 @@ export function createFighterScene(canvas: HTMLCanvasElement, options: FighterSc
     const gold = new MeshLambertMaterial({ color: GOLD });
     ds.push(gold);
 
-    const legGeo = new CapsuleGeometry(0.13, 0.5, 4, 12);
+    const legGeo = new CapsuleGeometry(plate ? 0.15 : 0.11, 0.5, 4, 12);
     ds.push(legGeo);
-    const legL = new Mesh(legGeo, legMat);
-    legL.position.set(-0.14, 0.38, 0);
-    const legR = new Mesh(legGeo, legMat);
-    legR.position.set(0.14, 0.38, 0);
+    const legL = new Mesh(legGeo, plate ? armorMat : legMat);
+    legL.position.set(-0.16, 0.38, 0);
+    const legR = new Mesh(legGeo, plate ? armorMat : legMat);
+    legR.position.set(0.16, 0.38, 0);
 
     const torsoGroup = new Group();
-    const cloth = new Mesh(new BoxGeometry(0.42, 0.6, 0.24), clothMat);
+    const cloth = new Mesh(new BoxGeometry(plate ? 0.4 : 0.34, 0.62, plate ? 0.22 : 0.18), clothMat);
     cloth.position.set(0, 1.16, 0);
-    const armorShell = new Mesh(new BoxGeometry(0.47, 0.64, 0.29), armorMat);
-    armorShell.position.set(0, 1.16, 0);
-    const padL = new Mesh(new BoxGeometry(0.2, 0.1, 0.2), armorMat);
-    padL.position.set(-0.27, 1.38, 0);
-    const padR = new Mesh(new BoxGeometry(0.2, 0.1, 0.2), armorMat);
-    padR.position.set(0.27, 1.38, 0);
+    const armorShell = new Mesh(new BoxGeometry(plate ? 0.56 : 0.38, plate ? 0.7 : 0.5, plate ? 0.34 : 0.22), armorMat);
+    armorShell.position.set(0, plate ? 1.18 : 1.2, 0);
+    const padGeo = new BoxGeometry(plate ? 0.28 : 0.14, plate ? 0.16 : 0.08, plate ? 0.28 : 0.16);
+    ds.push(padGeo);
+    const padL = new Mesh(padGeo, armorMat);
+    padL.position.set(plate ? -0.34 : -0.24, 1.4, 0);
+    const padR = new Mesh(padGeo, armorMat);
+    padR.position.set(plate ? 0.34 : 0.24, 1.4, 0);
     torsoGroup.add(cloth, armorShell, padL, padR);
 
     const neck = new Mesh(new BoxGeometry(0.09, 0.1, 0.09), skinMat);
     neck.position.set(0, 1.5, 0);
     const head = new Mesh(new SphereGeometry(0.14, 16, 12), skinMat);
-    head.position.set(0, 1.62, 0);
-    const helmet = new Mesh(new SphereGeometry(0.145, 16, 12), armorMat);
-    helmet.position.set(0, 1.65, 0);
-    helmet.scale.set(1, 0.8, 1);
+    head.position.set(0, 1.62, plate ? 0.02 : 0.04);
+    const helmet = new Mesh(new SphereGeometry(plate ? 0.18 : 0.15, 16, 12), armorMat);
+    helmet.position.set(0, plate ? 1.66 : 1.7, plate ? 0 : -0.02);
+    helmet.scale.set(1, plate ? 0.72 : 0.55, 1);
 
-    const armL = new Mesh(new CapsuleGeometry(0.06, 0.26, 4, 8), legMat);
-    armL.position.set(-0.2, 1.34, 0);
-    const armR = new Mesh(new CapsuleGeometry(0.06, 0.26, 4, 8), legMat);
-    armR.position.set(0.2, 1.34, 0);
+    const armGeo = new CapsuleGeometry(plate ? 0.07 : 0.05, 0.26, 4, 8);
+    ds.push(armGeo);
+    const armL = new Mesh(armGeo, plate ? armorMat : legMat);
+    armL.position.set(plate ? -0.28 : -0.2, 1.28, 0);
+    const armR = new Mesh(armGeo, plate ? armorMat : legMat);
+    armR.position.set(plate ? 0.28 : 0.2, 1.28, 0);
 
     const group = new Group();
     group.add(legL, legR, torsoGroup, neck, head, helmet, armL, armR);

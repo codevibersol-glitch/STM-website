@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { FighterScene } from './FighterScene';
 import { HowItWorks } from './HowItWorks';
 import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
 import { Header } from './Header';
@@ -25,6 +26,15 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
 export function PlayPage({ path }: { path: string }) {
   return (
     <PageShell path={path}>
+      <section className="section" aria-labelledby="play-set-title">
+        <div className="wrap">
+          <h2 id="play-set-title" className="section-title">
+            Vanilla sets
+          </h2>
+          <p className="section-intro">The games start from classic armour. This warrior is in Battlegear of Valor. Change the set in the builder.</p>
+          <FighterScene specId="warrior-protection" tierSetId="valor" />
+        </div>
+      </section>
       <HowItWorks />
     </PageShell>
   );

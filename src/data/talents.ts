@@ -15,15 +15,24 @@ export interface TalentTree {
   talents: readonly TalentNode[];
 }
 
+export type FighterClassId = 'warrior' | 'rogue';
+export type ArmorWeight = 'plate' | 'leather';
+
 export interface FighterSpec {
   id: string;
   name: string;
+  classId: FighterClassId;
   tree: TalentTree;
 }
 
 export interface TierSet {
   id: string;
   name: string;
+  classId: FighterClassId;
+  /** Plate or leather, the two weights these vanilla sets use. */
+  weight: ArmorWeight;
+  /** A flat stand-in colour for the set. Not a copied texture. */
+  color: number;
   text: string;
 }
 
@@ -39,15 +48,25 @@ export interface FighterState {
   talentIds: readonly string[];
 }
 
+/** Classic (vanilla) armour sets only. Later expansions are not in this list yet. */
 export const FIGHTER_TIER_SETS: readonly TierSet[] = [
-  { id: 'resolute', name: 'Resolute', text: 'The starting armour set of the build.' },
-  { id: 'vanguard', name: 'Vanguard', text: 'The heavier armour set of the build.' },
+  { id: 'valor', name: 'Battlegear of Valor', classId: 'warrior', weight: 'plate', color: 0x8a3a2a, text: 'Vanilla dungeon set. Plate.' },
+  { id: 'might', name: 'Battlegear of Might', classId: 'warrior', weight: 'plate', color: 0x6e2a22, text: 'Vanilla Molten Core set. Plate.' },
+  { id: 'wrath', name: 'Battlegear of Wrath', classId: 'warrior', weight: 'plate', color: 0x3e4c38, text: 'Vanilla Blackwing Lair set. Plate.' },
+  { id: 'shadowcraft', name: 'Shadowcraft Armor', classId: 'rogue', weight: 'leather', color: 0x2c3328, text: 'Vanilla dungeon set. Leather.' },
+  { id: 'nightslayer', name: 'Nightslayer Armor', classId: 'rogue', weight: 'leather', color: 0x1a2230, text: 'Vanilla Molten Core set. Leather.' },
+  { id: 'bloodfang', name: 'Bloodfang Armor', classId: 'rogue', weight: 'leather', color: 0x6a1e24, text: 'Vanilla Blackwing Lair set. Leather.' },
 ];
+
+export function setsFor(classId: FighterClassId): readonly TierSet[] {
+  return FIGHTER_TIER_SETS.filter((set) => set.classId === classId);
+}
 
 export const FIGHTER_SPECS: readonly FighterSpec[] = [
   {
     id: 'warrior-protection',
     name: 'Protection Warrior',
+    classId: 'warrior',
     tree: {
       id: 'warrior-protection',
       name: 'Protection',
@@ -62,6 +81,7 @@ export const FIGHTER_SPECS: readonly FighterSpec[] = [
   {
     id: 'rogue-subtlety',
     name: 'Subtlety Rogue',
+    classId: 'rogue',
     tree: {
       id: 'rogue-subtlety',
       name: 'Subtlety',
@@ -77,7 +97,7 @@ export const FIGHTER_SPECS: readonly FighterSpec[] = [
 
 export function defaultFighterState(): FighterState {
   const spec = FIGHTER_SPECS[0]!;
-  const set = FIGHTER_TIER_SETS[0]!;
+  const set = setsFor(spec.classId)[0]!;
   return { specId: spec.id, tierSetId: set.id, talentIds: [...spec.tree.talents.map((t) => t.id)] };
 }
 

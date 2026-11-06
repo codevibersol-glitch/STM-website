@@ -28,7 +28,7 @@ export const DOORS = {
   title: 'Open the WoW accessibility addon and leveling tool',
   intro: 'Each part of STM is its own page. Pick one and stay there.',
   items: [
-    { href: '/play', title: 'Play', text: 'Six working models: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
+    { href: '/play', title: 'Play', text: 'Six working models on a vanilla armour set: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
     { href: '/builder', title: 'Builder', text: 'Pick a spec, an armour set and the talents that hold the fight.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
@@ -198,7 +198,7 @@ export const UPDATES = {
 export const FIGHTER = {
   eyebrow: 'Fighter',
   title: 'Build your fighter',
-  intro: 'Pick a spec, take the armour set you trust, and hold the fight with the talents you choose.',
+  intro: 'Pick a spec, take a vanilla armour set, and hold the fight with the talents you choose.',
   spec: 'Spec',
   armour: 'Armour set',
   talents: 'Talents',

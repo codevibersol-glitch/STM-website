@@ -27,7 +27,7 @@ import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, EMAIL_SIGNUP, KLAVIYO_
 import type { NavItem } from '../data/copy';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
-import { FIGHTER_SPECS, FIGHTER_TIER_SETS, type FighterState } from '../data/talents';
+import { FIGHTER_SPECS, setsFor, type FighterState } from '../data/talents';
 import { DashboardDemo } from '../demos/DashboardDemo';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
@@ -447,19 +447,22 @@ export function Pricing() {
 export function Fighter() {
   const [state, setState] = useState<FighterState>({
     specId: FIGHTER_SPECS[0]!.id,
-    tierSetId: FIGHTER_TIER_SETS[0]!.id,
+    tierSetId: setsFor(FIGHTER_SPECS[0]!.classId)[0]!.id,
     talentIds: [...FIGHTER_SPECS[0]!.tree.talents.map((t) => t.id)],
   });
   const [tab, setTab] = useState<FighterTabId>('armour');
 
   const spec = FIGHTER_SPECS.find((s) => s.id === state.specId) ?? FIGHTER_SPECS[0]!;
-  const tierSet = FIGHTER_TIER_SETS.find((t) => t.id === state.tierSetId) ?? FIGHTER_TIER_SETS[0]!;
+  const classSets = setsFor(spec.classId);
+  const tierSet = classSets.find((t) => t.id === state.tierSetId) ?? classSets[0]!;
   const talents = spec ? spec.tree.talents.filter((t) => state.talentIds.includes(t.id)) : [];
 
   const chooseSpec = (id: string) => {
     const next = FIGHTER_SPECS.find((s) => s.id === id);
     if (!next) return;
-    setState({ specId: id, tierSetId: state.tierSetId, talentIds: [...next.tree.talents.map((t) => t.id)] });
+    const nextSets = setsFor(next.classId);
+    const tierSetId = nextSets.some((set) => set.id === state.tierSetId) ? state.tierSetId : nextSets[0]!.id;
+    setState({ specId: id, tierSetId, talentIds: [...next.tree.talents.map((t) => t.id)] });
   };
 
   const toggleTalent = (id: string) => {
@@ -494,7 +497,7 @@ export function Fighter() {
             {tab === 'armour' ? (
               <div className="fighter-sets">
                 <p className="fighter-label">{FIGHTER.armour}</p>
-                {FIGHTER_TIER_SETS.map((set) => (
+                {classSets.map((set) => (
                   <button
                     key={set.id}
                     type="button"
@@ -559,9 +562,10 @@ export function Characters() {
           id="characters-title"
           eyebrow="Characters"
           title="Your character on the dashboard"
-          intro="STM’s dashboard knows your character: equipped gear, bags, professions, talents and spells. Use the fighter builder to hold a build, then watch it live on the dashboard."
+          intro="The figure wears a vanilla set. The dashboard below is a leveling run: equipped gear, bags, professions, talents and spells."
         />
         <div className="characters" data-reveal>
+          <FighterScene specId="warrior-protection" tierSetId="valor" />
           <DashboardDemo />
         </div>
       </div>
