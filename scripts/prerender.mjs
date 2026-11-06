@@ -136,34 +136,24 @@ ${Object.keys(pageMeta).map((route) => `  <url>
 await writeFile(join(dist, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
 
 // _headers - the only inline script allowed is the settings one, by its hash.
-// Klaviyo does not publish an official CSP list. The hosts below are the ones their current onsite
-// bundles request (klaviyo.js plus the signup-forms chunk), kept to this form:
-//   script  static.klaviyo.com (klaviyo.js and form chunks), static-tracking.klaviyo.com (Active on Site)
-//   connect a.klaviyo.com (events), fast.a.klaviyo.com (the font list), static-forms.klaviyo.com (the form JSON)
-//   style   Klaviyo injects a <style> element for form CSS and fonts. A hash makes browsers ignore
-//           'unsafe-inline', so the inlined site CSS is allowed the same way. fonts.googleapis.com is
-//           the @import that loader writes when a form uses a Google font.
-//   font    fonts.gstatic.com serves those Google font files.
-//   img     d3k81ch9hvuctc.cloudfront.net is Klaviyo's form-image host.
-//   frame   geo.captcha-delivery.com is the DataDome check some submissions get.
-// The signup is a fetch to a.klaviyo.com, not a navigation, so form-action stays 'none'.
+// The email form is off, so Klaviyo's hosts are not allowed.
 // Cloudflare Web Analytics injects beacon.min.js from static.cloudflareinsights.com and posts
-// to cloudflareinsights.com. Nothing else in that policy changes.
+// to cloudflareinsights.com.
 const scriptHash = createHash('sha256').update(ssr.PREFS_SCRIPT).digest('base64');
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'sha256-${scriptHash}' https://static.klaviyo.com https://static-tracking.klaviyo.com https://static.cloudflareinsights.com`,
-  "style-src 'self' 'unsafe-inline' https://static.klaviyo.com https://fonts.googleapis.com",
+  `script-src 'self' 'sha256-${scriptHash}' https://static.cloudflareinsights.com`,
+  "style-src 'self' 'unsafe-inline'",
   "style-src-attr 'unsafe-inline'",
-  "img-src 'self' https://d3k81ch9hvuctc.cloudfront.net",
-  "font-src 'self' https://fonts.gstatic.com",
-  "connect-src 'self' https://a.klaviyo.com https://fast.a.klaviyo.com https://static-forms.klaviyo.com https://cloudflareinsights.com",
+  "img-src 'self'",
+  "font-src 'self'",
+  "connect-src 'self' https://cloudflareinsights.com",
   "manifest-src 'self'",
   "worker-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'none'",
-  "frame-src https://geo.captcha-delivery.com",
+  "frame-src 'none'",
   "frame-ancestors 'none'",
 ].join('; ');
 await writeFile(

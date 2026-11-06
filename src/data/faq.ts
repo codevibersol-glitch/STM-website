@@ -43,7 +43,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'data',
     q: 'Do you collect any data?',
-    a: 'Only if you choose to. The site uses Klaviyo, our email provider, which sets cookies and records visits so we can run the optional email signup. If you join the list, Klaviyo stores your email address to send you STM updates, and every email has an unsubscribe link. Payment and support still happen only on Telegram.',
+    a: 'The site does not ask for an email address and does not keep a mailing list. Cloudflare Web Analytics counts visits and does not use cookies. Payment and support happen only on Telegram.',
   },
   {
     id: 'risk',

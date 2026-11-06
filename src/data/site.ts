@@ -11,8 +11,14 @@ export const DISCORD_HANDLE = '@hugekush0222';
 export const DISCORD_URL = 'https://discord.gg/hugekush0222';
 
 /**
+ * The email signup is off. Nothing on the site loads Klaviyo or draws the form.
+ * The ids stay so the form can be switched back on without looking them up again.
+ */
+export const EMAIL_SIGNUP = false;
+
+/**
  * Klaviyo embedded signup (form "STM website signup"). The public company id is safe to ship.
- * klaviyo.js sets the __kla_id cookie and records visits; the privacy copy has to say so.
+ * klaviyo.js sets the __kla_id cookie and records visits; the privacy copy has to say so while the form is on.
  */
 export const KLAVIYO_COMPANY_ID = 'RsQHMM';
 export const KLAVIYO_FORM_ID = 'WL7BMB';

@@ -23,7 +23,7 @@ import { GALLERY_COPY } from '../data/gallery';
 import { FIGHTER } from '../data/copy';
 import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { SHOTS, type PlacedShot } from '../data/shots';
-import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, KLAVIYO_COMPANY_ID, KLAVIYO_FORM_ID, KLAVIYO_SCRIPT_SRC, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
+import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, EMAIL_SIGNUP, KLAVIYO_COMPANY_ID, KLAVIYO_FORM_ID, KLAVIYO_SCRIPT_SRC, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
 import type { NavItem } from '../data/copy';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
@@ -99,7 +99,7 @@ export function Hero() {
             {HERO.titleAfter}
           </h1>
           <p className="hero-lead">{HERO.lead}</p>
-          <Updates />
+          {EMAIL_SIGNUP ? <Updates /> : null}
           <div className="hero-ctas">
             <TelegramLink className="btn btn-gold btn-lg">
               <Icon name="plane" />
@@ -683,6 +683,7 @@ export function Updates() {
   // tag in the document (deferred or not) still lands on the main thread before the browser is idle, which is
   // what Lighthouse's bootup, TBT and LCP audits were measuring. After load it is a plain lazy fetch.
   useEffect(() => {
+    if (!EMAIL_SIGNUP) return;
     const start = () => {
       // Past the load event, into the browser's idle time: the loader then draws after the critical work.
       const ric = window as Window & { requestIdleCallback?: (cb: () => void, opts?: unknown) => number };
@@ -699,6 +700,7 @@ export function Updates() {
     if (document.readyState === 'complete') start();
     else window.addEventListener('load', start, { once: true });
   }, []);
+  if (!EMAIL_SIGNUP) return null;
   const openField = () => {
     const input = document.querySelector<HTMLInputElement>('#updates input[type="email"]');
     if (input) {

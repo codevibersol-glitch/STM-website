@@ -49,7 +49,7 @@ export const HERO = {
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
   secondaryCta: 'See how it works',
-  trust: ['Every WoW version', 'Every race and class', 'Plays to max level', 'Telegram + email updates'],
+  trust: ['Every WoW version', 'Every race and class', 'Plays to max level', 'Telegram updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
@@ -149,7 +149,7 @@ export const COMMITMENT = {
   points: [
     'Text size, high contrast, reduced motion and a dyslexia-friendly font',
     'Full keyboard use, visible focus and screen-reader labels',
-    'No account needed. The email list is optional.',
+    'No account needed.',
   ],
   cta: 'Shape the roadmap on Telegram',
 };
@@ -207,7 +207,7 @@ export const FIGHTER = {
 
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
-  privacy: 'No account needed. Email updates are optional.',
+  privacy: 'No account needed.',
   contact: 'Talk to us on Telegram or Discord:',
 };
 

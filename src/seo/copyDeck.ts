@@ -25,7 +25,7 @@ import { GALLERY_COPY } from '../data/gallery';
 import { HOW_COPY, LOOP, MODELS, UNDER_THE_HOOD } from '../data/how';
 import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { SHOTS } from '../data/shots';
-import { CREDITS, SITE_DESCRIPTION, SITE_TITLE, TELEGRAM_URL, TRADEMARK_NOTICE } from '../data/site';
+import { CREDITS, EMAIL_SIGNUP, SITE_DESCRIPTION, SITE_TITLE, TELEGRAM_URL, TRADEMARK_NOTICE } from '../data/site';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
 
@@ -54,7 +54,9 @@ export function copyDeck(): string {
     `- Kicker: ${HERO.kicker}`,
     `- **H1:** ${HERO.titleBefore}${HERO.titleKeyword}${HERO.titleAfter}`,
     `- Lead: ${HERO.lead}`,
-    `- Email sign-up (the hero's first action, above the buttons): ${UPDATES.eyebrow} — ${UPDATES.title}. ${UPDATES.intro}`,
+    EMAIL_SIGNUP
+      ? `- Email sign-up (the hero's first action, above the buttons): ${UPDATES.eyebrow} — ${UPDATES.title}. ${UPDATES.intro}`
+      : '- Email sign-up: off. Reach STM on Telegram.',
     `- Buttons: ${HERO.primaryCta} · ${HERO.secondaryCta}`,
     `- Trust line: ${HERO.trust.join(' · ')}`,
     `- Proof line: ${HERO.proofLead} ${stat('xp-median').value} ${stat('xp-median').unit} ${stat('xp-median').short ?? ''} · ${HERO.proofLink}`,

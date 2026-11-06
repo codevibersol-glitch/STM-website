@@ -54,18 +54,13 @@ async function axe(page: Page) {
   return results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
 }
 
-test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) => {
+test('does not load the email form or Klaviyo', async ({ page }) => {
   const errors = watchErrors(page);
-  const klaviyo = page.waitForResponse(
-    (r) => r.url().startsWith('https://static.klaviyo.com/onsite/js/RsQHMM/klaviyo.js') && r.request().resourceType() === 'script',
-  );
+  const urls: string[] = [];
+  page.on('request', (r) => urls.push(r.url()));
   const response = await page.goto('/');
   const csp = response?.headers()['content-security-policy'] ?? '';
-  expect(csp).toContain('https://static.klaviyo.com');
-  expect(csp).toContain('https://static-tracking.klaviyo.com');
-  expect(csp).toContain('https://a.klaviyo.com');
-  expect(csp).toContain('https://fast.a.klaviyo.com');
-  expect(csp).toContain('https://static-forms.klaviyo.com');
+  expect(csp).not.toMatch(/klaviyo/i);
   expect(csp).toContain("script-src 'self'");
   expect(csp).toContain('https://static.cloudflareinsights.com');
   expect(csp).toContain('https://cloudflareinsights.com');
@@ -73,19 +68,15 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).toMatch(/connect-src [^;]*https:\/\/cloudflareinsights\.com/);
   expect(csp).not.toMatch(/script-src [^;]*https:\/\/cloudflareinsights\.com/);
   expect(csp).toContain("form-action 'none'");
-  expect((await klaviyo).ok()).toBe(true);
-  await expect(page.locator('#updates-title')).toHaveText('Get a setup note by email');
-  await expect(page.locator('#updates')).toContainText('A short note on getting started');
+  await expect(page.locator('#updates')).toHaveCount(0);
+  await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(0);
+  await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveCount(0);
   const buy = page.locator('.hero-ctas .btn-gold');
   await expect(buy).toContainText('Get STM on Telegram');
   await expect(buy).toHaveClass(/btn-lg/);
-  await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(1);
-  await page.locator('#updates').scrollIntoViewIfNeeded();
-  // The loader then pulls the form and its modules. Klaviyo's analytics beacon can fail CORS on
-  // localhost (their server, not our CSP). Only a Content-Security-Policy refusal fails this test.
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(1500);
+  expect(urls.some((u) => /klaviyo/i.test(u))).toBe(false);
   expect(errors.filter((e) => /content security policy/i.test(e))).toEqual([]);
-  await expect(page.locator('#updates').getByRole('textbox', { name: 'Email address' })).toBeVisible();
 });
 
 test('loads with no console errors or CSP violations, and the 3D hero starts', async ({ page }) => {
@@ -97,26 +88,20 @@ test('loads with no console errors or CSP violations, and the 3D hero starts', a
   expect(errors).toEqual([]);
 });
 
-test('shows the email field above the fold on a phone, above the Telegram button', async ({ browser }) => {
+test('shows the Telegram button above the fold on a phone, with no email field', async ({ browser }) => {
   // iPhone 16 is 393px wide. About 620px stays visible once Safari's toolbars are open.
   const context = await browser.newContext({ viewport: { width: 393, height: 620 } });
   const page = await context.newPage();
   await page.goto('/');
-  const field = page.locator('#updates input[type="email"]');
-  await expect(field).toBeVisible();
+  await expect(page.locator('#updates')).toHaveCount(0);
+  await expect(page.locator('input[type="email"]')).toHaveCount(0);
   const fold = 620;
-  const fieldBox = await field.boundingBox();
-  const buyBox = await page.locator('.hero-ctas .btn-gold').boundingBox();
-  expect(fieldBox).toBeTruthy();
+  const buy = page.locator('.hero-ctas .btn-gold');
+  await expect(buy).toBeVisible();
+  const buyBox = await buy.boundingBox();
   expect(buyBox).toBeTruthy();
   expect(buyBox!.y).toBeGreaterThanOrEqual(0);
-  // The sign-up comes first: the field sits above the gold buy button.
-  expect(fieldBox!.y).toBeLessThan(buyBox!.y);
-  expect(fieldBox!.y + fieldBox!.height).toBeLessThanOrEqual(fold);
-  const submit = page.locator('#updates button').first();
-  const submitBox = await submit.boundingBox();
-  expect(submitBox).toBeTruthy();
-  expect(submitBox!.y + submitBox!.height).toBeLessThanOrEqual(fold);
+  expect(buyBox!.y + buyBox!.height).toBeLessThanOrEqual(fold);
   await context.close();
 });
 
@@ -126,7 +111,7 @@ test('is readable without JavaScript', async ({ browser }) => {
   await page.goto('/');
   await expect(page.locator('h1')).toContainText('WoW accessibility addon and leveling tool');
   await expect(page.locator('#doors h2')).toBeVisible();
-  await expect(page.locator('#updates h2')).toBeVisible();
+  await expect(page.locator('#updates')).toHaveCount(0);
   await expect(page.locator('.proof')).toContainText('XP/h');
   await expect(page.locator('#how-it-works')).toHaveCount(0);
   await expect(page.locator('#pricing')).toHaveCount(0);

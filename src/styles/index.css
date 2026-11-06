@@ -822,17 +822,28 @@ html[data-font="dyslexic"] {
     }
     .hero-ctas {
       grid-column: 1;
-      grid-row: 5;
+      grid-row: 4;
     }
     .hero-secondary {
       grid-column: 2;
-      grid-row: 5;
+      grid-row: 4;
       justify-self: start;
     }
     .trust {
-      grid-row: 6;
+      grid-row: 5;
     }
     .proof {
+      grid-row: 6;
+    }
+    /* When the email form is on, it takes the row and the buttons move down. */
+    #updates ~ .hero-ctas,
+    #updates ~ .hero-secondary {
+      grid-row: 5;
+    }
+    #updates ~ .trust {
+      grid-row: 6;
+    }
+    #updates ~ .proof {
       grid-row: 7;
     }
   }
