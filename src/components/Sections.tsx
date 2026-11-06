@@ -125,7 +125,7 @@ export function Hero() {
 /** The home page's way into the rest of the site: one card, one page. */
 export function Doors() {
   return (
-    <section id="doors" className="section" aria-labelledby="doors-title">
+    <section id="doors" className="section section-tight" aria-labelledby="doors-title">
       <div className="wrap">
         <SectionHead id="doors-title" eyebrow={DOORS.eyebrow} title={DOORS.title} intro={DOORS.intro} />
         <ul className="cards cards-4">
@@ -562,7 +562,7 @@ export function Characters() {
           id="characters-title"
           eyebrow="Characters"
           title="Your character on the dashboard"
-          intro="The figure wears a vanilla set. The dashboard below is a leveling run: equipped gear, bags, professions, talents and spells."
+          intro="The figure is a free knight or rogue, not a World of Warcraft model. The name under it is the vanilla set the build holds. The dashboard below is a sample leveling run."
         />
         <div className="characters" data-reveal>
           <FighterScene specId="warrior-protection" tierSetId="valor" />

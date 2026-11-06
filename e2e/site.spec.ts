@@ -262,6 +262,7 @@ test('the copy button copies the feedback template and says so', async ({ browse
   const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
   const page = await context.newPage();
   await page.goto('/guide');
+  await page.getByRole('tab', { name: 'Feedback' }).click();
   const button = page.getByRole('button', { name: 'Copy feedback template' });
   await button.scrollIntoViewIfNeeded();
   await button.click();
@@ -312,6 +313,7 @@ test('the goals model: switching the guard off turns a flee into a fight', async
 
 test('the score model: another level moves the winner', async ({ page }) => {
   await page.goto('/play');
+  await page.getByRole('tab', { name: 'Score' }).click();
   const model = page.locator('#model-scorer');
   await model.scrollIntoViewIfNeeded();
   const winner = model.getByTestId('scorer-winner');
@@ -324,6 +326,7 @@ test('the score model: another level moves the winner', async ({ page }) => {
 
 test('the maps model: the straight line costs pulls, the priced path none', async ({ page }) => {
   await page.goto('/play');
+  await page.getByRole('tab', { name: 'Maps' }).click();
   const model = page.locator('#model-map');
   await model.scrollIntoViewIfNeeded();
   await expect(model.getByTestId('map-pulls')).toHaveText('0');
@@ -333,6 +336,7 @@ test('the maps model: the straight line costs pulls, the priced path none', asyn
 
 test('the Telegram model answers /status, /stop and /resume', async ({ page }) => {
   await page.goto('/play');
+  await page.getByRole('tab', { name: 'Your phone' }).click();
   const model = page.locator('#model-telegram');
   await model.scrollIntoViewIfNeeded();
   const log = model.getByTestId('chat-log');
@@ -350,6 +354,7 @@ test('the pictures load, fit the screen and cause no CSP errors', async ({ brows
   const page = await context.newPage();
   const errors = watchErrors(page);
   await page.goto('/guide');
+  await page.getByRole('tab', { name: 'Pictures' }).click();
   await scrollThrough(page);
   const images = page.locator('#see img');
   expect(await images.count()).toBe(Object.keys(SHOTS).length);
@@ -412,15 +417,51 @@ test('the phone menu opens, closes with Escape and gives focus back', async ({ b
   await context.close();
 });
 
+test('a phone can turn the figure and the routes do not scroll sideways', async ({ browser }) => {
+  for (const width of [360, 390]) {
+    const context = await browser.newContext({ viewport: { width, height: 700 } });
+    const page = await context.newPage();
+    const errors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error' && /content security policy/i.test(message.text())) errors.push(message.text());
+    });
+    for (const path of ['/', '/play', '/builder', '/characters', '/guide', '/pricing']) {
+      await page.goto(path);
+      await page.waitForLoadState('load');
+      const [scroll, inner] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+      expect(scroll, `${path} at ${width}`).toBeLessThanOrEqual(inner);
+    }
+    await page.goto('/builder');
+    await expect(page.locator('.fighter-scene.is-live')).toBeVisible({ timeout: 20_000 });
+    const canvas = page.locator('.fighter-canvas');
+    const before = await canvas.getAttribute('data-yaw');
+    const box = await canvas.boundingBox();
+    expect(box).toBeTruthy();
+    await page.mouse.move(box!.x + 30, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + 160, box!.y + box!.height / 2);
+    await page.mouse.up();
+    await expect.poll(() => canvas.getAttribute('data-yaw')).not.toBe(before);
+    await expect(page.locator('.fighter-credit')).toContainText('Kay Lousberg');
+    await expect(page.locator('.fighter-credit')).toContainText('Not a World of Warcraft model');
+    expect(errors).toEqual([]);
+    await context.close();
+  }
+});
+
 test('the phone Telegram button stays off the first screen and steps aside for the footer', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto('/guide');
+  await page.getByRole('tab', { name: 'Features' }).click();
   const fab = page.getByRole('link', { name: 'Message STM on Telegram (opens in a new tab)' });
   await page.waitForTimeout(500);
   await expect(fab).toBeHidden();
-  await page.locator('#features').scrollIntoViewIfNeeded();
-  await expect(fab).toBeVisible();
+  const tall = await page.evaluate(() => document.body.scrollHeight > window.innerHeight * 1.8);
+  if (tall) {
+    await page.evaluate(() => window.scrollTo(0, window.innerHeight));
+    await expect(fab).toBeVisible();
+  }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(fab).toBeHidden();
   await context.close();

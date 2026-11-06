@@ -1,26 +1,23 @@
-// The fighter's own 3D scene: a low-poly WoW-style player wearing the armour set the build holds, standing on
-// the duel ground under the accent light. Loaded lazily (see the FighterScene component) and rebuilt whenever the
-// build changes: the armour set re-tints the shell, the spec picks the weapon.
+// The fighter's 3D scene. The mesh is a CC0 KayKit figure (see src/data/models.ts), not a WoW client model.
+// It loads when the canvas is on screen, on phones as well as desktops, and draws only when something changed.
 
 import {
   AmbientLight,
-  BoxGeometry,
-  CapsuleGeometry,
-  CircleGeometry,
+  Box3,
+  Color,
   DirectionalLight,
   Fog,
   Group,
   Mesh,
   MeshLambertMaterial,
   PerspectiveCamera,
-  PointLight,
+  PlaneGeometry,
   Scene,
-  SphereGeometry,
   Vector3,
   WebGLRenderer,
-  type BufferGeometry,
-  type Material,
 } from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { figureFor } from '../data/models';
 import { FIGHTER_TIER_SETS, type ArmorWeight } from '../data/talents';
 
 export interface FighterSceneOptions {
@@ -30,197 +27,144 @@ export interface FighterSceneOptions {
 
 export interface FighterSceneHandle {
   setOptions(options: FighterSceneOptions): void;
-  setPointer(x: number, y: number): void;
+  /** Horizontal drag, in pixels. */
+  drag(dx: number): void;
   start(): void;
   stop(): void;
   dispose(): void;
 }
 
 const BG = 0x060709;
-const ACCENT = 0xc6ff3a;
-const LEG_TONE = 0x141922;
-const CLOTH_TONE = 0x1b212a;
-const SKIN_TONE = 0x8a5a33;
-const STEEL = 0xcfd6dd;
-const GOLD = 0xd8c27a;
+const loader = new GLTFLoader();
+const cache = new Map<string, Promise<Group>>();
 
-function setLook(tierSetId: string): { color: number; weight: ArmorWeight } {
-  const set = FIGHTER_TIER_SETS.find((item) => item.id === tierSetId);
-  return { color: set?.color ?? 0x8a3a2a, weight: set?.weight ?? 'plate' };
+function loadFigure(url: string): Promise<Group> {
+  let pending = cache.get(url);
+  if (!pending) {
+    pending = loader.loadAsync(url).then((gltf) => gltf.scene);
+    cache.set(url, pending);
+  }
+  return pending;
 }
 
-interface BuiltCharacter {
-  group: Group;
-  torso: Group;
-  weapon: Group;
-  disposables: (BufferGeometry | Material)[];
+function look(tierSetId: string): { weight: ArmorWeight } {
+  const set = FIGHTER_TIER_SETS.find((item) => item.id === tierSetId);
+  return { weight: set?.weight ?? 'plate' };
+}
+
+function fit(group: Group): void {
+  group.position.set(0, 0, 0);
+  group.rotation.set(0, 0, 0);
+  group.scale.set(1, 1, 1);
+  group.updateMatrixWorld(true);
+  const box = new Box3().setFromObject(group);
+  const size = box.getSize(new Vector3());
+  const height = Math.max(size.y, 0.001);
+  const scale = 1.65 / height;
+  group.scale.setScalar(scale);
+  group.updateMatrixWorld(true);
+  const fitted = new Box3().setFromObject(group);
+  const center = fitted.getCenter(new Vector3());
+  group.position.set(-center.x, -fitted.min.y, -center.z);
 }
 
 export function createFighterScene(canvas: HTMLCanvasElement, options: FighterSceneOptions): FighterSceneHandle | null {
   let renderer: WebGLRenderer;
   try {
-    renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const narrow = window.innerWidth < 768;
+    renderer = new WebGLRenderer({
+      canvas,
+      antialias: !narrow,
+      alpha: true,
+      powerPreference: narrow ? 'low-power' : 'default',
+    });
   } catch {
     return null;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.5));
   renderer.setClearColor(BG, 0);
 
   const scene = new Scene();
-  scene.fog = new Fog(BG, 18, 46);
-  const camera = new PerspectiveCamera(38, 1, 0.1, 80);
-  const base = new Vector3(0, 2.35, 4.8);
-  const target = new Vector3(0, 1.2, 0);
-  camera.position.copy(base);
-  camera.lookAt(target);
+  scene.fog = new Fog(BG, 6, 14);
+  scene.background = new Color(BG);
+  const camera = new PerspectiveCamera(32, 1, 0.1, 40);
+  camera.position.set(0, 1.15, 3.15);
+  camera.lookAt(0, 0.95, 0);
 
-  const disposables: (BufferGeometry | Material)[] = [];
-  const track = <T extends BufferGeometry | Material>(thing: T): T => {
-    disposables.push(thing);
-    return thing;
-  };
+  scene.add(new AmbientLight(0xc5d4e4, 1.15));
+  const sun = new DirectionalLight(0xfff4e0, 2.2);
+  sun.position.set(2.2, 4, 3);
+  scene.add(sun);
+  const fill = new DirectionalLight(0x8fb4d8, 0.7);
+  fill.position.set(-3, 2, -2);
+  scene.add(fill);
 
-  const ground = new Mesh(track(new CircleGeometry(40, 48)), track(new MeshLambertMaterial({ color: 0x0c1016 })));
+  const ground = new Mesh(new PlaneGeometry(12, 12), new MeshLambertMaterial({ color: 0x10151c }));
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
-  scene.add(new AmbientLight(0x9fb3c8, 0.7));
-  const sun = new DirectionalLight(0xcfdcff, 1.5);
-  sun.position.set(-2, 4, 3);
-  scene.add(sun);
-  const glow = new PointLight(ACCENT, 8, 8, 1.7);
-  glow.position.set(0, 2, 0);
-  scene.add(glow);
 
-  const buildCharacter = (o: FighterSceneOptions): BuiltCharacter => {
-    const ds: (BufferGeometry | Material)[] = [];
-    const look = setLook(o.tierSetId);
-    const plate = look.weight === 'plate';
-    const armorMat = new MeshLambertMaterial({ color: look.color });
-    ds.push(armorMat);
-    const legMat = new MeshLambertMaterial({ color: LEG_TONE });
-    ds.push(legMat);
-    const skinMat = new MeshLambertMaterial({ color: SKIN_TONE });
-    ds.push(skinMat);
-    const clothMat = new MeshLambertMaterial({ color: CLOTH_TONE });
-    ds.push(clothMat);
-    const steel = new MeshLambertMaterial({ color: STEEL });
-    ds.push(steel);
-    const gold = new MeshLambertMaterial({ color: GOLD });
-    ds.push(gold);
+  const pivot = new Group();
+  scene.add(pivot);
 
-    const legGeo = new CapsuleGeometry(plate ? 0.15 : 0.11, 0.5, 4, 12);
-    ds.push(legGeo);
-    const legL = new Mesh(legGeo, plate ? armorMat : legMat);
-    legL.position.set(-0.16, 0.38, 0);
-    const legR = new Mesh(legGeo, plate ? armorMat : legMat);
-    legR.position.set(0.16, 0.38, 0);
+  let disposed = false;
+  let token = 0;
+  let yaw = 0.4;
 
-    const torsoGroup = new Group();
-    const cloth = new Mesh(new BoxGeometry(plate ? 0.4 : 0.34, 0.62, plate ? 0.22 : 0.18), clothMat);
-    cloth.position.set(0, 1.16, 0);
-    const armorShell = new Mesh(new BoxGeometry(plate ? 0.56 : 0.38, plate ? 0.7 : 0.5, plate ? 0.34 : 0.22), armorMat);
-    armorShell.position.set(0, plate ? 1.18 : 1.2, 0);
-    const padGeo = new BoxGeometry(plate ? 0.28 : 0.14, plate ? 0.16 : 0.08, plate ? 0.28 : 0.16);
-    ds.push(padGeo);
-    const padL = new Mesh(padGeo, armorMat);
-    padL.position.set(plate ? -0.34 : -0.24, 1.4, 0);
-    const padR = new Mesh(padGeo, armorMat);
-    padR.position.set(plate ? 0.34 : 0.24, 1.4, 0);
-    torsoGroup.add(cloth, armorShell, padL, padR);
-
-    const neck = new Mesh(new BoxGeometry(0.09, 0.1, 0.09), skinMat);
-    neck.position.set(0, 1.5, 0);
-    const head = new Mesh(new SphereGeometry(0.14, 16, 12), skinMat);
-    head.position.set(0, 1.62, plate ? 0.02 : 0.04);
-    const helmet = new Mesh(new SphereGeometry(plate ? 0.18 : 0.15, 16, 12), armorMat);
-    helmet.position.set(0, plate ? 1.66 : 1.7, plate ? 0 : -0.02);
-    helmet.scale.set(1, plate ? 0.72 : 0.55, 1);
-
-    const armGeo = new CapsuleGeometry(plate ? 0.07 : 0.05, 0.26, 4, 8);
-    ds.push(armGeo);
-    const armL = new Mesh(armGeo, plate ? armorMat : legMat);
-    armL.position.set(plate ? -0.28 : -0.2, 1.28, 0);
-    const armR = new Mesh(armGeo, plate ? armorMat : legMat);
-    armR.position.set(plate ? 0.28 : 0.2, 1.28, 0);
-
-    const group = new Group();
-    group.add(legL, legR, torsoGroup, neck, head, helmet, armL, armR);
-
-    const weaponGroup = new Group();
-    const isWarrior = o.specId.includes('warrior');
-    const blade = new Mesh(new CapsuleGeometry(0.02, isWarrior ? 0.38 : 0.26, 4, 8), isWarrior ? steel : gold);
-    blade.rotation.x = Math.PI / 2 - (isWarrior ? 0.25 : 0.45);
-    const handle = new Mesh(new CapsuleGeometry(0.02, 0.12, 4, 8), legMat);
-    handle.rotation.x = Math.PI / 2 - (isWarrior ? 0.25 : 0.45);
-    weaponGroup.add(blade, handle);
-    weaponGroup.position.set(isWarrior ? 0.08 : 0.16, isWarrior ? 1.4 : 1.3, isWarrior ? 0.3 : -0.02);
-    group.add(weaponGroup);
-
-    return { group, torso: torsoGroup, weapon: weaponGroup, disposables: ds };
-  };
-
-  let builtCharacter: BuiltCharacter = buildCharacter(options);
-  const fighterGroup = builtCharacter.group;
-  scene.add(fighterGroup);
-
-  const pointer = { x: 0, y: 0 };
-  let frame = 0;
-  let running = false;
-  const started = performance.now();
-
-  const render = (now: number) => {
-    frame = 0;
-    const t = Math.max(0, now - started) / 1000;
-    builtCharacter.torso.scale.setScalar(1 + 0.018 * Math.sin(t * 2.3));
-    builtCharacter.weapon.rotation.z = Math.sin(t * 1.6) * 0.07;
-    builtCharacter.weapon.rotation.x =
-      (options.specId.includes('warrior') ? Math.PI / 2 - 0.25 : Math.PI / 2 - 0.45) + Math.sin(t * 1.6) * 0.08;
-    camera.position.set(base.x + pointer.x * 0.6, base.y - pointer.y * 0.25, base.z - pointer.x * 0.35);
-    camera.lookAt(target);
-    renderer.render(scene, camera);
-    if (running) frame = requestAnimationFrame(render);
-  };
-
-  const resize = () => {
+  const paint = () => {
+    if (disposed) return;
     const { clientWidth: w, clientHeight: h } = canvas;
     if (w === 0 || h === 0) return;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, w < 768 ? 1.25 : 1.5));
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    pivot.rotation.y = yaw;
+    renderer.render(scene, camera);
+    canvas.dataset.yaw = yaw.toFixed(3);
   };
-  resize();
-  const ro = new ResizeObserver(resize);
+
+  const show = async (next: FighterSceneOptions) => {
+    const mine = ++token;
+    const { weight } = look(next.tierSetId);
+    const figure = figureFor(weight);
+    try {
+      const source = await loadFigure(figure.url);
+      if (disposed || mine !== token) return;
+      const group = source.clone(true);
+      group.traverse((obj) => {
+        if (figure.hide.includes(obj.name)) obj.visible = false;
+      });
+      fit(group);
+      pivot.clear();
+      pivot.add(group);
+      paint();
+    } catch {
+      // The set name stays on the page when the file cannot be read.
+    }
+  };
+
+  const ro = new ResizeObserver(() => paint());
   ro.observe(canvas);
+  void show(options);
 
   return {
     setOptions(next) {
-      builtCharacter.disposables.forEach((d) => d.dispose());
-      scene.remove(builtCharacter.group);
-      builtCharacter = buildCharacter(next);
-      scene.add(builtCharacter.group);
-      options = next;
+      void show(next);
     },
-    setPointer(x, y) {
-      pointer.x = x;
-      pointer.y = y;
+    drag(dx) {
+      yaw += dx * 0.01;
+      paint();
     },
     start() {
-      if (running) return;
-      running = true;
-      frame = requestAnimationFrame(render);
+      paint();
     },
     stop() {
-      running = false;
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
+      // Demand rendering: nothing is looping, so leaving the screen just stops new draws.
     },
     dispose() {
-      running = false;
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
+      disposed = true;
+      token += 1;
       ro.disconnect();
-      builtCharacter.disposables.forEach((d) => d.dispose());
-      disposables.forEach((d) => d.dispose());
       renderer.dispose();
     },
   };

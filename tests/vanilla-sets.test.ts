@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FIGURE_CREDIT, figureFor } from '../src/data/models';
 import { FIGHTER_SPECS, FIGHTER_TIER_SETS, defaultFighterState, setsFor } from '../src/data/talents';
 
 describe('vanilla armour sets', () => {
@@ -22,5 +23,12 @@ describe('vanilla armour sets', () => {
     expect(spec?.classId).toBe('warrior');
     expect(set?.classId).toBe(spec?.classId);
     expect(set?.name).toBe('Battlegear of Valor');
+  });
+
+  it('uses a local CC0 figure and does not call it a WoW model', () => {
+    expect(figureFor('plate').url).toBe('/models/knight.glb');
+    expect(figureFor('leather').url).toBe('/models/rogue.glb');
+    expect(FIGURE_CREDIT).toContain('CC0');
+    expect(FIGURE_CREDIT).toContain('Not a World of Warcraft model');
   });
 });

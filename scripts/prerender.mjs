@@ -145,9 +145,10 @@ const csp = [
   `script-src 'self' 'sha256-${scriptHash}' https://static.cloudflareinsights.com`,
   "style-src 'self' 'unsafe-inline'",
   "style-src-attr 'unsafe-inline'",
-  "img-src 'self'",
+  "img-src 'self' blob:",
   "font-src 'self'",
-  "connect-src 'self' https://cloudflareinsights.com",
+  // GLTFLoader reads an embedded texture through a blob: URL.
+  "connect-src 'self' blob: https://cloudflareinsights.com",
   "manifest-src 'self'",
   "worker-src 'self'",
   "object-src 'none'",

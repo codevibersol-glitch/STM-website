@@ -58,11 +58,12 @@ function drape(geometry: BufferGeometry, cx: number, cz: number, lift: number): 
 export function createMapScene(canvas: HTMLCanvasElement): MapScene | null {
   let renderer: WebGLRenderer;
   try {
-    renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const narrow = window.innerWidth < 768;
+    renderer = new WebGLRenderer({ canvas, antialias: !narrow, alpha: true, powerPreference: narrow ? 'low-power' : 'default' });
   } catch {
     return null;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 1.5));
   renderer.setClearColor(BG, 0);
 
   const scene = new Scene();

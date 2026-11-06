@@ -3,9 +3,6 @@ import type { MapScene } from '../hero/scene';
 import { PREFS_EVENT, motionReduced } from '../lib/prefs';
 import { MapPoster } from './MapPoster';
 
-/** The 3D map loads only where it pays off: a wide screen, motion allowed. Phones keep the still poster. */
-const MIN_WIDTH = 768;
-
 /**
  * True when the browser can create a WebGL context. Without one, three.js only logs errors (and the scene's file
  * would be downloaded for nothing), so the still poster stays.
@@ -23,8 +20,8 @@ function webglAvailable(): boolean {
 }
 
 /**
- * The hero's background: the map. The SVG poster is always there (no JavaScript, reduced motion, phones, no WebGL);
- * after the first paint the three.js scene is loaded over it and fades in.
+ * The hero's background: the map. The SVG poster is always there (no JavaScript, reduced motion, no WebGL).
+ * After the first paint the three.js scene is loaded over it, including on a phone.
  */
 export function MapHero() {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -42,7 +39,7 @@ export function MapHero() {
 
     let webgl: boolean | null = null;
     const allowed = () => {
-      if (motionReduced() || window.innerWidth < MIN_WIDTH) return false;
+      if (motionReduced()) return false;
       webgl ??= webglAvailable();
       return webgl;
     };

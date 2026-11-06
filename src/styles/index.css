@@ -681,9 +681,9 @@ html[data-font="dyslexic"] {
   }
   .hero-inner {
     display: grid;
-    align-content: center;
-    min-height: min(calc(100svh - var(--header-h)), 60rem);
-    padding: 3rem 0 3rem;
+    align-content: start;
+    min-height: 0;
+    padding: 1.25rem 0 0.5rem;
   }
   @media (max-width: 47.99rem) {
     /* Start at the top so the buy button and the email field fit on a phone screen. */
@@ -913,6 +913,9 @@ html[data-font="dyslexic"] {
   .section {
     position: relative;
     padding: clamp(4.5rem, 3rem + 5vw, 8rem) 0;
+  }
+  .section-tight {
+    padding: 1.25rem 0 2.5rem;
   }
   .section:nth-child(even) {
     background:
@@ -1940,19 +1943,56 @@ html[data-font="dyslexic"] {
     width: 100%;
     height: 100%;
     opacity: 0;
+    touch-action: none;
+    cursor: grab;
     transition: opacity 1s ease;
   }
   .fighter-scene.is-live .fighter-canvas {
     opacity: 1;
   }
-  .fighter-set-name {
+  .fighter-set-name,
+  .fighter-credit {
     position: absolute;
-    left: 1rem;
-    bottom: 1rem;
+    left: 0;
+    right: 0;
     z-index: 1;
     margin: 0;
+    padding: 0 1rem;
+  }
+  .fighter-set-name {
+    bottom: 2.6rem;
     color: var(--c-text);
     font-size: 0.95rem;
+  }
+  .fighter-credit {
+    bottom: 0;
+    padding-top: 0.2rem;
+    padding-bottom: 0.7rem;
+    color: var(--c-muted);
+    font-size: 0.78rem;
+    background: linear-gradient(transparent, rgb(6 7 9 / 0.94) 45%);
+  }
+  @media (max-width: 47.99rem) {
+    .fighter-scene {
+      height: 18rem;
+    }
+  }
+  .tabs {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .tablist {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+  }
+  .js .tab-panel {
+    display: none;
+  }
+  .js .tab-panel.is-active {
+    display: block;
   }
 
   /* The fighter build's tabs: armour set, spec, talents, build. */

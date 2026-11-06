@@ -28,7 +28,7 @@ export const DOORS = {
   title: 'Open the WoW accessibility addon and leveling tool',
   intro: 'Each part of STM is its own page. Pick one and stay there.',
   items: [
-    { href: '/play', title: 'Play', text: 'Six working models on a vanilla armour set: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
+    { href: '/play', title: 'Play', text: 'Six sample demos: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
     { href: '/builder', title: 'Builder', text: 'Pick a spec, an armour set and the talents that hold the fight.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },

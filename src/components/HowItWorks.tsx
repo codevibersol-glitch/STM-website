@@ -8,6 +8,7 @@ import { ScorerDemo } from '../demos/ScorerDemo';
 import { TelegramDemo } from '../demos/TelegramDemo';
 import { Icon } from './Icon';
 import { SectionHead } from './Sections';
+import { Tabs } from './Tabs';
 
 const DEMOS: Record<ModelId, ComponentType> = {
   planner: PlannerDemo,
@@ -37,41 +38,53 @@ export function HowItWorks() {
           ))}
         </ol>
 
-        <div className="models">
-          {MODELS.map((model, i) => {
-            const Demo = DEMOS[model.id];
-            return (
-              <article key={model.id} id={`model-${model.id}`} className={i % 2 === 1 ? 'model model-flip' : 'model'} aria-labelledby={`model-${model.id}-title`}>
-                <div className="model-text" data-reveal>
-                  <p className="model-kicker">{model.kicker}</p>
-                  <h3 id={`model-${model.id}-title`}>{model.title}</h3>
-                  <p className="model-body">{model.body}</p>
-                  <ul className="model-points">
-                    {model.points.map((point) => (
-                      <li key={point}>{point}</li>
+        <Tabs
+          label="Sample demos"
+          tabs={[
+            ...MODELS.map((model) => {
+              const Demo = DEMOS[model.id];
+              return {
+                id: `model-${model.id}`,
+                label: model.kicker,
+                panel: (
+                  <article id={`model-${model.id}`} className="model" aria-labelledby={`model-${model.id}-title`}>
+                    <div className="model-text">
+                      <p className="model-kicker">{model.kicker}</p>
+                      <h3 id={`model-${model.id}-title`}>{model.title}</h3>
+                      <p className="model-body">{model.body}</p>
+                      <ul className="model-points">
+                        {model.points.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="model-demo">
+                      <Demo />
+                    </div>
+                  </article>
+                ),
+              };
+            }),
+            {
+              id: 'under-the-hood',
+              label: 'Rules',
+              panel: (
+                <div className="hood" id="under-the-hood">
+                  <h3>{HOW_COPY.hoodTitle}</h3>
+                  <p className="hood-intro">{HOW_COPY.hoodIntro}</p>
+                  <dl className="hood-list">
+                    {UNDER_THE_HOOD.map((item) => (
+                      <div key={item.title}>
+                        <dt>{item.title}</dt>
+                        <dd>{item.text}</dd>
+                      </div>
                     ))}
-                  </ul>
+                  </dl>
                 </div>
-                <div className="model-demo">
-                  <Demo />
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        <div className="hood" data-reveal>
-          <h3>{HOW_COPY.hoodTitle}</h3>
-          <p className="hood-intro">{HOW_COPY.hoodIntro}</p>
-          <dl className="hood-list">
-            {UNDER_THE_HOOD.map((item) => (
-              <div key={item.title}>
-                <dt>{item.title}</dt>
-                <dd>{item.text}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+              ),
+            },
+          ]}
+        />
       </div>
     </section>
   );

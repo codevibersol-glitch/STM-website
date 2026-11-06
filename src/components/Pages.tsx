@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { FighterScene } from './FighterScene';
 import { HowItWorks } from './HowItWorks';
 import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
 import { Header } from './Header';
+import { Tabs } from './Tabs';
 import { SKIP_LINK } from '../data/copy';
+import { SHOTS } from '../data/shots';
 
 /** The frame every page shares: skip link, the same site nav, main, footer. */
 export function PageShell({ path, children }: { path: string; children: ReactNode }) {
@@ -26,15 +27,6 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
 export function PlayPage({ path }: { path: string }) {
   return (
     <PageShell path={path}>
-      <section className="section" aria-labelledby="play-set-title">
-        <div className="wrap">
-          <h2 id="play-set-title" className="section-title">
-            Vanilla sets
-          </h2>
-          <p className="section-intro">The games start from classic armour. This warrior is in Battlegear of Valor. Change the set in the builder.</p>
-          <FighterScene specId="warrior-protection" tierSetId="valor" />
-        </div>
-      </section>
       <HowItWorks />
     </PageShell>
   );
@@ -88,15 +80,22 @@ export function ResultsPage({ path }: { path: string }) {
 
 /** Who it is for, the versions, the pictures and the feedback template. */
 export function GuidePage({ path }: { path: string }) {
+  const tabs = [
+    { id: 'guide-versions', label: 'Versions', panel: <Versions /> },
+    { id: 'guide-who', label: 'Who', panel: <Who /> },
+    { id: 'guide-how', label: 'How', panel: <How /> },
+    { id: 'guide-features', label: 'Features', panel: <Features /> },
+    ...(SHOTS.length > 0 ? [{ id: 'guide-pictures', label: 'Pictures', panel: <Gallery /> }] : []),
+    { id: 'guide-commitment', label: 'Commitment', panel: <Commitment /> },
+    { id: 'guide-feedback', label: 'Feedback', panel: <Feedback /> },
+  ];
   return (
     <PageShell path={path}>
-      <Versions />
-      <Gallery />
-      <Who />
-      <How />
-      <Features />
-      <Commitment />
-      <Feedback />
+      <section className="section section-tight">
+        <div className="wrap">
+          <Tabs label="The guide" tabs={tabs} />
+        </div>
+      </section>
     </PageShell>
   );
 }
