@@ -9,7 +9,7 @@ This folder is the STM website, built from `PROMPT.md`. That brief is the source
   - **One status, Beta:** the app is in beta and plays from the first level to max level. Say it once on the first
     screen and in the FAQ; the Results section says which levels are measured. Never "free beta", "limited spots" or "users".
   - **Hardcore and Questing are "coming soon"**, with no dates. Make no questing claim until the owner says it is ready.
-- **Telegram is the only channel for buying, questions and support:** https://t.me/HugeKush, opened in a new tab with
+- **Telegram is the only channel for buying, questions and support:** https://t.me/stm_addon, opened in a new tab with
   `rel="noopener noreferrer"`. No card form or checkout on the site, and no third-party embeds or download links.
   The one exception is the **optional email sign-up** (the `#updates` panel, words in `UPDATES`): the Klaviyo onsite
   script (`KLAVIYO_*` in `src/data/site.ts`) draws the form, sets cookies and records visits, so the privacy copy

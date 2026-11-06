@@ -44,7 +44,7 @@ two jobs: (1) present STM so the right people instantly understand how it helps 
   this, no free"). A **pre-sale** runs until WoW: Forever launches on 4 November 2026 (a wipe), at a lower price
   than after launch. Prices live only in `src/data/pricing.ts`; until the owner publishes them the cards say "Price on
   Telegram". **Never invent a price, never show 0.** Payment and delivery happen on Telegram: no checkout on the site.
-- **Contact:** Telegram only: **https://t.me/HugeKush** (@HugeKush).
+- **Contact:** Telegram only: **https://t.me/stm_addon** (@stm_addon).
 
 ## 2. Positioning and honesty (non-negotiable)
 
@@ -70,7 +70,7 @@ two jobs: (1) present STM so the right people instantly understand how it helps 
 
 ## 3. Telegram is the only channel
 
-- Every call to action opens **https://t.me/HugeKush** in a new tab (`rel="noopener noreferrer"`).
+- Every call to action opens **https://t.me/stm_addon** in a new tab (`rel="noopener noreferrer"`).
 - Nowhere: forms, email addresses, newsletter, sign-up, login, comments, chat widgets, cookies, analytics,
   tracking pixels, third-party embeds or download links. No cookie banner is needed ΓÇö say "No tracking. No sign-up."
   proudly.
@@ -147,7 +147,7 @@ Blizzard imitation.
    source).
 7a. **Pricing** (`#pricing`): two plans from `pricing.ts` - the Pre-sale (until 4 November 2026, the lower price) and
    From launch (the full price) - each with a Telegram buy button; "What you get" (only true things) and "How to
-   buy" (message @HugeKush, get the payment details, pay, receive STM with setup help). A plain end date - no
+   buy" (message @stm_addon, get the payment details, pay, receive STM with setup help). A plain end date - no
    countdown, no "only N left". After launch day the pre-sale card says "Pre-sale ended" by itself.
 8. **Our accessibility commitment:** what STM and this site do for accessibility, and an open invitation for disabled
    players to shape the roadmap.
@@ -193,7 +193,7 @@ Blizzard imitation.
     the pre-sale price, currency and `priceValidUntil` once the price is published (no offer before that, never price
     0) ΓÇö **no aggregateRating or review**;
   - `FAQPage`;
-  - `Organization` with `sameAs: ["https://t.me/HugeKush"]`.
+  - `Organization` with `sameAs: ["https://t.me/stm_addon"]`.
   - Must pass Google's Rich Results Test.
 - **Speed:**
   - LCP under 2.0 s on mobile, CLS under 0.05;
@@ -230,7 +230,7 @@ Blizzard imitation.
   - `faq.ts`, `features.ts`;
   - a `copy.md` deck of all page text.
 - **Tests:**
-  - Vitest guardrails: the only outbound link is t.me/HugeKush; the words "undetectable", "ban-proof", "guaranteed",
+  - Vitest guardrails: the only outbound link is t.me/stm_addon; the words "undetectable", "ban-proof", "guaranteed",
     "safe from bans", "open source" and "license" appear nowhere; every number on the page comes from `stats.json`.
   - Playwright: no console errors; content readable without JavaScript; axe clean; no sideways scroll at 390, 768
     and 1440 px; reduced motion; the toolbar; the copy button.
@@ -246,7 +246,7 @@ direct upload of a folder with no Git needed. The build must be ready to drag in
   - a `404.html` in the site's style, with a way back home;
   - `robots.txt` and `sitemap.xml`;
   - the favicon set, the manifest and the OG image.
-- `SITE_URL` (environment variable, default `https://stm-addon.pages.dev`) sets the canonical link, `og:url`, the
+- `SITE_URL` (environment variable, default `https://stm-addon.netlify.app`) sets the canonical link, `og:url`, the
   sitemap's addresses and the JSON-LD `url`. A wrong or missing one must not break the build.
 - Add a Cloudflare **`_headers`** file in `dist/`:
   - long cache (`max-age=31536000, immutable`) for the hashed assets, no cache for the HTML;
@@ -282,7 +282,7 @@ direct upload of a folder with no Git needed. The build must be ready to drag in
 
 - [ ] `dist/` is built, previews correctly with `npm run preview`, and has `404.html`, `_headers`, `robots.txt` and
       `sitemap.xml` with the `SITE_URL` addresses; `DEPLOY.md` walks a non-developer through Cloudflare Pages.
-- [ ] The only contact is https://t.me/HugeKush ΓÇö no form, email, analytics, cookies or embeds.
+- [ ] The only contact is https://t.me/stm_addon ΓÇö no form, email, analytics, cookies or embeds.
 - [ ] STM is presented as an accessibility addon; that it plays automatically is stated honestly; the risk answer is
       in the FAQ.
 - [ ] No Blizzard logos or promotional art; the pictures follow the rules above; the trademark notice and the credits are in the footer.

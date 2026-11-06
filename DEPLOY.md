@@ -36,7 +36,7 @@ structured data, so search engines see the right one.
 
 ## Updating the site later
 
-1. Build again (as above; `npm run build` alone builds for `https://stm-addon.pages.dev`).
+1. Build again (as above; `npm run build` alone builds for `https://stm-addon.netlify.app`).
 2. Cloudflare dashboard ΓåÆ **Workers & Pages** ΓåÆ **stm-addon** ΓåÆ **Create deployment** ΓåÆ drag `dist` in ΓåÆ **Save and deploy**.
 
 Or in one command: **`npm run deploy`**. The first time, it opens Cloudflare in your browser to log in.
@@ -57,8 +57,8 @@ The settings, if a new project is ever needed:
    - **Root directory:** leave empty
 3. **Environment variables** (Production and Preview): `NODE_VERSION` = `22` (the repository's `.node-version` says the
    same), and `SITE_URL` = the final address (it goes into the canonical link, the sitemap, the share image and the
-   structured data). The project is called **`stm-addon`**, so its address is `https://stm-addon.pages.dev`; without
-   `SITE_URL` the site assumes `https://stm-addon.pages.dev`.
+   structured data). The project is called **`stm-addon`**, so its address is `https://stm-addon.netlify.app`; without
+   `SITE_URL` the site assumes `https://stm-addon.netlify.app`.
 4. **Save and deploy.** From then on: `git push` ΓåÆ about a minute later the site is updated. Each pull request or other
    branch gets its own preview address.
 

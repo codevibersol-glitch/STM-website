@@ -148,7 +148,7 @@ export const FEEDBACK = {
   eyebrow: 'Feedback',
   title: 'Tell us what would help, on Telegram',
   intro:
-    'Questions before you buy, or ideas once you play? Feedback decides what STM builds next. Answer three short questions in your own words and send them to @HugeKush on Telegram.',
+    'Questions before you buy, or ideas once you play? Feedback decides what STM builds next. Answer three short questions in your own words and send them to @stm_addon on Telegram.',
   prompts: [
     { title: 'Your situation', hint: 'How you play today, and what gets in the way.' },
     { title: "What's hard in WoW for you", hint: 'The moments that cost you the most effort, pain or time.' },

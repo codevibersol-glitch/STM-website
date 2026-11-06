@@ -1902,6 +1902,29 @@ html[data-font="dyslexic"] {
     font-size: 0.95rem;
   }
 
+  /* The build-your-fighter 3D: the WoW-style player in the chosen armour set. */
+  .fighter-scene {
+    position: relative;
+    height: 26rem;
+    margin: 0 0 1.25rem;
+    border: 1px solid var(--c-line);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 0%, rgb(21 27 34 / 0.9), rgb(6 7 9 / 0.6));
+  }
+  .fighter-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .fighter-scene.is-live .fighter-canvas {
+    opacity: 1;
+  }
+
   /* ---------------------------------------------------------------------------------- FAQ */
 
   .faq {

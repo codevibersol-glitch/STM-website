@@ -34,6 +34,7 @@ import { MapHero } from './MapHero';
 import { TiltCard, useCountUp } from './Motion';
 import { TelegramLink } from './TelegramLink';
 import { DiscordLink } from './DiscordLink';
+import { FighterScene } from './FighterScene';
 import { Wordmark } from './Wordmark';
 
 interface SectionHeadProps {
@@ -441,6 +442,7 @@ export function Fighter() {
       <div className="wrap">
         <SectionHead id="fighter-title" eyebrow={FIGHTER.eyebrow} title={FIGHTER.title} intro={FIGHTER.intro} />
         <div className="fighter" data-reveal>
+          <FighterScene specId={state.specId} tierSetId={state.tierSetId} />
           <div className="fighter-sets">
             <p className="fighter-label">{FIGHTER.armour}</p>
             {FIGHTER_TIER_SETS.map((set) => (

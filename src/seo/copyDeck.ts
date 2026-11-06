@@ -178,7 +178,7 @@ export function copyDeck(): string {
     '## Footer',
     '',
     `- ${FOOTER.tagline}`,
-    `- ${FOOTER.contact} @HugeKush`,
+    `- ${FOOTER.contact} @stm_addon`,
     `- ${FOOTER.privacy}`,
     `- ${TRADEMARK_NOTICE}`,
     `- ${CREDITS}`,

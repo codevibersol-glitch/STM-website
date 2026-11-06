@@ -1,7 +1,7 @@
 import { Header } from './components/Header';
 import { HowItWorks } from './components/HowItWorks';
 import { BuilderPage, CharactersPage, FaqPage, PricingPage, ResultsPage } from './components/Pages';
-import { Commitment, Faq, Fighter, Feedback, FloatingTelegram, Footer, Gallery, Hero, How, Pricing, Results, TimeBack, Versions, Who, Features } from './components/Sections';
+import { Commitment, Faq, Feedback, FloatingTelegram, Footer, Gallery, Hero, How, Pricing, Results, TimeBack, Versions, Who, Features } from './components/Sections';
 import { SKIP_LINK } from './data/copy';
 
 // Scroll reveals ([data-reveal]) are pure CSS scroll-driven animations - see index.css.
@@ -34,7 +34,6 @@ export function App({ path = '/' }: AppProps) {
         <Results />
         <TimeBack />
         <Pricing />
-        <Fighter />
         <Commitment />
         <Faq />
         <Feedback />

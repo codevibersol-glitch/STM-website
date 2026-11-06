@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { PRICING } from '../src/data/pricing';
 
-const TELEGRAM = 'https://t.me/HugeKush';
+const TELEGRAM = 'https://t.me/stm_addon';
 const DISCORD_URL = 'https://discord.gg/hugekush0222';
 const STATS = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'stats.json'), 'utf8')) as {
   stats: { id: string; prefix: string; value: string }[];

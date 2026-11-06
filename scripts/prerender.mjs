@@ -4,7 +4,7 @@
 //   sitemap.xml, robots.txt - with the SITE_URL address
 //   _headers     - Cloudflare Pages: caching, security headers and the Content-Security-Policy
 //   ../copy.md   - every word on the page, for review
-// SITE_URL sets the public address (default https://stm-website.pages.dev).
+// SITE_URL sets the public address (default https://stm-addon.netlify.app).
 
 import { createHash } from 'node:crypto';
 import { readdir, readFile, rm, writeFile } from 'node:fs/promises';
