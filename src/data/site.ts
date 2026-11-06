@@ -6,6 +6,10 @@ export const BRAND = 'STM';
 export const TELEGRAM_HANDLE = '@HugeKush';
 export const TELEGRAM_URL = 'https://t.me/HugeKush';
 
+/** The same person, on Discord: this nickname is how people reach him for messages. */
+export const DISCORD_HANDLE = '@hugekush0222';
+export const DISCORD_URL = 'https://discord.gg/hugekush0222';
+
 /**
  * Klaviyo embedded signup (form "STM website signup"). The public company id is safe to ship.
  * klaviyo.js sets the __kla_id cookie and records visits; the privacy copy has to say so.

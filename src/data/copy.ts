@@ -2,7 +2,6 @@
 // Edit the words here; the components only lay them out. `npm run build` also writes them all to copy.md.
 
 import type { IconName } from '../components/Icon';
-import { LAUNCH_DAY } from './pricing';
 import { BETA_LABEL, BETA_REACH } from './site';
 import { SHOTS } from './shots';
 
@@ -13,12 +12,16 @@ const NAV_ITEMS = [
   // The pictures section exists only once its picture files do (npm run shots).
   ...(SHOTS.length > 0 ? [{ href: '#see', label: 'See it' }] : []),
   { href: '#who', label: "Who it's for" },
-  { href: '#results', label: 'Results' },
-  { href: '#pricing', label: 'Pricing' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#feedback', label: 'Feedback' },
+  { href: '/results', label: 'Results' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/characters', label: 'Characters' },
 ] as const;
-export const NAV: readonly { readonly href: string; readonly label: string }[] = NAV_ITEMS;
+export interface NavItem {
+  readonly href: string;
+  readonly label: string;
+}
+export const NAV: readonly NavItem[] = NAV_ITEMS;
 
 export const HEADER_CTA = 'Buy on Telegram';
 
@@ -31,7 +34,7 @@ export const HERO = {
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
   primaryCta: 'Get STM on Telegram',
   secondaryCta: 'See how it works',
-  trust: ['Every WoW version', 'Every race and class', 'Pre-sale until launch', 'Telegram + email updates'],
+  trust: ['Every WoW version', 'Every race and class', 'Plays to max level', 'Telegram + email updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
@@ -112,12 +115,10 @@ export const TIME_BACK = {
 // The plans, their prices and the buying steps live in pricing.ts; these are the section's own words.
 export const PRICING_COPY = {
   eyebrow: 'Pricing',
-  title: 'Get STM: pre-sale until launch',
-  intro: `STM is paid software. Buy it during the pre-sale, before ${LAUNCH_DAY}, for the lower price.`,
-  ribbon: 'Lower price',
-  ended: 'Pre-sale ended',
+  title: 'Get STM: three plans, launch day',
+  intro: 'STM is paid software. Pick a plan, and buy it on Telegram: payment and delivery happen there. There is no free version.',
+  ribbon: 'Full access',
   priceOnTelegram: 'Price on Telegram',
-  savingAfter: 'below the price after launch',
   includesTitle: 'What you get',
   stepsTitle: 'How to buy',
   note: 'Payment and delivery happen on Telegram. There is no card form on this site.',
@@ -175,7 +176,7 @@ export const FEEDBACK = {
 export const UPDATES = {
   eyebrow: 'Email',
   title: 'Get a setup note by email',
-  intro: 'A short note on getting started, and a reminder before the pre-sale ends. Payment and support stay on Telegram.',
+  intro: 'A short note on getting started. Payment and support stay on Telegram.',
   fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 
@@ -192,7 +193,7 @@ export const FIGHTER = {
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
   privacy: 'No account needed. Email updates are optional.',
-  contact: 'Talk to us on Telegram:',
+  contact: 'Talk to us on Telegram or Discord:',
 };
 
 export const FAB_LABEL = 'Telegram';

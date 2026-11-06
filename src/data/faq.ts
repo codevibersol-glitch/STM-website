@@ -1,5 +1,5 @@
 import { costAnswer } from './pricing.ts';
-import { RISK_ANSWER, TELEGRAM_HANDLE } from './site.ts';
+import { RISK_ANSWER, DISCORD_HANDLE, TELEGRAM_HANDLE } from './site.ts';
 import { comingSoonList, versionList } from './versions.ts';
 
 export interface FaqItem {
@@ -38,7 +38,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'feedback',
     q: 'How do I give feedback?',
-    a: `On Telegram only: send a message to ${TELEGRAM_HANDLE}. The feedback section on this page has a ready-made template you can copy.`,
+    a: `On Telegram or Discord: send a message to ${TELEGRAM_HANDLE} on Telegram, or to ${DISCORD_HANDLE} on Discord. The feedback section on this page has a ready-made template you can copy.`,
   },
   {
     id: 'data',

@@ -2273,6 +2273,18 @@ html[data-font="dyslexic"] {
     width: min(100%, 26rem);
     margin: 0 auto;
   }
+  /* The loader draws the card after Klaviyo loads, so the room it needs is reserved before it lands and the
+     card itself is taken out of flow: the Telegram buy button below never shifts when the form appears. */
+  html.js .signup-form {
+    position: relative;
+    min-height: 16rem;
+  }
+  html.js .signup-form form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
   .signup-fallback {
     order: 5;
     margin: 1rem 0 0;

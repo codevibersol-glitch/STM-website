@@ -20,17 +20,20 @@ import { FAQ } from '../data/faq';
 import { FEATURES } from '../data/features';
 import { GALLERY_COPY } from '../data/gallery';
 import { FIGHTER } from '../data/copy';
-import { PRICING, billingWords, formatPrice, plan, presaleOver, saving } from '../data/pricing';
+import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { SHOTS, type PlacedShot } from '../data/shots';
-import { BETA_LABEL, BETA_REACH, CREDITS, KLAVIYO_FORM_ID, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
+import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, KLAVIYO_COMPANY_ID, KLAVIYO_FORM_ID, KLAVIYO_SCRIPT_SRC, TELEGRAM_HANDLE, TRADEMARK_NOTICE } from '../data/site';
+import type { NavItem } from '../data/copy';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
 import { FIGHTER_SPECS, FIGHTER_TIER_SETS, type FighterState } from '../data/talents';
+import { DashboardDemo } from '../demos/DashboardDemo';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
 import { MapHero } from './MapHero';
 import { TiltCard, useCountUp } from './Motion';
 import { TelegramLink } from './TelegramLink';
+import { DiscordLink } from './DiscordLink';
 import { Wordmark } from './Wordmark';
 
 interface SectionHeadProps {
@@ -340,11 +343,6 @@ export function TimeBack() {
 }
 
 export function Pricing() {
-  // The pre-sale card says "ended" once launch day has passed - in the browser, so the page stays
-  // true without a rebuild. The server (and a page without JavaScript) shows the plans as built.
-  const [ended, setEnded] = useState(false);
-  useEffect(() => setEnded(presaleOver(new Date())), []);
-  const off = saving(plan('presale').price, plan('launch').price);
   return (
     <section id="pricing" className="section" aria-labelledby="pricing-title">
       <div className="wrap">
@@ -352,38 +350,31 @@ export function Pricing() {
         <ul className="plans">
           {PRICING.plans.map((p) => {
             const price = formatPrice(p.price);
-            const isEnded = p.id === 'presale' && ended;
             return (
               <li
                 key={p.id}
                 className={p.highlight ? 'plan plan-highlight' : 'plan'}
                 data-plan={p.id}
-                data-ended={isEnded ? 'true' : undefined}
                 data-reveal
               >
-                {p.highlight ? <p className="plan-ribbon">{isEnded ? PRICING_COPY.ended : PRICING_COPY.ribbon}</p> : null}
+                {p.highlight ? <p className="plan-ribbon">{PRICING_COPY.ribbon}</p> : null}
                 <h3>{p.name}</h3>
                 <p className="plan-when">{p.when}</p>
                 {price ? (
                   <p className="plan-price">
                     {price}
-                    <span className="plan-billing">{billingWords()}</span>
+                    <span className="plan-billing">{billingWords(p.billing)}</span>
                   </p>
                 ) : (
                   <p className="plan-price plan-price-tbd">{PRICING_COPY.priceOnTelegram}</p>
                 )}
-                {p.id === 'presale' && off !== null ? (
-                  <p className="plan-save">
-                    {off}% {PRICING_COPY.savingAfter}
-                  </p>
-                ) : null}
                 <p className="plan-note">{p.note}</p>
-                {isEnded ? null : (
+                {p.cta ? (
                   <TelegramLink className={p.highlight ? 'btn btn-gold' : 'btn btn-ghost'}>
                     <Icon name="plane" />
                     {p.cta}
                   </TelegramLink>
-                )}
+                ) : null}
               </li>
             );
           })}
@@ -497,6 +488,28 @@ export function Fighter() {
   );
 }
 
+/**
+ * Characters page section: the character model STM tracks — gear, talents, spells,
+ * shown live on the dashboard. Complements the fighter builder at /builder.
+ */
+export function Characters() {
+  return (
+    <section id="characters" className="section" aria-labelledby="characters-title">
+      <div className="wrap">
+        <SectionHead
+          id="characters-title"
+          eyebrow="Characters"
+          title="Your character on the dashboard"
+          intro="STM’s dashboard knows your character: equipped gear, bags, professions, talents and spells. Use the fighter builder to hold a build, then watch it live on the dashboard."
+        />
+        <div className="characters" data-reveal>
+          <DashboardDemo />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Commitment() {
   return (
     <section id="accessibility" className="section" aria-labelledby="commitment-title">
@@ -582,8 +595,51 @@ export function Feedback() {
   );
 }
 
+// The Klaviyo loader: injected by the app, never by the document, so the third-party runtime stays off the
+// critical path (a script tag in the HTML would put its whole boot on the main thread before first paint).
+let klaviyoLoader: Promise<void> | null = null;
+function loadKlaviyo(): Promise<void> {
+  klaviyoLoader ??= new Promise((resolve) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src*="${KLAVIYO_COMPANY_ID}"]`);
+    const done = () => resolve();
+    const fail = () => resolve();
+    if (existing) {
+      existing.addEventListener('load', done, { once: true });
+      existing.addEventListener('error', fail, { once: true });
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = KLAVIYO_SCRIPT_SRC;
+    s.async = true;
+    s.onload = done;
+    s.onerror = fail;
+    document.head.appendChild(s);
+  });
+  return klaviyoLoader;
+}
+
 /** Optional email list, the hero's first action, above the Telegram buy button. Klaviyo draws the field into the container. */
 export function Updates() {
+  // Draw the Klaviyo loader once the page is up, off the critical path and past the first paint: a script
+  // tag in the document (deferred or not) still lands on the main thread before the browser is idle, which is
+  // what Lighthouse's bootup, TBT and LCP audits were measuring. After load it is a plain lazy fetch.
+  useEffect(() => {
+    const start = () => {
+      // Past the load event, into the browser's idle time: the loader then draws after the critical work.
+      const ric = window as Window & { requestIdleCallback?: (cb: () => void, opts?: unknown) => number };
+      if (typeof ric.requestIdleCallback === 'function') {
+        ric.requestIdleCallback(() => {
+          void loadKlaviyo();
+        }, { timeout: 4000 });
+      } else {
+        window.setTimeout(() => {
+          void loadKlaviyo();
+        }, 1500);
+      }
+    };
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+  }, []);
   const openField = () => {
     const input = document.querySelector<HTMLInputElement>('#updates input[type="email"]');
     if (input) {
@@ -612,7 +668,7 @@ export function Updates() {
   );
 }
 
-export function Footer() {
+export function Footer({ nav = NAV }: { nav?: readonly NavItem[] }) {
   return (
     <footer className="site-footer">
       <div className="wrap footer-grid">
@@ -623,7 +679,7 @@ export function Footer() {
           </a>
           <p className="footer-tagline">{FOOTER.tagline}</p>
           <p className="footer-contact">
-            {FOOTER.contact} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink>
+            {FOOTER.contact} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink> <DiscordLink>{DISCORD_HANDLE}</DiscordLink>
           </p>
           <p className="footer-privacy">
             <Icon name="shield" />
@@ -632,7 +688,7 @@ export function Footer() {
         </div>
         <nav aria-label="Footer">
           <ul className="footer-nav">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <a href={item.href}>{item.label}</a>
               </li>

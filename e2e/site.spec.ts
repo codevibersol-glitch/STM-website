@@ -3,8 +3,10 @@ import { expect, test, type Page } from '@playwright/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { PRICING } from '../src/data/pricing';
 
 const TELEGRAM = 'https://t.me/HugeKush';
+const DISCORD_URL = 'https://discord.gg/hugekush0222';
 const STATS = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'stats.json'), 'utf8')) as {
   stats: { id: string; prefix: string; value: string }[];
 };
@@ -73,7 +75,7 @@ test('loads Klaviyo onsite JavaScript with no CSP violations', async ({ page }) 
   expect(csp).toContain("form-action 'none'");
   expect((await klaviyo).ok()).toBe(true);
   await expect(page.locator('#updates-title')).toHaveText('Get a setup note by email');
-  await expect(page.locator('#updates')).toContainText('before the pre-sale ends');
+  await expect(page.locator('#updates')).toContainText('A short note on getting started');
   const buy = page.locator('.hero-ctas .btn-gold');
   await expect(buy).toContainText('Get STM on Telegram');
   await expect(buy).toHaveClass(/btn-lg/);
@@ -263,13 +265,17 @@ test('the copy button copies the feedback template and says so', async ({ browse
   await context.close();
 });
 
-test('every link off the site is Telegram, in a new tab, without the referrer', async ({ page }) => {
+test('every link off the site is Telegram or Discord, in a new tab, without the referrer', async ({ page }) => {
   await page.goto('/');
   const links = await page.locator('a[href^="http"]').evaluateAll((as) =>
     as.map((a) => ({ href: a.getAttribute('href'), target: a.getAttribute('target'), rel: a.getAttribute('rel') })),
   );
   expect(links.length).toBeGreaterThan(4);
-  for (const l of links) expect(l).toEqual({ href: TELEGRAM, target: '_blank', rel: 'noopener noreferrer' });
+  for (const l of links) {
+    expect([TELEGRAM, DISCORD_URL]).toContain(l.href);
+    expect(l.target).toBe('_blank');
+    expect(l.rel).toBe('noopener noreferrer');
+  }
 });
 
 test('one app for every version: plain names, what is coming soon, and the beta status', async ({ page }) => {
@@ -350,28 +356,31 @@ test('the pictures load, fit the screen and cause no CSP errors', async ({ brows
   await context.close();
 });
 
-test('the pricing section offers both plans, bought on Telegram', async ({ page }) => {
+test('the pricing section offers the plans, bought on Telegram', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#pricing .plan')).toHaveCount(2);
+  await expect(page.locator('#pricing .plan')).toHaveCount(PRICING.plans.length);
   const links = page.locator('#pricing .plan a');
-  await expect(links).toHaveCount(2);
+  await expect(links).toHaveCount(PRICING.plans.length);
   for (const link of await links.all()) {
     await expect(link).toHaveAttribute('href', TELEGRAM);
     await expect(link).toHaveAttribute('target', '_blank');
     await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   }
   await expect(page.locator('#pricing')).toContainText('There is no card form on this site');
-  await expect(page.locator('#pricing [data-plan="presale"]')).not.toHaveAttribute('data-ended', /./);
 });
 
-test('after launch day the pre-sale card says it ended, and stops selling', async ({ page }) => {
-  await page.clock.setFixedTime(new Date('2026-11-06T12:00:00Z'));
-  await page.goto('/');
-  const presale = page.locator('#pricing [data-plan="presale"]');
-  await expect(presale).toHaveAttribute('data-ended', 'true');
-  await expect(presale.locator('.plan-ribbon')).toHaveText('Pre-sale ended');
-  await expect(presale.locator('a')).toHaveCount(0);
-  await expect(page.locator('#pricing [data-plan="launch"] a')).toHaveCount(1);
+test('the section pages render their own content', async ({ page }) => {
+  const cases = [
+    ['/builder', '#fighter'],
+    ['/pricing', '#pricing'],
+    ['/faq', '#faq'],
+    ['/results', '#results'],
+  ] as const;
+  for (const [path, selector] of cases) {
+    const response = await page.goto(path);
+    expect(response?.status(), path).toBe(200);
+    await expect(page.locator(selector).first()).toBeVisible();
+  }
 });
 
 test('the phone menu opens, closes with Escape and gives focus back', async ({ browser }) => {

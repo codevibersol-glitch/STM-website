@@ -2,7 +2,7 @@
   "name": "stm-website",
   "private": true,
   "version": "1.0.0",
-  "description": "STM - the WoW accessibility addon and leveling tool. Static, prerendered marketing site; feedback through Telegram only.",
+  "description": "STM - the WoW accessibility addon and leveling tool. Static, prerendered marketing site; buy and feedback through Telegram and Discord.",
   "type": "module",
   "scripts": {
     "dev": "vite",

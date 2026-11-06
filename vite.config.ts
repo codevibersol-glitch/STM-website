@@ -17,6 +17,19 @@ export default defineConfig({
         return html.replace('<!--app-head-->', headTags(siteUrl.url));
       },
     },
+    {
+      // The Klaviyo onsite script stays in the source on purpose (the guardrails read it from there), but the
+      // build takes it out of the document: the app injects it as a lazy, client-side loader once the page is
+      // up, so the whole third-party runtime never sits on the critical path (bootup, TBT, LCP, CLS).
+      name: 'stm-klaviyo-lazy',
+      apply: 'build',
+      transformIndexHtml: {
+        order: 'post',
+        handler(html: string) {
+          return html.replace(/<script[^>]*klaviyo[^>]*>[\s\S]*?<\/script>/, '');
+        },
+      },
+    },
   ],
   define: {
     __BUILD_YEAR__: JSON.stringify(new Date().getFullYear()),

@@ -28,7 +28,7 @@ for (const marker of ['<!--app-html-->', `<script>${ssr.PREFS_SCRIPT}</script>`]
 // Preload the two faces of the first screen's text (headline and body), so it settles quickly.
 // Bold body text follows on its own; on slow phones it would only compete.
 const assets = await readdir(join(dist, 'assets'));
-const fontPatterns = [/^space-grotesk-latin-wght-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/];
+const fontPatterns = [/^space-grotesk-latin-wght-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-700-normal-[\w-]+\.woff2$/];
 const preloads = fontPatterns
   .map((re) => assets.find((a) => re.test(a)))
   .filter(Boolean)
@@ -54,6 +54,31 @@ for (const m of stylesheetLinks) await rm(join(dist, 'assets', m[1]));
 // index.html
 const page = withPreloads(withStyle).replace('<!--app-html-->', ssr.renderApp());
 await writeFile(join(dist, 'index.html'), page);
+
+// The section pages: each one renders its own section, with its own title and description.
+const pageMeta = {
+  '/builder': {
+    title: 'Builder · STM',
+    description:
+      'Build your fighter in STM, the WoW accessibility addon and leveling tool: pick a spec, take the armour set you trust, hold the fight with the talents you choose.',
+  },
+  '/characters': { title: 'Characters · STM', description: 'Character models in STM: gear, talents and spells, shown live on the dashboard of the WoW accessibility addon and leveling tool.' },
+  '/pricing': { title: 'Pricing · STM', description: 'The STM plans: FLEX, GO and Founder, from the basic bot features to full access. Buy on Telegram.' },
+  '/faq': { title: 'FAQ · STM', description: 'The STM FAQ: what the addon is, how it plays, what it costs, how to buy and how to give feedback.' },
+  '/results': { title: 'Results · STM', description: 'The measured results of STM: XP per hour, hours of play, kills and analysed deaths in WoW.' },
+};
+const withHead = (html, meta, path) =>
+  html
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${meta.title}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${meta.description}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${siteUrl}${path}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${siteUrl}${path}$2`)
+    .replace(/(<meta name="twitter:url" content=")[^"]*(")/, `$1${siteUrl}${path}$2`);
+const base = withPreloads(withStyle);
+for (const [route, meta] of Object.entries(pageMeta)) {
+  const html = base.replace('<!--app-html-->', ssr.renderApp(route));
+  await writeFile(join(dist, `${route.slice(1)}.html`), withHead(html, meta, route));
+}
 
 // 404.html - the same styles, no scripts but the settings one.
 const stylesheets = [inlineStyle];
@@ -91,6 +116,12 @@ await writeFile(
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+${['/builder', '/pricing', '/faq', '/results'].map((route) => `  <url>
+    <loc>${siteUrl}${route}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n')}
 </urlset>
 `,
 );

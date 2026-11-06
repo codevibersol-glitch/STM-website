@@ -18,6 +18,7 @@ import {
   BETA_REACH,
   CREDITS,
   DEFAULT_SITE_URL,
+  DISCORD_URL,
   PRIMARY_KEYWORD,
   RISK_ANSWER,
   SITE_DESCRIPTION,
@@ -27,7 +28,7 @@ import {
   TELEGRAM_URL,
   TRADEMARK_NOTICE,
 } from '../src/data/site';
-import { LAUNCH_DATE, PRICING, formatDay, formatPrice, plan, saving } from '../src/data/pricing';
+import { LAUNCH_DATE, PRICING, formatDay, formatPrice, plan } from '../src/data/pricing';
 import { SHOTS } from '../src/data/shots';
 import stats from '../src/data/stats.json';
 import { stat } from '../src/data/stats';
@@ -87,16 +88,17 @@ describe('Telegram is the only channel', () => {
   const anchors = [...html.matchAll(/<a\s[^>]*>/g)].map((m) => m[0]);
   const hrefs = anchors.map((a) => /href="([^"]*)"/.exec(a)?.[1] ?? '');
 
-  it('links only to the page itself or to t.me/HugeKush', () => {
+  it('links only to the page itself, Telegram or Discord', () => {
+    const internalHrefs = ['/', '/builder', '/characters', '/pricing', '/faq', '/results'];
     for (const href of hrefs) {
-      const internal = href.startsWith('#') || href === '/';
-      expect(internal || href === TELEGRAM_URL, `unexpected link ${href}`).toBe(true);
+      const internal = href.startsWith('#') || internalHrefs.includes(href);
+      expect(internal || href === TELEGRAM_URL || href === DISCORD_URL, `unexpected link ${href}`).toBe(true);
     }
     expect(hrefs.filter((h) => h === TELEGRAM_URL).length).toBeGreaterThanOrEqual(5);
   });
 
-  it('opens Telegram in a new tab without sharing the referrer', () => {
-    for (const a of anchors.filter((x) => x.includes(TELEGRAM_URL))) {
+  it('opens Telegram and Discord in a new tab without sharing the referrer', () => {
+    for (const a of anchors.filter((x) => x.includes(TELEGRAM_URL) || x.includes(DISCORD_URL))) {
       expect(a).toContain('target="_blank"');
       expect(a).toContain('rel="noopener noreferrer"');
     }
@@ -111,7 +113,7 @@ describe('Telegram is the only channel', () => {
     expect(html).toContain(`class="klaviyo-form-${KLAVIYO_FORM_ID}"`);
     const external = [...(html + head + index).matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map((m) => m[1] ?? '');
     for (const url of external) {
-      const allowed = url === TELEGRAM_URL || url === KLAVIYO_SCRIPT_SRC || url.startsWith(DEFAULT_SITE_URL);
+      const allowed = url === TELEGRAM_URL || url === DISCORD_URL || url === KLAVIYO_SCRIPT_SRC || url.startsWith(DEFAULT_SITE_URL);
       expect(allowed, `unexpected link ${url}`).toBe(true);
     }
   });
@@ -186,8 +188,8 @@ describe('honest claims', () => {
   it('makes no fake urgency: a plain end date, no countdown or scarcity', () => {
     expect(text).not.toMatch(/only \d+ (left|spots|copies|seats)|hurry|last chance|ends in \d|countdown|limited (spots|seats|copies)/i);
     expect(LAUNCH_DATE).toBe('2026-11-04');
-    expect(plan('presale').when).toBe(`Until ${formatDay(LAUNCH_DATE)}`);
-    expect(text).toContain(`Until ${formatDay(LAUNCH_DATE)}`);
+    expect(plan('go').when).toBe(`From ${formatDay(LAUNCH_DATE)}`);
+    expect(text).toContain(`From ${formatDay(LAUNCH_DATE)}`);
   });
 
   it('sells on Telegram only: every plan button is the Telegram link', () => {
@@ -204,8 +206,6 @@ describe('honest claims', () => {
     // Prices and dates come from pricing.ts (as stored, and as formatted on the page).
     for (const m of JSON.stringify(PRICING).matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
     for (const p of PRICING.plans) for (const m of (formatPrice(p.price) ?? '').matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
-    const off = saving(plan('presale').price, plan('launch').price);
-    if (off !== null) allowed.add(String(off));
     // Digits inside a word (the credit "Xian55" is a name) are not numbers.
     const found = [...textOutsideDemos.matchAll(/(?<![A-Za-z\d])\d[\d,]*/g)].map((m) => m[0].replace(/,$/, ''));
     expect(found.length).toBeGreaterThan(5);
@@ -267,12 +267,12 @@ describe('search', () => {
     expect(app.name).toBe('STM');
     expect(app.applicationCategory).toBe('GameApplication');
     expect(app.operatingSystem).toBe('Windows');
-    // STM is never listed as free: an offer appears only once the pre-sale price is published.
-    const pre = plan('presale');
-    if (pre.price !== null && PRICING.currency) {
-      expect(app.offers.price).toBe(String(pre.price));
+    // STM is never listed as free: an offer appears only once a plan price is published.
+    const offered = PRICING.plans.find((p) => (p.price ?? 0) > 0);
+    if (offered && offered.price !== null && PRICING.currency) {
+      expect(app.offers.price).toBe(String(offered.price));
       expect(app.offers.priceCurrency).toBe(PRICING.currency);
-      expect(app.offers.priceValidUntil).toBe(LAUNCH_DATE);
+      if (offered.billing === 'once') expect(app.offers.priceValidUntil).toBe(LAUNCH_DATE);
     } else {
       expect(app.offers).toBeUndefined();
     }

@@ -1,11 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { HEADER_CTA, NAV } from '../data/copy';
+import { HEADER_CTA, NAV, type NavItem } from '../data/copy';
 import { A11yToolbar } from './A11yToolbar';
 import { Icon } from './Icon';
 import { TelegramLink } from './TelegramLink';
 import { Wordmark } from './Wordmark';
-
-export function Header() {
+export function Header({ homeHref = '#top', nav = NAV }: { homeHref?: string; nav?: readonly NavItem[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [current, setCurrent] = useState('');
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -56,13 +55,13 @@ export function Header() {
   return (
     <header className="site-header" data-menu={menuOpen ? 'open' : 'closed'}>
       <div className="wrap header-row">
-        <a href="#top" className="wordmark">
+        <a href={homeHref} className="wordmark">
           <Wordmark className="wordmark-mark" label={null} />
           <span className="sr-only">STM, back to the top</span>
         </a>
         <nav id={navId} className="site-nav" aria-label="Main">
           <ul>
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <a href={item.href} aria-current={item.href === current ? 'location' : undefined} onClick={() => setMenuOpen(false)}>
                   {item.label}

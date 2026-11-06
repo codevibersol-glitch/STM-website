@@ -136,7 +136,7 @@ export function copyDeck(): string {
     '',
     ...PRICING.plans.map(
       (p) =>
-        `- **${p.name}** (${p.when}): ${formatPrice(p.price) ? `${formatPrice(p.price)} ${billingWords()}` : PRICING_COPY.priceOnTelegram}. ${p.note} Button: ${p.cta}`,
+        `- **${p.name}** (${p.when}): ${formatPrice(p.price) ? `${formatPrice(p.price)} ${billingWords(p.billing)}` : PRICING_COPY.priceOnTelegram}. ${p.note} Button: ${p.cta}`,
     ),
     '',
     `${PRICING_COPY.includesTitle}:`,

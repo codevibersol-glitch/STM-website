@@ -1,7 +1,7 @@
 // The <head> of every page, built from the data files. Used by the Vite dev server, the build and the tests.
 
 import { FAQ } from '../data/faq.ts';
-import { LAUNCH_DATE, PRICING, billingWords } from '../data/pricing.ts';
+import { LAUNCH_DATE, PRICING, billingWords, formatPrice } from '../data/pricing.ts';
 import {
   BRAND,
   DEFAULT_SITE_URL,
@@ -60,20 +60,20 @@ function scriptJson(value: unknown): string {
 }
 
 /**
- * The pre-sale offer, once its price is published in pricing.ts. Until then there is no offer at all:
+ * The offer, once a plan price is published in pricing.ts. Until then there is no offer at all:
  * STM is never listed as free.
  */
 export function offerOf(home: string): { offers?: Record<string, unknown> } {
-  const pre = PRICING.plans.find((p) => p.id === 'presale');
-  if (!pre || pre.price === null || pre.price <= 0 || !PRICING.currency) return {};
+  const offer = PRICING.plans.find((p) => (p.price ?? 0) > 0);
+  if (!offer || offer.price === null || offer.price <= 0 || !PRICING.currency) return {};
   return {
     offers: {
       '@type': 'Offer',
-      price: String(pre.price),
+      price: String(offer.price),
       priceCurrency: PRICING.currency,
-      priceValidUntil: LAUNCH_DATE,
+      ...(offer.billing === 'once' ? { priceValidUntil: LAUNCH_DATE } : {}),
       availability: 'https://schema.org/InStock',
-      description: `Pre-sale price (${billingWords()}), until the pre-sale ends`,
+      description: `${offer.name}: ${formatPrice(offer.price)} ${billingWords(offer.billing)}`,
       url: home,
     },
   };
