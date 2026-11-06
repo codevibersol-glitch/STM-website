@@ -476,7 +476,7 @@ export function Fighter() {
                 id={`fighter-tab-${t.id}`}
                 aria-selected={tab === t.id}
                 aria-controls={`fighter-panel-${t.id}`}
-                className="btn btn-ghost"
+                className="tab"
                 onClick={() => setTab(t.id)}
               >
                 {t.label}
@@ -491,7 +491,7 @@ export function Fighter() {
                   <button
                     key={set.id}
                     type="button"
-                    className="btn btn-ghost"
+                    className="choice"
                     aria-pressed={tierSet.id === set.id}
                     onClick={() => chooseSet(set.id)}
                   >

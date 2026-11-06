@@ -254,6 +254,7 @@ test('still works when the browser blocks storage', async ({ page }) => {
     });
   });
   await page.goto('/');
+  await expect(page.locator('#root')).toHaveAttribute('data-ready', 'true', { timeout: 10000 });
   await page.getByRole('button', { name: 'Accessibility' }).click();
   await page.getByRole('switch', { name: 'High contrast' }).check();
   await expect(page.locator('html')).toHaveAttribute('data-contrast', 'high');
@@ -407,8 +408,9 @@ test('the section pages stay themselves after JavaScript loads', async ({ page }
 test('the talent planner spends a vanilla point and blocks a tauren rogue', async ({ page }) => {
   await page.goto('/builder');
   await page.getByRole('tab', { name: 'Talents' }).click();
+  await page.getByRole('button', { name: /^Improved Heroic Strike,/ }).click();
   await page.getByRole('button', { name: 'Add a point to Improved Heroic Strike' }).click();
-  await expect(page.locator('[data-planner]')).toContainText('1 of 51');
+  await expect(page.locator('[data-planner]')).toContainText('1 spent');
   await page.getByRole('tab', { name: 'Class' }).click();
   await page.getByRole('button', { name: 'Rogue', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Tauren' })).toBeDisabled();

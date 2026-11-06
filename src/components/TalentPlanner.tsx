@@ -38,13 +38,13 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
     <div className="planner-choices">
       <p className="fighter-label">What should the character do?</p>
       <div className="planner-actions">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => chooseRole('line')}>
+        <button type="button" className="choice" onClick={() => chooseRole('line')}>
           Hold a line
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => chooseRole('unseen')}>
+        <button type="button" className="choice" onClick={() => chooseRole('unseen')}>
           Stay unseen
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => chooseRole('damage')}>
+        <button type="button" className="choice" onClick={() => chooseRole('damage')}>
           Deal damage
         </button>
       </div>
@@ -52,7 +52,7 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
       <div className="planner-actions">
         <button
           type="button"
-          className="btn btn-ghost btn-sm"
+          className="choice"
           aria-pressed={weapon === 'two-hand'}
           onClick={() => {
             setWeapon('two-hand');
@@ -63,7 +63,7 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
         </button>
         <button
           type="button"
-          className="btn btn-ghost btn-sm"
+          className="choice"
           aria-pressed={weapon === 'dagger'}
           onClick={() => {
             setWeapon('dagger');
@@ -79,7 +79,7 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
           <button
             key={item.id}
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="choice"
             aria-pressed={plan.classId === item.id}
             onClick={() => chooseClass(item.id)}
           >
@@ -98,7 +98,7 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
             <button
               key={race.id}
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="choice"
               aria-pressed={plan.raceId === race.id}
               disabled={!legal}
               onClick={() => onChange({ ...plan, raceId: race.id })}
@@ -113,73 +113,128 @@ export function ClassChoices({ plan, onChange }: { plan: Plan; onChange: (plan: 
   );
 }
 
+function mark(name: string) {
+  const n = name.toLowerCase();
+  if (/shield|block|wall|bash/.test(n)) return 'M4 4h16v10l-8 6-8-6V4z';
+  if (/poison|blood|wound|hemorr|lethal/.test(n)) return 'M12 3s6 6 6 10a6 6 0 1 1-12 0c0-4 6-10 6-10z';
+  if (/shout|voice|howl|cruel/.test(n)) return 'M5 9h4l6-4v14l-6-4H5V9z';
+  if (/charge|sprint|intercept|rush/.test(n)) return 'M4 16l6-8 3 3 7-9';
+  if (/stealth|decept|camou|ghost|sap|ambush|opport/.test(n)) return 'M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z';
+  return 'M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3z';
+}
+
 export function TalentTrees({ plan, onChange }: { plan: Plan; onChange: (plan: Plan) => void }) {
   const trees = classTrees(plan.classId);
   const [treeId, setTreeId] = useState(trees[0]?.id ?? '');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const tree = trees.find((item) => item.id === treeId) ?? trees[0]!;
+  const selected = tree.talents.find((item) => item.id === selectedId) ?? null;
   const spent = totalPoints(plan.classId, plan.ranks);
   const inTree = tree.talents.reduce((sum, talent) => sum + rankOf(plan.ranks, talent.id), 0);
+  const add = selected ? canAdd(plan.classId, plan.ranks, selected.id) : null;
+  const remove = selected ? canRemove(plan.classId, plan.ranks, selected.id) : null;
+  const byId = new Map(tree.talents.map((talent) => [talent.id, talent]));
   return (
     <div data-planner>
-      <p className="planner-points">
-        {spent} of {POINT_CAP} points. {tree.name} has {inTree}.
-      </p>
+      <div className="planner-head">
+        <p className="planner-points">
+          {spent} spent. {POINT_CAP - spent} left. {tree.name} has {inTree}.
+        </p>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange({ ...plan, ranks: {} })}>
+          Reset points
+        </button>
+      </div>
       <div className="planner-actions" role="tablist" aria-label="Talent trees">
         {trees.map((item) => (
           <button
             key={item.id}
             type="button"
             role="tab"
-            className="btn btn-ghost btn-sm"
+            className="tab"
             aria-selected={item.id === tree.id}
-            onClick={() => setTreeId(item.id)}
+            onClick={() => {
+              setTreeId(item.id);
+              setSelectedId(null);
+            }}
           >
             {item.name}
           </button>
         ))}
       </div>
-      {[0, 1, 2, 3, 4, 5, 6].map((tier) => {
-        const row = tree.talents.filter((talent) => talent.tier === tier);
-        if (row.length === 0) return null;
-        return (
-          <div key={tier} className="talent-tier">
-            <p className="fighter-label">{tier === 0 ? 'First row' : `Needs ${tier * 5} points in ${tree.name}`}</p>
-            <ul className="talent-list">
-              {row.map((talent) => {
-                const rank = rankOf(plan.ranks, talent.id);
-                const add = canAdd(plan.classId, plan.ranks, talent.id);
-                const remove = canRemove(plan.classId, plan.ranks, talent.id);
-                return (
-                  <li key={talent.id} className="talent">
-                    <span className="talent-name">{talent.name}</span>
-                    <span className="talent-rank">
-                      {rank} of {talent.ranks}
-                    </span>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      disabled={!add.ok}
-                      aria-label={add.ok ? `Add a point to ${talent.name}` : `Add a point to ${talent.name}. ${add.reason}`}
-                      onClick={() => onChange({ ...plan, ranks: addPoint(plan.classId, plan.ranks, talent.id).ranks })}
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      disabled={!remove.ok}
-                      aria-label={remove.ok ? `Remove a point from ${talent.name}` : `Remove a point from ${talent.name}. ${remove.reason}`}
-                      onClick={() => onChange({ ...plan, ranks: removePoint(plan.classId, plan.ranks, talent.id).ranks })}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+      <div className="talent-board">
+        <svg className="talent-links" viewBox="0 0 4 7" preserveAspectRatio="none" aria-hidden="true">
+          {tree.talents.map((talent) => {
+            if (!talent.requires) return null;
+            const prior = byId.get(talent.requires);
+            if (!prior) return null;
+            return (
+              <line
+                key={talent.id}
+                x1={prior.col + 0.5}
+                y1={prior.tier + 0.5}
+                x2={talent.col + 0.5}
+                y2={talent.tier + 0.5}
+              />
+            );
+          })}
+        </svg>
+        {tree.talents.map((talent) => {
+          const rank = rankOf(plan.ranks, talent.id);
+          const open = canAdd(plan.classId, plan.ranks, talent.id).ok;
+          const state = rank >= talent.ranks ? 'maxed' : rank > 0 ? 'spent' : open ? 'available' : 'locked';
+          return (
+            <button
+              key={talent.id}
+              type="button"
+              className="talent-node"
+              data-state={state}
+              style={{ gridColumn: talent.col + 1, gridRow: talent.tier + 1 }}
+              aria-expanded={selected?.id === talent.id}
+              aria-label={`${talent.name}, ${rank} of ${talent.ranks}, ${state}`}
+              onClick={() => setSelectedId(talent.id)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d={mark(talent.name)} fill="none" stroke="currentColor" strokeWidth="1.7" />
+              </svg>
+              <span className="talent-badge">
+                {rank}/{talent.ranks}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {selected && add && remove ? (
+        <div className="talent-sheet" role="region" aria-live="polite" aria-label={selected.name}>
+          <p>
+            <strong>{selected.name}</strong>. Rank {rankOf(plan.ranks, selected.id)} of {selected.ranks}.{' '}
+            {selected.tier === 0 ? 'First row.' : `Needs ${selected.tier * 5} points in ${tree.name}.`}
+            {selected.requires ? ` Needs a point in ${byId.get(selected.requires)?.name}.` : ''}
+          </p>
+          <p>{add.ok ? 'A point can be added.' : add.reason}</p>
+          <div className="talent-sheet-actions">
+            <button
+              type="button"
+              className="btn btn-gold"
+              disabled={!add.ok}
+              aria-label={`Add a point to ${selected.name}`}
+              onClick={() => onChange({ ...plan, ranks: addPoint(plan.classId, plan.ranks, selected.id).ranks })}
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={!remove.ok}
+              aria-label={`Remove a point from ${selected.name}`}
+              onClick={() => onChange({ ...plan, ranks: removePoint(plan.classId, plan.ranks, selected.id).ranks })}
+            >
+              Remove
+            </button>
           </div>
-        );
-      })}
+        </div>
+      ) : (
+        <p className="planner-scope">Tap a talent to read it and spend or take back a point.</p>
+      )}
       <i data-planner-end></i>
     </div>
   );

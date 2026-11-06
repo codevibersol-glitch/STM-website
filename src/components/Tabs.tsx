@@ -60,7 +60,7 @@ export function Tabs({ label, tabs }: { label: string; tabs: readonly TabItem[] 
               aria-selected={selected}
               aria-controls={`${baseId}-panel-${tab.id}`}
               tabIndex={selected ? 0 : -1}
-              className="btn btn-ghost btn-sm"
+              className="tab"
               onClick={() => choose(tab.id)}
               onKeyDown={(event) => onKey(event, index)}
             >
