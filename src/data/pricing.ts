@@ -83,7 +83,7 @@ export const PRICING: Pricing = {
   ],
   steps: [
     'Create an account and pay with card (Stripe Checkout) or crypto to the listed wallet addresses.',
-    'For crypto: send the plan amount, include the payment reference in the memo, then wait for confirmation (monthly plans get 30 days; Founder is lifetime).',
+    'For crypto: pick BTC/ETH/BNB/SOL, send the plan amount on that exact network (ETH≠BNB), include the payment reference in the memo, then wait for confirmation (monthly plans get 30 days; Founder is lifetime).',
     'Copy your license key from the account page into license.json on the PC that runs STM.',
     `Message ${TELEGRAM_HANDLE} on Telegram to receive the build and setup help.`,
   ],

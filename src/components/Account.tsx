@@ -1,17 +1,36 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { api, type CryptoCheckout, type Entitlement, type PlanId } from '../lib/api';
+import { api, type CryptoAsset, type CryptoCheckout, type Entitlement, type PlanId } from '../lib/api';
 import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { TELEGRAM_HANDLE, TELEGRAM_URL } from '../data/site';
 
 type Mode = 'login' | 'register';
-type CryptoAsset = 'btc' | 'eth' | 'bnb' | 'sol';
 
 const ASSET_LABELS: Record<CryptoAsset, string> = {
   btc: 'Bitcoin (BTC)',
   eth: 'Ethereum (ETH)',
-  bnb: 'BNB Smart Chain',
+  bnb: 'BNB Smart Chain (BNB)',
   sol: 'Solana (SOL)',
 };
+
+const ASSET_HINTS: Record<CryptoAsset, string> = {
+  btc: 'Native BTC on Bitcoin only — not Lightning or wrapped BTC.',
+  eth: 'Native ETH on Ethereum mainnet only. Same address on BSC — wrong network is unrecoverable.',
+  bnb: 'Native BNB on BNB Smart Chain only. Same address on Ethereum — wrong network is unrecoverable.',
+  sol: 'Native SOL on Solana only — not SPL tokens.',
+};
+
+function isCryptoAsset(value: string | null | undefined): value is CryptoAsset {
+  return value === 'btc' || value === 'eth' || value === 'bnb' || value === 'sol';
+}
+
+async function copyText(value: string) {
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function Account() {
   const [mode, setMode] = useState<Mode>('register');
@@ -24,11 +43,31 @@ export function Account() {
   const [loaded, setLoaded] = useState(false);
   const [cryptoPay, setCryptoPay] = useState<CryptoCheckout | null>(null);
   const [cryptoAsset, setCryptoAsset] = useState<CryptoAsset>('btc');
+  const [copied, setCopied] = useState<string | null>(null);
 
   const refresh = async () => {
     const me = await api.me();
     setUserEmail(me.user?.email ?? null);
     setEntitlement(me.entitlement);
+    if (!me.user) {
+      setCryptoPay(null);
+      return me;
+    }
+    try {
+      const pending = await api.cryptoPending();
+      const active = pending.activePending;
+      if (me.entitlement?.active) {
+        setCryptoPay(null);
+      } else if (active && active.status === 'pending') {
+        setCryptoPay(active);
+        if (isCryptoAsset(active.preferredAsset)) setCryptoAsset(active.preferredAsset);
+      } else {
+        setCryptoPay(null);
+      }
+    } catch {
+      // Keep any in-memory crypto panel if pending fetch fails.
+    }
+    return me;
   };
 
   useEffect(() => {
@@ -84,11 +123,33 @@ export function Account() {
         return;
       }
       setCryptoPay(res);
+      if (isCryptoAsset(res.preferredAsset)) setCryptoAsset(res.preferredAsset);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'checkout_failed');
     } finally {
       setBusy(false);
     }
+  };
+
+  const onAssetChange = async (next: CryptoAsset) => {
+    setCryptoAsset(next);
+    if (!cryptoPay || cryptoPay.status !== 'pending') return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await api.checkoutCrypto(cryptoPay.plan, next);
+      if (!res.url) setCryptoPay(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'checkout_failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onCopy = async (label: string, value: string) => {
+    const ok = await copyText(value);
+    setCopied(ok ? label : null);
+    if (ok) window.setTimeout(() => setCopied(null), 1600);
   };
 
   const logout = async () => {
@@ -164,6 +225,7 @@ export function Account() {
   }
 
   const walletAddress = cryptoPay?.wallets?.[cryptoAsset];
+  const networkWarning = cryptoPay?.assetMeta?.warning ?? ASSET_HINTS[cryptoAsset];
 
   return (
     <section id="account" className="section" aria-labelledby="account-title">
@@ -195,6 +257,15 @@ export function Account() {
               <>
                 <p className="plan-note">License key — paste into license.json on the PC that runs STM:</p>
                 <code className="license-key">{entitlement.licenseKey}</code>
+                <div className="account-buy">
+                  <button
+                    className="btn btn-ghost"
+                    type="button"
+                    onClick={() => void onCopy('license', entitlement.licenseKey!)}
+                  >
+                    {copied === 'license' ? 'Copied' : 'Copy license key'}
+                  </button>
+                </div>
               </>
             ) : null}
             <p className="plan-note">
@@ -215,14 +286,17 @@ export function Account() {
           <div className="plan account-card" id="crypto-pay">
             <h2>Pay with crypto · {cryptoPay.plan.toUpperCase()}</h2>
             <p>
-              Send about €{(cryptoPay.amountCents / 100).toFixed(2)} equivalent. Put reference{' '}
-              <code className="license-key">{cryptoPay.reference}</code> in the memo when your wallet allows it.
+              Send about €{(cryptoPay.amountCents / 100).toFixed(2)} equivalent in{' '}
+              <strong>{ASSET_LABELS[cryptoAsset]}</strong>. Put reference{' '}
+              <code className="license-key">{cryptoPay.reference}</code> in the memo when your wallet allows it — we match
+              your transfer with that reference (order id).
             </p>
             <label>
               Network
               <select
                 value={cryptoAsset}
-                onChange={(e) => setCryptoAsset(e.target.value as CryptoAsset)}
+                onChange={(e) => void onAssetChange(e.target.value as CryptoAsset)}
+                disabled={busy}
               >
                 {(Object.keys(ASSET_LABELS) as CryptoAsset[]).map((id) => (
                   <option key={id} value={id}>
@@ -231,15 +305,40 @@ export function Account() {
                 ))}
               </select>
             </label>
+            <p className="plan-note">{networkWarning}</p>
             <p className="plan-note">{ASSET_LABELS[cryptoAsset]} address:</p>
-            <code className="license-key">{walletAddress}</code>
+            <code className="license-key">{walletAddress || '—'}</code>
+            <div className="account-buy">
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={!walletAddress}
+                onClick={() => walletAddress && void onCopy('address', walletAddress)}
+              >
+                {copied === 'address' ? 'Copied' : 'Copy address'}
+              </button>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => void onCopy('reference', cryptoPay.reference)}
+              >
+                {copied === 'reference' ? 'Copied' : 'Copy reference'}
+              </button>
+            </div>
             <p className="plan-note">
-              Status: <strong>{cryptoPay.status}</strong>. After you send, we confirm on-chain and activate your plan
-              {cryptoPay.periodDays ? ` (+${cryptoPay.periodDays} days)` : ' (lifetime for Founder)'}. You can stay on
-              this page and refresh — or message {TELEGRAM_HANDLE} if it takes longer than expected.
+              Status: <strong>{cryptoPay.status}</strong>
+              {cryptoPay.expiresAt ? ` · pay by ${new Date(cryptoPay.expiresAt).toLocaleString()}` : null}. After you
+              send, we confirm on-chain and activate your plan
+              {cryptoPay.periodDays ? ` (+${cryptoPay.periodDays} days)` : ' (lifetime for Founder)'}. Stay on this page
+              and refresh — or message {TELEGRAM_HANDLE} if it takes longer than expected.
             </p>
             <div className="account-buy">
-              <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void refresh()}>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={busy}
+                onClick={() => void refresh().catch((err) => setError(err instanceof Error ? err.message : 'refresh_failed'))}
+              >
                 Refresh status
               </button>
               <button className="btn btn-ghost" type="button" onClick={() => setCryptoPay(null)}>
@@ -248,6 +347,28 @@ export function Account() {
             </div>
           </div>
         ) : null}
+
+        <div className="plan account-card">
+          <h2>Crypto network</h2>
+          <p className="plan-note">
+            Pick the network before you pay with crypto. ETH and BNB share an address — the network must still match.
+          </p>
+          <label>
+            Network
+            <select
+              value={cryptoAsset}
+              onChange={(e) => setCryptoAsset(e.target.value as CryptoAsset)}
+              disabled={busy || !!cryptoPay}
+            >
+              {(Object.keys(ASSET_LABELS) as CryptoAsset[]).map((id) => (
+                <option key={id} value={id}>
+                  {ASSET_LABELS[id]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="plan-note">{ASSET_HINTS[cryptoAsset]}</p>
+        </div>
 
         <ul className="plans account-plans">
           {PRICING.plans.map((p) => {

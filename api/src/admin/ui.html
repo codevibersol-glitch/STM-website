@@ -186,15 +186,16 @@
           <h2 style="margin: 0;">Pending crypto</h2>
           <button class="btn-ghost" type="button" id="refresh-crypto">Refresh</button>
         </div>
-        <p class="muted">Confirm after you see the transfer on-chain. Monthly plans get +30 days; Founder is lifetime.</p>
+        <p class="muted">Confirm after you see the transfer on-chain (match email + reference + amount). Monthly plans get +30 days; Founder is lifetime. Pendings expire after 72 hours.</p>
         <div style="overflow-x: auto; margin-top: 0.75rem;">
           <table>
             <thead>
               <tr>
-                <th>Email</th>
+                <th>Email / asset</th>
                 <th>Plan</th>
                 <th>Ref</th>
                 <th>Amount</th>
+                <th>Expires</th>
                 <th></th>
               </tr>
             </thead>
@@ -312,11 +313,13 @@
         for (const p of rows) {
           const tr = document.createElement('tr');
           const euros = ((p.amountCents || 0) / 100).toFixed(2);
+          const expires = p.expiresAt ? new Date(p.expiresAt).toLocaleString() : '—';
           tr.innerHTML = `
-            <td>${p.email || p.userId}<div class="muted">${p.preferredAsset || ''}</div></td>
+            <td>${p.email || p.userId}<div class="muted">${(p.preferredAsset || '').toUpperCase()}</div></td>
             <td>${p.plan}</td>
             <td><code>${p.reference}</code></td>
             <td>€${euros}</td>
+            <td class="muted">${expires}</td>
             <td></td>`;
           const btn = document.createElement('button');
           btn.type = 'button';

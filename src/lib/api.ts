@@ -2,6 +2,7 @@
 export const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, '') || 'http://localhost:8787';
 
 export type PlanId = 'flex' | 'go' | 'founder';
+export type CryptoAsset = 'btc' | 'eth' | 'bnb' | 'sol';
 
 export type Entitlement = {
   active: boolean;
@@ -17,6 +18,13 @@ export type MeResponse = {
   entitlement: Entitlement | null;
 };
 
+export type CryptoAssetMeta = {
+  label: string;
+  network: string;
+  send: string;
+  warning: string;
+};
+
 export type CryptoCheckout = {
   paymentId: string;
   reference: string;
@@ -27,6 +35,8 @@ export type CryptoCheckout = {
   preferredAsset?: string;
   wallets: { btc: string; eth: string; bnb: string; sol: string };
   periodDays: number | null;
+  expiresAt?: string | null;
+  assetMeta?: CryptoAssetMeta;
   note?: string;
   url?: string;
   mock?: boolean;
@@ -56,7 +66,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ plan }),
     }),
-  checkoutCrypto: (plan: PlanId, asset?: 'btc' | 'eth' | 'bnb' | 'sol') =>
+  checkoutCrypto: (plan: PlanId, asset?: CryptoAsset) =>
     req<CryptoCheckout>('/checkout/crypto', {
       method: 'POST',
       body: JSON.stringify({ plan, asset }),
@@ -72,7 +82,10 @@ export const api = {
         currency: string;
         preferredAsset: string | null;
         createdAt: string;
+        confirmedAt?: string | null;
+        expiresAt?: string | null;
       }>;
+      activePending: CryptoCheckout | null;
       wallets: CryptoCheckout['wallets'];
     }>('/checkout/crypto/pending'),
 };

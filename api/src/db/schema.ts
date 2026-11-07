@@ -59,7 +59,7 @@ export const cryptoPayments = sqliteTable('crypto_payments', {
     .notNull()
     .references(() => users.id),
   plan: text('plan').notNull(),
-  status: text('status').notNull(), // pending | confirmed | cancelled
+  status: text('status').notNull(), // pending | confirmed | cancelled | expired
   amountCents: integer('amount_cents').notNull(),
   currency: text('currency').notNull(),
   reference: text('reference').notNull().unique(),
