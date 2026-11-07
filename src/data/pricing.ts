@@ -50,7 +50,7 @@ export const PRICING: Pricing = {
       when: `From ${LAUNCH_DAY}`,
       price: 19,
       billing: 'month',
-      note: 'The basic bot features: walking and grinding.',
+      note: 'Grind only: walk, fight, loot, sell, repair. No professions or extras.',
       cta: 'Get FLEX',
       highlight: false,
     },
@@ -60,7 +60,7 @@ export const PRICING: Pricing = {
       when: `From ${LAUNCH_DAY}`,
       price: 45,
       billing: 'month',
-      note: 'Full access to the features.',
+      note: 'Full access: grinding plus professions, gathering and crafting.',
       cta: 'Get GO',
       highlight: true,
     },
@@ -70,13 +70,14 @@ export const PRICING: Pricing = {
       when: `From ${LAUNCH_DAY}`,
       price: 250,
       billing: 'once',
-      note: 'Full access plus future access.',
+      note: 'Full access like GO, plus future access.',
       cta: 'Become a Founder',
       highlight: false,
     },
   ],
   includes: [
-    'Every feature on this page: leveling, combat that retreats from a lost fight, resting, looting, selling, repairing, gathering and crafting',
+    'FLEX: walking and grinding — combat, loot, sell, repair and class training',
+    'GO / Founder: everything above, plus professions, gathering and crafting',
     'The in-game NOW and NEXT panel, the dashboard on your PC, and Telegram control from your phone',
     'Ready from launch: every race and every class, with setup help on Telegram',
   ],
@@ -117,7 +118,7 @@ export function costAnswer(): string {
   const founder = formatPrice(plan('founder').price);
   const how = `You create an account on this site, pay with card (Stripe) or crypto to our BTC/ETH/BNB/SOL wallets (include the payment reference), then message ${TELEGRAM_HANDLE} on Telegram to receive the build. The license key on your account page unlocks the running bot.`;
   if (flex && go && founder) {
-    return `STM is paid. FLEX is ${flex} (a month) for the basic bot features: walking and grinding. GO is ${go} (a month) for the full access to the features. FOUNDER is ${founder} (one-time) for the full access plus future access. ${how} There is no free version.`;
+    return `STM is paid. FLEX is ${flex} (a month) for grind only: walking, combat, loot, sell and repair — no professions. GO is ${go} (a month) for full access including professions, gathering and crafting. FOUNDER is ${founder} (one-time) for the same full access plus future access. ${how} There is no free version.`;
   }
   return `STM is paid, with three plans from launch day. Create an account on this site to pay; message ${TELEGRAM_HANDLE} for the build. There is no free version.`;
 }

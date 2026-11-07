@@ -95,7 +95,7 @@ export const HOW = {
     },
     {
       title: "Choose your character's plan",
-      text: 'Pick any race and any class, and what matters to you: leveling, gathering or crafting. Questing is coming soon.',
+      text: 'Pick any race and any class. FLEX covers grind leveling; GO and Founder also run gathering and crafting. Questing is coming soon.',
     },
     {
       title: 'Watch, take over, or check from your phone',
@@ -131,8 +131,8 @@ export const TIME_BACK = {
 export const PRICING_COPY = {
   eyebrow: 'Pricing',
   title: 'Get STM: three plans, launch day',
-  intro: 'STM is paid software. Create an account, pay with card or crypto, then receive the build on Telegram with your license key. There is no free version.',
-  ribbon: 'Full access',
+  intro: 'STM is paid software. FLEX is grind-only; GO and Founder unlock professions and the rest. Create an account, pay with card or crypto, then receive the build on Telegram with your license key. There is no free version.',
+  ribbon: 'Grind + professions',
   priceOnTelegram: 'Price on Telegram',
   includesTitle: 'What you get',
   stepsTitle: 'How to buy',

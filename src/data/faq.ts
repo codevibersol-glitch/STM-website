@@ -13,7 +13,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'what',
     q: 'What is STM?',
-    a: 'STM is one app that is both a leveling tool and an accessibility tool for World of Warcraft: a WoW accessibility addon and desktop companion that takes your character up the levels. While it runs, it plays the repetitive parts of the game for you: walking to enemies, the combat rotation, retreating from a fight it is losing, resting and eating, looting, selling junk, repairing gear, training new spells, gathering and crafting. Questing is coming soon.',
+    a: 'STM is one app that is both a leveling tool and an accessibility tool for World of Warcraft: a WoW accessibility addon and desktop companion that takes your character up the levels. While it runs, it plays the repetitive parts of the game for you: walking to enemies, the combat rotation, retreating from a fight it is losing, resting and eating, looting, selling junk, repairing gear and training new spells. Gathering and crafting are included on GO and Founder (not FLEX). Questing is coming soon.',
   },
   {
     id: 'plays',

@@ -29,8 +29,8 @@ export const FEATURES: readonly Feature[] = [
   {
     id: 'crafting',
     icon: 'pick',
-    title: 'Gathering and crafting',
-    text: 'Mining, blacksmithing, cooking and first aid are handled along the way, without extra clicks from you.',
+    title: 'Gathering and crafting (GO / Founder)',
+    text: 'On GO and Founder, mining, blacksmithing, cooking and first aid run along the way. FLEX is grind-only and does not include professions.',
   },
   {
     id: 'panel',
