@@ -625,48 +625,6 @@ export function Feedback() {
 
 // The Klaviyo loader: injected by the app, never by the document, so the third-party runtime stays off the
 // critical path (a script tag in the HTML would put its whole boot on the main thread before first paint).
-
-
-/** Optional email list, the hero's first action, above the Telegram buy button. Klaviyo draws the field into the container. */
-export function Footer({ nav = NAV }: { nav?: readonly NavItem[] }) {
-  return (
-    <footer className="site-footer">
-      <div className="wrap footer-grid">
-        <div>
-          <a href="#top" className="wordmark">
-            <Wordmark className="wordmark-mark" label={null} />
-            <span className="sr-only">STM, back to the top</span>
-          </a>
-          <p className="footer-tagline">{FOOTER.tagline}</p>
-          <p className="footer-contact">
-            {FOOTER.contact} <TelegramLink>{TELEGRAM_HANDLE}</TelegramLink> <DiscordLink>{DISCORD_HANDLE}</DiscordLink>
-          </p>
-          <p className="footer-privacy">
-            <Icon name="shield" />
-            {FOOTER.privacy}
-          </p>
-        </div>
-        <nav aria-label="Footer">
-          <ul className="footer-nav">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <a href={item.href}>{item.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="legal">
-          <p>{TRADEMARK_NOTICE}</p>
-          <p>{CREDITS}</p>
-          <p>STM · {__BUILD_YEAR__}</p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-// The Klaviyo loader: injected by the app, never by the document, so the third-party runtime stays off the
-// critical path (a script tag in the HTML would put its whole boot on the main thread before first paint).
 let klaviyoLoader: Promise<void> | null = null;
 function loadKlaviyo(): Promise<void> {
   klaviyoLoader ??= new Promise((resolve) => {
