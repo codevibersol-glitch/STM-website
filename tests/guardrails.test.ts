@@ -99,7 +99,7 @@ describe('Telegram is the only channel', () => {
   const hrefs = anchors.map((a) => /href="([^"]*)"/.exec(a)?.[1] ?? '');
 
   it('links only to the page itself, Telegram or Discord', () => {
-    const internalHrefs = ['/', '/play', '/builder', '/characters', '/pricing', '/faq', '/results', '/guide'];
+    const internalHrefs = ['/', '/play', '/builder', '/characters', '/pricing', '/account', '/faq', '/results', '/guide'];
     for (const href of hrefs) {
       const internal = href.startsWith('#') || internalHrefs.includes(href);
       expect(internal || href === TELEGRAM_URL || href === DISCORD_URL, `unexpected link ${href}`).toBe(true);
@@ -130,7 +130,8 @@ describe('Telegram is the only channel', () => {
 });
 
 describe('honest claims', () => {
-  const banned = /undetectable|ban-?proof|guarantee|safe from bans|open[ -]source|licen[cs]e/i;
+  // "license key" / "license.json" are the product unlock terms; bare "license" / open-source claims stay banned.
+  const banned = /undetectable|ban-?proof|guarantee|safe from bans|open[ -]source|licen[cs]e(?! key|\.json)/i;
 
   it('never uses the banned words, on the page, in the head, in the data or in the copy deck', () => {
     expect(text).not.toMatch(banned);
@@ -152,10 +153,10 @@ describe('honest claims', () => {
     expect(copyDeck()).not.toMatch(/no tracking|no cookies|no sign-up|no forms and/i);
     expect(HERO.trust).toContain('Telegram updates');
     expect(HERO.trust.join(' ')).not.toMatch(/tracking|telegram only|email/i);
-    expect(COMMITMENT.points).toContain('No account needed.');
-    expect(FOOTER.privacy).toBe('No account needed.');
+    expect(COMMITMENT.points).toContain('Buying needs an account; delivery stays on Telegram.');
+    expect(FOOTER.privacy).toBe('Buying needs an account. Delivery stays on Telegram.');
     expect(FAQ.find((f) => f.id === 'data')?.a).toBe(
-      'The site does not ask for an email address and does not keep a mailing list. Cloudflare Web Analytics counts visits and does not use cookies. Payment and support happen only on Telegram.',
+      'Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram.',
     );
     expect(text).not.toContain(UPDATES.title);
     const hero = /<section id="top"[\s\S]*?<\/section>/.exec(home)?.[0] ?? '';
@@ -201,12 +202,13 @@ describe('honest claims', () => {
     expect(text).toContain(`From ${formatDay(LAUNCH_DATE)}`);
   });
 
-  it('sells on Telegram only: every plan button is the Telegram link', () => {
+  it('sells through the account page: every plan button goes to /account', () => {
     const section = /<section id="pricing"[\s\S]*?<\/section>/.exec(pricingPage)?.[0] ?? '';
     const links = [...section.matchAll(/<a\s[^>]*href="([^"]*)"/g)].map((m) => m[1]);
     expect(links.length).toBe(PRICING.plans.length);
-    for (const href of links) expect(href).toBe(TELEGRAM_URL);
+    for (const href of links) expect(href).toBe('/account');
     expect(section).not.toMatch(/<form|<input/i);
+    expect(HERO.primaryCta).toBe('Buy STM');
   });
 
   it('takes every number on the page from stats.json (outside the sample-data models)', () => {

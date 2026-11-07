@@ -1,5 +1,5 @@
 /** Routes the site actually ships. The client and the prerender must agree on these. */
-export const ROUTES = ['/', '/play', '/builder', '/characters', '/results', '/pricing', '/faq', '/guide'] as const;
+export const ROUTES = ['/', '/play', '/builder', '/characters', '/results', '/pricing', '/account', '/faq', '/guide'] as const;
 
 export type RoutePath = (typeof ROUTES)[number];
 

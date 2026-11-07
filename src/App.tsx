@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Header } from './components/Header';
-import { BuilderPage, CharactersPage, FaqPage, GuidePage, PlayPage, PricingPage, ResultsPage } from './components/Pages';
+import { AccountPage, BuilderPage, CharactersPage, FaqPage, GuidePage, PlayPage, PricingPage, ResultsPage } from './components/Pages';
 import { Doors, FloatingTelegram, Footer, Hero } from './components/Sections';
 import { SKIP_LINK } from './data/copy';
 import { normalizePath } from './routes';
@@ -26,6 +26,7 @@ export function App({ path = '/' }: AppProps) {
   if (route === '/builder') return <BuilderPage path={route} />;
   if (route === '/characters') return <CharactersPage path={route} />;
   if (route === '/pricing') return <PricingPage path={route} />;
+  if (route === '/account') return <AccountPage path={route} />;
   if (route === '/faq') return <FaqPage path={route} />;
   if (route === '/results') return <ResultsPage path={route} />;
   if (route === '/guide') return <GuidePage path={route} />;

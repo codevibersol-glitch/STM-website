@@ -72,7 +72,8 @@ test('does not load the email form or Klaviyo', async ({ page }) => {
   await expect(page.locator('.klaviyo-form-WL7BMB')).toHaveCount(0);
   await expect(page.getByRole('textbox', { name: 'Email address' })).toHaveCount(0);
   const buy = page.locator('.hero-ctas .btn-gold');
-  await expect(buy).toContainText('Get STM on Telegram');
+  await expect(buy).toContainText('Buy STM');
+  await expect(buy).toHaveAttribute('href', '/account');
   await expect(buy).toHaveClass(/btn-lg/);
   await page.waitForTimeout(1500);
   expect(urls.some((u) => /klaviyo/i.test(u))).toBe(false);

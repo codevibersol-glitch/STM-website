@@ -106,6 +106,21 @@ npm run lighthouse  # speed, accessibility, best practices and SEO - each must b
 - The icons, `manifest.webmanifest` and `og.png`, the picture shown when the link is shared.
 - `assets/`: scripts and fonts with hashed names, cached for a year.
 
+## Account API (co-deployed on Netlify)
+
+The `/account` page talks to **stm-api** under same-origin `/api/*` (Netlify Function + Turso).
+
+1. Vendor copy lives in `api/` (sync from sibling with `node scripts/sync-api.mjs`).
+2. Set Netlify env vars (names only — paste values from local gitignored `.env`, never into git). Full notes: **stm-api README → Netlify env checklist**.
+   - Required: `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (`whsec_…`, not `mk_…`), `ADMIN_EMAILS`, `SESSION_SECRET`, `CORS_ORIGIN`, `PUBLIC_URL`
+   - Stripe products/prices (optional if code defaults are fine): `STRIPE_PRODUCT_FLEX`, `STRIPE_PRODUCT_GO`, `STRIPE_PRODUCT_FOUNDER`, `STRIPE_PRICE_FLEX`, `STRIPE_PRICE_GO`, `STRIPE_PRICE_FOUNDER`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`
+   - Optional wallets: `CRYPTO_WALLET_BTC`, `CRYPTO_WALLET_ETH`, `CRYPTO_WALLET_BNB`, `CRYPTO_WALLET_SOL`
+   - Stripe webhook endpoint URL: `https://stm-addon.netlify.app/api/webhooks/stripe`
+   - Local Netlify Functions: use Netlify UI env, or a gitignored `stm-website/.env` with the same names (`loadEnv` reads website-root `.env`).
+3. `VITE_API_URL=/api` is set in `netlify.toml`.
+4. Admin UI: `https://stm-addon.netlify.app/api/admin/ui`.
+5. **Rotate** any `sk_live_…` / Turso token / `whsec_…` that was exposed outside Netlify/local `.env`.
+
 ## Second choice: GitHub Pages
 
 It is free too, but a free account needs a **public** repository, and the `_headers` security rules

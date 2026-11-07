@@ -134,6 +134,12 @@ decide or supply:
   widths, names with a hash) ΓåÆ `src/data/shots.generated.json` ΓåÆ the "See it" section. Without pictures the section is left out.
 - **Game scenes belong to Blizzard Entertainment.** A line under the pictures says so; the footer keeps the trademark notice.
 
+## Account API (Netlify `/api`)
+
+stm-api is vendored in `api/` and co-deployed as a Netlify Function (`netlify/functions/api.ts`). Rewrites send `/api/*` there. Edit the sibling `C:\Users\yonat\src\stm-api`, then `npm run sync-api` before pushing.
+
+See **stm-api README** for the Netlify env checklist (exact var names + webhook `https://stm-addon.netlify.app/api/webhooks/stripe`). Paste secrets only in the Netlify UI or gitignored `.env` — never into git. Admin: `/api/admin/ui`. Rotate any exposed `sk_live` / Turso token / `whsec_`.
+
 ## Notes
 
 - **npm's install-script warning:** npm held back the setup scripts of `esbuild` and `workerd` (both from Wrangler). Nothing in the build needs them. If `npm run deploy` ever complains, run `npm approve-scripts workerd`.

@@ -43,7 +43,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'data',
     q: 'Do you collect any data?',
-    a: 'The site does not ask for an email address and does not keep a mailing list. Cloudflare Web Analytics counts visits and does not use cookies. Payment and support happen only on Telegram.',
+    a: 'Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram.',
   },
   {
     id: 'risk',

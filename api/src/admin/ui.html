@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>STM admin · entitle customer</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0d10;
+        --panel: #14181f;
+        --line: #2a3140;
+        --text: #eef2f7;
+        --muted: #9aa3b2;
+        --accent: #c6ff3a;
+        --accent-ink: #10140a;
+        --danger: #ff8d8d;
+        --ok: #7dffb3;
+        --focus: #7eb6ff;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(40rem 20rem at 10% -10%, rgb(198 255 58 / 0.12), transparent 60%),
+          var(--bg);
+        color: var(--text);
+      }
+      main {
+        width: min(100% - 2rem, 48rem);
+        margin: 2.5rem auto 3rem;
+      }
+      h1 { margin: 0 0 0.35rem; font-size: 1.75rem; }
+      .sub { margin: 0 0 1.5rem; color: var(--muted); }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        padding: 1.25rem 1.35rem;
+        margin-bottom: 1rem;
+      }
+      label {
+        display: grid;
+        gap: 0.35rem;
+        margin-bottom: 0.9rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+      input, select, textarea, button { font: inherit; }
+      input, select, textarea {
+        width: 100%;
+        min-height: 2.7rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 0.7rem;
+        border: 1px solid var(--line);
+        background: #0b0d10;
+        color: var(--text);
+      }
+      textarea {
+        min-height: 8rem;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.85rem;
+        resize: vertical;
+      }
+      input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+      button {
+        min-height: 2.7rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn-gold { background: var(--accent); color: var(--accent-ink); }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--line);
+      }
+      .error { color: var(--danger); margin: 0.5rem 0 0; }
+      .ok { color: var(--ok); margin: 0.5rem 0 0; }
+      .key {
+        margin: 0.75rem 0;
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--line);
+        background: #000;
+        color: var(--accent);
+        font-family: ui-monospace, Consolas, monospace;
+        word-break: break-all;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th, td {
+        text-align: left;
+        padding: 0.55rem 0.35rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th { color: var(--muted); font-weight: 600; }
+      .muted { color: var(--muted); }
+      .hidden { display: none !important; }
+      code { font-family: ui-monospace, Consolas, monospace; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>STM admin</h1>
+      <p class="sub">Entitle customers · confirm crypto payments · same-origin session on this API</p>
+
+      <section id="login-card" class="card">
+        <h2>Admin sign-in</h2>
+        <p class="muted">Must be listed in <code>ADMIN_EMAILS</code> (yonatanhornstein@gmail.com).</p>
+        <form id="login-form">
+          <label>Email
+            <input id="admin-email" type="email" required value="yonatanhornstein@gmail.com" autocomplete="username" />
+          </label>
+          <label>Password
+            <input id="admin-password" type="password" required minlength="8" autocomplete="current-password" />
+          </label>
+          <div class="row">
+            <button class="btn-gold" type="submit">Sign in</button>
+            <button class="btn-ghost" type="button" id="register-admin">Create admin account</button>
+          </div>
+          <p id="login-error" class="error hidden"></p>
+        </form>
+      </section>
+
+      <section id="app-card" class="card hidden">
+        <div class="row" style="justify-content: space-between; margin-bottom: 1rem;">
+          <p class="muted" style="margin: 0;">Signed in as <strong id="who"></strong></p>
+          <button class="btn-ghost" type="button" id="logout">Sign out</button>
+        </div>
+
+        <h2>Entitle customer</h2>
+        <form id="entitle-form">
+          <label>Customer email
+            <input id="cust-email" type="email" required autocomplete="off" />
+          </label>
+          <label>Customer password <span class="muted">(used if creating a new account)</span>
+            <input id="cust-password" type="password" required minlength="8" autocomplete="new-password" />
+          </label>
+          <label>Plan
+            <select id="cust-plan" required>
+              <option value="flex">FLEX · monthly</option>
+              <option value="go" selected>GO · monthly</option>
+              <option value="founder">Founder · one-time</option>
+            </select>
+          </label>
+          <div class="row">
+            <button class="btn-gold" type="submit">Create / activate</button>
+          </div>
+          <p id="entitle-error" class="error hidden"></p>
+          <p id="entitle-ok" class="ok hidden"></p>
+        </form>
+
+        <div id="result" class="hidden">
+          <h3>License key</h3>
+          <div class="key" id="license-key"></div>
+          <div class="row">
+            <button class="btn-ghost" type="button" id="copy-key">Copy key</button>
+            <button class="btn-ghost" type="button" id="copy-json">Copy license.json</button>
+          </div>
+          <label style="margin-top: 1rem;">license.json snippet
+            <textarea id="license-json" readonly></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section id="crypto-card" class="card hidden">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin: 0;">Pending crypto</h2>
+          <button class="btn-ghost" type="button" id="refresh-crypto">Refresh</button>
+        </div>
+        <p class="muted">Confirm after you see the transfer on-chain. Monthly plans get +30 days; Founder is lifetime.</p>
+        <div style="overflow-x: auto; margin-top: 0.75rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Ref</th>
+                <th>Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="crypto-body"></tbody>
+          </table>
+        </div>
+        <p id="crypto-empty" class="muted hidden">No pending crypto payments.</p>
+        <p id="crypto-msg" class="ok hidden"></p>
+      </section>
+
+      <section id="users-card" class="card hidden">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin: 0;">Users</h2>
+          <button class="btn-ghost" type="button" id="refresh-users">Refresh</button>
+        </div>
+        <div style="overflow-x: auto; margin-top: 0.75rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Key</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const show = (el, on) => el.classList.toggle('hidden', !on);
+      const API_BASE = location.pathname.startsWith('/api/') ? '/api' : '';
+
+      async function api(path, init = {}) {
+        const res = await fetch(API_BASE + path, {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
+          ...init,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `http_${res.status}`);
+        return data;
+      }
+
+      function licenseSnippet(key) {
+        return JSON.stringify(
+          { Enabled: false, Key: key, ApiBaseUrl: API_BASE ? location.origin + '/api' : location.origin },
+          null,
+          2,
+        );
+      }
+
+      function showResult(key, message) {
+        $('license-key').textContent = key || '(no key)';
+        $('license-json').value = key ? licenseSnippet(key) : '';
+        show($('result'), !!key);
+        $('entitle-ok').textContent = message || '';
+        show($('entitle-ok'), !!message);
+      }
+
+      async function refreshMe() {
+        const me = await api('/auth/me');
+        if (!me.user?.admin) {
+          show($('login-card'), true);
+          show($('app-card'), false);
+          show($('users-card'), false);
+          show($('crypto-card'), false);
+          return false;
+        }
+        $('who').textContent = me.user.email;
+        show($('login-card'), false);
+        show($('app-card'), true);
+        show($('users-card'), true);
+        show($('crypto-card'), true);
+        await Promise.all([loadUsers(), loadCrypto()]);
+        return true;
+      }
+
+      async function loadUsers() {
+        const data = await api('/admin/users');
+        const body = $('users-body');
+        body.innerHTML = '';
+        for (const u of data.users || []) {
+          const tr = document.createElement('tr');
+          const plan = u.entitlement?.active ? u.entitlement.plan : '—';
+          const key = u.entitlement?.licenseKey || '';
+          tr.innerHTML = `
+            <td>${u.email}<div class="muted">${u.id}</div></td>
+            <td>${plan}${u.entitlement?.currentPeriodEnd ? `<div class="muted">${new Date(u.entitlement.currentPeriodEnd).toLocaleString()}</div>` : ''}</td>
+            <td><code>${key ? key.slice(0, 18) + '…' : '—'}</code></td>
+            <td></td>`;
+          if (key) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-ghost';
+            btn.textContent = 'Show';
+            btn.onclick = () => {
+              $('cust-email').value = u.email;
+              showResult(key, `Loaded ${u.email}`);
+            };
+            tr.lastElementChild.appendChild(btn);
+          }
+          body.appendChild(tr);
+        }
+      }
+
+      async function loadCrypto() {
+        const data = await api('/admin/crypto-payments?status=pending');
+        const body = $('crypto-body');
+        body.innerHTML = '';
+        const rows = data.payments || [];
+        show($('crypto-empty'), rows.length === 0);
+        for (const p of rows) {
+          const tr = document.createElement('tr');
+          const euros = ((p.amountCents || 0) / 100).toFixed(2);
+          tr.innerHTML = `
+            <td>${p.email || p.userId}<div class="muted">${p.preferredAsset || ''}</div></td>
+            <td>${p.plan}</td>
+            <td><code>${p.reference}</code></td>
+            <td>€${euros}</td>
+            <td></td>`;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-gold';
+          btn.textContent = 'Confirm → activate';
+          btn.onclick = async () => {
+            btn.disabled = true;
+            try {
+              const res = await api('/admin/crypto-confirm', {
+                method: 'POST',
+                body: JSON.stringify({ paymentId: p.id }),
+              });
+              $('crypto-msg').textContent = `Confirmed ${p.email || p.userId} · ${p.plan}` +
+                (res.licenseKey ? ` · ${res.licenseKey}` : '');
+              show($('crypto-msg'), true);
+              if (res.licenseKey) showResult(res.licenseKey, `Crypto activated ${p.plan}`);
+              await Promise.all([loadCrypto(), loadUsers()]);
+            } catch (err) {
+              alert(err.message || String(err));
+              btn.disabled = false;
+            }
+          };
+          tr.lastElementChild.appendChild(btn);
+          body.appendChild(tr);
+        }
+      }
+
+      $('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        show($('login-error'), false);
+        try {
+          await api('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: $('admin-email').value,
+              password: $('admin-password').value,
+            }),
+          });
+          const ok = await refreshMe();
+          if (!ok) throw new Error('forbidden — email is not in ADMIN_EMAILS');
+        } catch (err) {
+          $('login-error').textContent = err.message || String(err);
+          show($('login-error'), true);
+        }
+      });
+
+      $('register-admin').addEventListener('click', async () => {
+        show($('login-error'), false);
+        try {
+          await api('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: $('admin-email').value,
+              password: $('admin-password').value,
+            }),
+          });
+          const ok = await refreshMe();
+          if (!ok) {
+            throw new Error(
+              'registered, but email is not in ADMIN_EMAILS — restart stm-api after editing .env',
+            );
+          }
+        } catch (err) {
+          $('login-error').textContent = err.message || String(err);
+          show($('login-error'), true);
+        }
+      });
+
+      $('logout').addEventListener('click', async () => {
+        await api('/auth/logout', { method: 'POST', body: '{}' });
+        showResult('', '');
+        await refreshMe();
+      });
+
+      $('entitle-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        show($('entitle-error'), false);
+        show($('entitle-ok'), false);
+        try {
+          const data = await api('/admin/entitle', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: $('cust-email').value,
+              password: $('cust-password').value,
+              plan: $('cust-plan').value,
+            }),
+          });
+          showResult(data.licenseKey, `Activated ${data.email} on ${data.plan}`);
+          await loadUsers();
+        } catch (err) {
+          $('entitle-error').textContent = err.message || String(err);
+          show($('entitle-error'), true);
+        }
+      });
+
+      $('refresh-users').addEventListener('click', () => loadUsers().catch((e) => alert(e.message)));
+      $('refresh-crypto').addEventListener('click', () => loadCrypto().catch((e) => alert(e.message)));
+      $('copy-key').addEventListener('click', async () => {
+        await navigator.clipboard.writeText($('license-key').textContent);
+        $('entitle-ok').textContent = 'Key copied';
+        show($('entitle-ok'), true);
+      });
+      $('copy-json').addEventListener('click', async () => {
+        await navigator.clipboard.writeText($('license-json').value);
+        $('entitle-ok').textContent = 'license.json copied';
+        show($('entitle-ok'), true);
+      });
+
+      refreshMe().catch(() => {});
+    </script>
+  </body>
+</html>

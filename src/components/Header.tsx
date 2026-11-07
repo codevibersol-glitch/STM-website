@@ -3,7 +3,6 @@ import { HEADER_CTA, NAV, type NavItem } from '../data/copy';
 import { normalizePath } from '../routes';
 import { A11yToolbar } from './A11yToolbar';
 import { Icon } from './Icon';
-import { TelegramLink } from './TelegramLink';
 import { Wordmark } from './Wordmark';
 export function Header({ homeHref = '/', nav = NAV, path = '/' }: { homeHref?: string; nav?: readonly NavItem[]; path?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,10 +76,9 @@ export function Header({ homeHref = '/', nav = NAV, path = '/' }: { homeHref?: s
         </nav>
         <div className="header-actions">
           <A11yToolbar />
-          <TelegramLink className="btn btn-gold btn-sm header-cta">
-            <Icon name="plane" />
+          <a href="/account" className="btn btn-gold btn-sm header-cta">
             {HEADER_CTA}
-          </TelegramLink>
+          </a>
           <button
             ref={menuButton}
             type="button"

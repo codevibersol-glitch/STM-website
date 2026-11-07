@@ -51,7 +51,7 @@ export const PRICING: Pricing = {
       price: 19,
       billing: 'month',
       note: 'The basic bot features: walking and grinding.',
-      cta: 'Get FLEX on Telegram',
+      cta: 'Get FLEX',
       highlight: false,
     },
     {
@@ -61,7 +61,7 @@ export const PRICING: Pricing = {
       price: 45,
       billing: 'month',
       note: 'Full access to the features.',
-      cta: 'Get GO on Telegram',
+      cta: 'Get GO',
       highlight: true,
     },
     {
@@ -81,9 +81,10 @@ export const PRICING: Pricing = {
     'Ready from launch: every race and every class, with setup help on Telegram',
   ],
   steps: [
-    `Message ${TELEGRAM_HANDLE} on Telegram and say which plan you want.`,
-    'You get the payment details there.',
-    'Pay, and receive STM with help setting it up.',
+    'Create an account and pay with card (Stripe Checkout) or crypto to the listed wallet addresses.',
+    'For crypto: send the plan amount, include the payment reference in the memo, then wait for confirmation (monthly plans get 30 days; Founder is lifetime).',
+    'Copy your license key from the account page into license.json on the PC that runs STM.',
+    `Message ${TELEGRAM_HANDLE} on Telegram to receive the build and setup help.`,
   ],
 };
 
@@ -114,9 +115,9 @@ export function costAnswer(): string {
   const flex = formatPrice(plan('flex').price);
   const go = formatPrice(plan('go').price);
   const founder = formatPrice(plan('founder').price);
-  const how = `You pay on Telegram: message ${TELEGRAM_HANDLE}, get the payment details, and receive STM with setup help.`;
+  const how = `You create an account on this site, pay with card (Stripe) or crypto to our BTC/ETH/BNB/SOL wallets (include the payment reference), then message ${TELEGRAM_HANDLE} on Telegram to receive the build. The license key on your account page unlocks the running bot.`;
   if (flex && go && founder) {
     return `STM is paid. FLEX is ${flex} (a month) for the basic bot features: walking and grinding. GO is ${go} (a month) for the full access to the features. FOUNDER is ${founder} (one-time) for the full access plus future access. ${how} There is no free version.`;
   }
-  return `STM is paid, with three plans from launch day. Message ${TELEGRAM_HANDLE} on Telegram for the price and the payment details; you pay there and receive STM with setup help. There is no free version.`;
+  return `STM is paid, with three plans from launch day. Create an account on this site to pay; message ${TELEGRAM_HANDLE} for the build. There is no free version.`;
 }

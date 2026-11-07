@@ -1,15 +1,32 @@
-# Netlify deployment for the STM website.
-# Netlify reads the generated dist/_headers file (CSP, caching, security headers) itself,
-# so only the build settings live here.
+# Netlify co-deploy: static stm-website + stm-api as a Function under /api/*
 
 [build]
-  command = "npm run build"
+  command = "node scripts/sync-api.mjs && npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
+  # Same-origin API (rewritten to the Function). Override only if the API is hosted elsewhere.
+  VITE_API_URL = "/api"
 
 [context.production.environment]
-  # The deployed site once it is on Netlify. The Vite build reads SITE_URL for the canonical
-  # link, sitemap, og:image and structured data; Cloudflare Pages did the same via its env var.
   SITE_URL = "https://stm-addon.netlify.app"
+  VITE_API_URL = "/api"
+
+[functions]
+  node_bundler = "esbuild"
+  # libsql may ship platform natives; keep external so Netlify can resolve them.
+  external_node_modules = ["@libsql/client"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api"
+  to = "/.netlify/functions/api"
+  status = 200
+  force = true

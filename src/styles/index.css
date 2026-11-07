@@ -2699,6 +2699,90 @@ html[data-font="dyslexic"] {
     content-visibility: auto;
     contain-intrinsic-size: auto 60rem;
   }
+
+  /* ---------------------------------------------------------------------------- account */
+  .wrap.narrow {
+    width: min(100% - 2rem, 28rem);
+  }
+  .account-form {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0 1rem;
+  }
+  .account-form label {
+    display: grid;
+    gap: 0.4rem;
+    color: var(--c-muted);
+    font-size: 0.95rem;
+  }
+  .account-form input {
+    width: 100%;
+    min-height: 2.9rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--c-line);
+    border-radius: 0.75rem;
+    background: var(--c-panel);
+    color: var(--c-text);
+    font: inherit;
+  }
+  .account-form input:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+  .account-form .btn {
+    justify-self: start;
+  }
+  .form-error {
+    margin: 0;
+    color: #ff8d8d;
+    font-weight: 600;
+  }
+  .linkish {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--c-accent);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .account-card {
+    margin: 1.5rem 0 2rem;
+    padding: 1.4rem 1.5rem;
+  }
+  .account-card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.4rem;
+  }
+  .license-key {
+    display: block;
+    margin: 0.75rem 0 1rem;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 0.75rem;
+    background: rgb(0 0 0 / 0.35);
+    color: var(--c-accent);
+    font-family: var(--f-mono);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+  }
+  .account-plans {
+    margin-top: 1.5rem;
+  }
+  .account-buy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: auto;
+  }
+  html[data-contrast='high'] .account-form input,
+  html[data-contrast='high'] .license-key {
+    border: 2px solid #fff;
+    background: #000;
+    color: #fff;
+  }
 }
 
 /* ------------------------------------------------------------------------------ reduced motion

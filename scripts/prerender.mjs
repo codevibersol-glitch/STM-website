@@ -67,7 +67,8 @@ const pageMeta = {
       'Build your fighter in STM, the WoW accessibility addon and leveling tool: pick a spec, take the armour set you trust, hold the fight with the talents you choose.',
   },
   '/characters': { title: 'Characters · STM', description: 'Character models in STM: gear, talents and spells, shown live on the dashboard of the WoW accessibility addon and leveling tool.' },
-  '/pricing': { title: 'Pricing · STM', description: 'The STM plans: FLEX, GO and Founder, from the basic bot features to full access. Buy on Telegram.' },
+  '/pricing': { title: 'Pricing · STM', description: 'The STM plans: FLEX, GO and Founder, from the basic bot features to full access. Pay with card or crypto.' },
+  '/account': { title: 'Account · STM', description: 'Create an STM account, pay with Stripe or crypto, and copy your license key.' },
   '/faq': { title: 'FAQ · STM', description: 'The STM FAQ: what the addon is, how it plays, what it costs, how to buy and how to give feedback.' },
   '/results': { title: 'Results · STM', description: 'The measured results of STM: XP per hour, hours of play, kills and analysed deaths in WoW.' },
   '/guide': {
@@ -139,6 +140,25 @@ await writeFile(join(dist, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: $
 // The email form is off, so Klaviyo's hosts are not allowed.
 // Cloudflare Web Analytics injects beacon.min.js from static.cloudflareinsights.com and posts
 // to cloudflareinsights.com.
+// Account page fetches stm-api (VITE_API_URL). Same-origin `/api` is covered by 'self'.
+// Always allow localhost for local API preview; add an absolute API origin when VITE_API_URL is a full URL.
+const apiOrigin = (() => {
+  const raw = (process.env.VITE_API_URL || '').replace(/\/+$/, '');
+  if (!raw || raw.startsWith('/')) return '';
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return '';
+  }
+})();
+const connectSrc = [
+  "'self'",
+  'blob:',
+  'https://cloudflareinsights.com',
+  'http://localhost:8787',
+  'http://127.0.0.1:8787',
+  ...(apiOrigin && !apiOrigin.includes('localhost') && !apiOrigin.includes('127.0.0.1') ? [apiOrigin] : []),
+].join(' ');
 const scriptHash = createHash('sha256').update(ssr.PREFS_SCRIPT).digest('base64');
 const csp = [
   "default-src 'self'",
@@ -148,7 +168,7 @@ const csp = [
   "img-src 'self' blob:",
   "font-src 'self'",
   // GLTFLoader reads an embedded texture through a blob: URL.
-  "connect-src 'self' blob: https://cloudflareinsights.com",
+  `connect-src ${connectSrc}`,
   "manifest-src 'self'",
   "worker-src 'self'",
   "object-src 'none'",

@@ -1,0 +1,14 @@
+{
+  "name": "stm-api-vendor",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "dependencies": {
+    "@hono/node-server": "1.19.0",
+    "@libsql/client": "0.15.15",
+    "drizzle-orm": "0.44.6",
+    "hono": "4.9.9",
+    "stripe": "19.1.0",
+    "zod": "4.1.11"
+  }
+}

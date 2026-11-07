@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Account } from './Account';
 import { HowItWorks } from './HowItWorks';
 import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
 import { Header } from './Header';
@@ -55,6 +56,15 @@ export function PricingPage({ path }: { path: string }) {
   return (
     <PageShell path={path}>
       <Pricing />
+    </PageShell>
+  );
+}
+
+/** Account, billing and license key. */
+export function AccountPage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
+      <Account />
     </PageShell>
   );
 }

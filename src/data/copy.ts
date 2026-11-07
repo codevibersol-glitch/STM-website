@@ -32,13 +32,13 @@ export const DOORS = {
     { href: '/builder', title: 'Builder', text: 'A vanilla talent planner for warrior and rogue, and an armour name for that class.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
-    { href: '/pricing', title: 'Pricing', text: 'Three plans. You buy on Telegram.' },
+    { href: '/pricing', title: 'Pricing', text: 'Three plans. Create an account to pay; the build still comes on Telegram.' },
     { href: '/faq', title: 'Questions', text: 'What STM does, the account risk, and how buying works.' },
     { href: '/guide', title: 'Guide', text: 'Who it is for, every version it plays, and how to send feedback.' },
   ],
 } as const;
 
-export const HEADER_CTA = 'Buy on Telegram';
+export const HEADER_CTA = 'Buy STM';
 
 export const HERO = {
   kicker: `${BETA_LABEL} · ${BETA_REACH}`,
@@ -47,7 +47,7 @@ export const HERO = {
   titleAfter: ' and leveling tool that plays the grind for you',
   lead:
     'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
-  primaryCta: 'Get STM on Telegram',
+  primaryCta: 'Buy STM',
   secondaryCta: 'See how it works',
   trust: ['Every WoW version', 'Every race and class', 'Plays to max level', 'Telegram updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
@@ -131,12 +131,12 @@ export const TIME_BACK = {
 export const PRICING_COPY = {
   eyebrow: 'Pricing',
   title: 'Get STM: three plans, launch day',
-  intro: 'STM is paid software. Pick a plan, and buy it on Telegram: payment and delivery happen there. There is no free version.',
+  intro: 'STM is paid software. Create an account, pay with card or crypto, then receive the build on Telegram with your license key. There is no free version.',
   ribbon: 'Full access',
   priceOnTelegram: 'Price on Telegram',
   includesTitle: 'What you get',
   stepsTitle: 'How to buy',
-  note: 'Payment and delivery happen on Telegram. There is no card form on this site.',
+  note: 'Pay on this site with Stripe or crypto wallets. Delivery and setup help stay on Telegram.',
 };
 
 export const COMMITMENT = {
@@ -149,9 +149,16 @@ export const COMMITMENT = {
   points: [
     'Text size, high contrast, reduced motion and a dyslexia-friendly font',
     'Full keyboard use, visible focus and screen-reader labels',
-    'No account needed.',
+    'Buying needs an account; delivery stays on Telegram.',
   ],
   cta: 'Shape the roadmap on Telegram',
+};
+
+export const UPDATES = {
+  eyebrow: 'Email',
+  title: 'Get a setup note by email',
+  intro: 'A short note on getting started. Pay on the account page; the build still comes on Telegram.',
+  fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
 };
 
 export const FAQ_COPY = {
@@ -188,13 +195,6 @@ export const FEEDBACK = {
   note: 'You write and send this message in Telegram. The page does not send the template for you.',
 };
 
-export const UPDATES = {
-  eyebrow: 'Email',
-  title: 'Get a setup note by email',
-  intro: 'A short note on getting started. Payment and support stay on Telegram.',
-  fallback: 'The email form needs JavaScript. You can still reach us on Telegram.',
-};
-
 export const FIGHTER = {
   eyebrow: 'Fighter',
   title: 'Build your fighter',
@@ -207,7 +207,7 @@ export const FIGHTER = {
 
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
-  privacy: 'No account needed.',
+  privacy: 'Buying needs an account. Delivery stays on Telegram.',
   contact: 'Talk to us on Telegram or Discord:',
 };
 
