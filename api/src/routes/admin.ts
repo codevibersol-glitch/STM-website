@@ -122,6 +122,25 @@ adminRoutes.post('/set-period', async (c) => {
   return c.json({ currentPeriodEnd: custom });
 });
 
+/** Clear machine bind + live session so the customer can activate on a new PC. */
+adminRoutes.post('/unbind-machine', async (c) => {
+  const body = z.object({ userId: z.string().min(4) }).safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.json({ error: 'invalid_body' }, 400);
+
+  await db
+    .update(licenses)
+    .set({
+      machineFingerprint: null,
+      sessionToken: null,
+      sessionExpiresAt: null,
+      lastSeenAt: null,
+    })
+    .where(and(eq(licenses.userId, body.data.userId), eq(licenses.status, 'active')))
+    .run();
+
+  return c.json({ ok: true });
+});
+
 adminRoutes.get('/crypto-payments', async (c) => {
   await expireStaleCryptoPendings();
   const status = c.req.query('status') ?? 'pending';

@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS licenses (
   plan TEXT NOT NULL,
   machine_fingerprint TEXT,
   last_seen_at INTEGER,
+  session_token TEXT,
+  session_expires_at INTEGER,
   created_at INTEGER NOT NULL
 );
 
@@ -62,11 +64,27 @@ CREATE TABLE IF NOT EXISTS crypto_payments (
 );
 `;
 
+const ALTERS = [
+  'ALTER TABLE licenses ADD COLUMN session_token TEXT',
+  'ALTER TABLE licenses ADD COLUMN session_expires_at INTEGER',
+];
+
 let migrated = false;
+
+async function addColumnIfMissing(statement: string): Promise<void> {
+  try {
+    await client.execute(statement);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    // SQLite / libSQL: column already present on existing DBs.
+    if (!/duplicate column|already exists/i.test(msg)) throw err;
+  }
+}
 
 export async function migrate(): Promise<void> {
   if (migrated) return;
   await client.executeMultiple(SQL);
+  for (const alter of ALTERS) await addColumnIfMissing(alter);
   migrated = true;
   console.log('stm-api schema ready');
 }

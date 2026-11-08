@@ -28,6 +28,8 @@ export async function ensureLicense(userId: string, plan: PlanId) {
     plan,
     machineFingerprint: null as string | null,
     lastSeenAt: null as Date | null,
+    sessionToken: null as string | null,
+    sessionExpiresAt: null as Date | null,
     createdAt: new Date(),
   };
   await db.insert(licenses).values(row).run();

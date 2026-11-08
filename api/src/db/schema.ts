@@ -38,6 +38,9 @@ export const licenses = sqliteTable('licenses', {
   plan: text('plan').notNull(),
   machineFingerprint: text('machine_fingerprint'),
   lastSeenAt: integer('last_seen_at', { mode: 'timestamp_ms' }),
+  /** Single live bot seat — mint on activate; heartbeat must match while fresh. */
+  sessionToken: text('session_token'),
+  sessionExpiresAt: integer('session_expires_at', { mode: 'timestamp_ms' }),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
