@@ -106,6 +106,9 @@ export function Hero() {
             <a href="/account" className="btn btn-gold btn-lg">
               {HERO.primaryCta}
             </a>
+            <a href="/pricing#trial" className="btn btn-ghost btn-lg">
+              Try it free for {PRICING.trialDays} days
+            </a>
           </div>
           <a className="btn btn-ghost btn-lg hero-secondary" href="/play">
             {HERO.secondaryCta}

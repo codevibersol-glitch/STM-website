@@ -26,6 +26,8 @@ export interface Plan {
 export interface Pricing {
   /** ISO 4217 currency code, set together with the prices. */
   currency: string | null;
+  /** Days a grind-only trial lasts after the key is first activated. */
+  trialDays: number;
   plans: readonly Plan[];
   includes: readonly string[];
   steps: readonly string[];
@@ -43,6 +45,7 @@ export const LAUNCH_DAY = formatDay(LAUNCH_DATE);
 
 export const PRICING: Pricing = {
   currency: 'EUR',
+  trialDays: 5,
   plans: [
     {
       id: 'flex',

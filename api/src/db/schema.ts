@@ -20,9 +20,9 @@ export const subscriptions = sqliteTable('subscriptions', {
   userId: text('user_id')
     .notNull()
     .references(() => users.id),
-  plan: text('plan').notNull(), // flex | go | founder
+  plan: text('plan').notNull(), // flex | go | founder | trial
   status: text('status').notNull(), // active | past_due | canceled | expired
-  provider: text('provider').notNull(), // stripe | crypto | manual | nowpayments
+  provider: text('provider').notNull(), // stripe | crypto | manual | nowpayments | trial
   providerRef: text('provider_ref'),
   currentPeriodEnd: integer('current_period_end', { mode: 'timestamp_ms' }),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
@@ -70,4 +70,12 @@ export const cryptoPayments = sqliteTable('crypto_payments', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   confirmedAt: integer('confirmed_at', { mode: 'timestamp_ms' }),
   confirmedBy: text('confirmed_by'),
+});
+
+/** One row per trial-mint attempt, so an IP can be limited across function instances. */
+export const trialRequests = sqliteTable('trial_requests', {
+  id: text('id').primaryKey(),
+  ip: text('ip').notNull(),
+  email: text('email').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });

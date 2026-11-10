@@ -20,6 +20,10 @@ export const PLANS: Record<PlanId, PlanDef> = {
 /** Far-future end for lifetime Founder access. */
 export const LIFETIME_END = new Date('2099-01-01T00:00:00Z');
 
+/** Grind-only key minted on the site. Not for sale: checkout keeps using isPlanId. */
+export const TRIAL_PLAN = 'trial';
+export const TRIAL_DAYS = 5;
+
 export function isPlanId(value: string): value is PlanId {
   return value === 'flex' || value === 'go' || value === 'founder';
 }

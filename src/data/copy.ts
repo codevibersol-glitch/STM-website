@@ -2,6 +2,7 @@
 // Edit the words here; the components only lay them out. `npm run build` also writes them all to copy.md.
 
 import type { IconName } from '../components/Icon';
+import { PRICING } from './pricing';
 import { BETA_LABEL, BETA_REACH } from './site';
 
 // Seven links at most: at the largest text size an eighth makes the header wrap to three rows, and the
@@ -32,7 +33,7 @@ export const DOORS = {
     { href: '/builder', title: 'Builder', text: 'A vanilla talent planner for warrior and rogue, and an armour name for that class.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
-    { href: '/pricing', title: 'Pricing', text: 'Three plans. Create an account to pay; the build still comes on Telegram.' },
+    { href: '/pricing', title: 'Pricing', text: `Three plans, or a ${PRICING.trialDays}-day grind try. Create an account to pay; the build still comes on Telegram.` },
     { href: '/faq', title: 'Questions', text: 'What STM does, the account risk, and how buying works.' },
     { href: '/guide', title: 'Guide', text: 'Who it is for, every version it plays, and how to send feedback.' },
   ],
