@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
 import { Account } from './Account';
+import { ForeverPlanner } from './ForeverPlanner';
 import { HowItWorks } from './HowItWorks';
+import { InstallGuide } from './InstallGuide';
 import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
+import { WhatsNew } from './WhatsNew';
 import { Header } from './Header';
 import { Tabs } from './Tabs';
 import { SKIP_LINK } from '../data/copy';
@@ -29,6 +32,44 @@ export function PlayPage({ path }: { path: string }) {
   return (
     <PageShell path={path}>
       <HowItWorks />
+    </PageShell>
+  );
+}
+
+/** WoW Forever talent calculator for all nine classes. */
+export function TalentsPage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
+      <section id="talents" className="section" aria-labelledby="talents-title">
+        <div className="wrap">
+          <p className="eyebrow">Talents</p>
+          <h2 id="talents-title" className="section-title">
+            WoW Forever talent calculator
+          </h2>
+          <p className="section-intro">
+            Spend points for every class, on Horde and Alliance. The row rules and the point cap are the ones in the Forever client. A link shares the build. Leveling orders are the plans people saved most often, not a measured route.
+          </p>
+          <ForeverPlanner />
+        </div>
+      </section>
+    </PageShell>
+  );
+}
+
+/** The desktop update, as a quest log. */
+export function NewPage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
+      <WhatsNew />
+    </PageShell>
+  );
+}
+
+/** How to run STM-Setup.exe past the unsigned-publisher warning. */
+export function InstallPage({ path }: { path: string }) {
+  return (
+    <PageShell path={path}>
+      <InstallGuide />
     </PageShell>
   );
 }
@@ -92,6 +133,7 @@ export function ResultsPage({ path }: { path: string }) {
 export function GuidePage({ path }: { path: string }) {
   const tabs = [
     { id: 'guide-versions', label: 'Versions', panel: <Versions /> },
+    { id: 'guide-install', label: 'Install', panel: <InstallGuide /> },
     { id: 'guide-who', label: 'Who', panel: <Who /> },
     { id: 'guide-how', label: 'How', panel: <How /> },
     { id: 'guide-features', label: 'Features', panel: <Features /> },

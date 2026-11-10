@@ -12,7 +12,7 @@ export const FEATURES: readonly Feature[] = [
     id: 'leveling',
     icon: 'compass',
     title: 'Hands-free leveling, all the way to max level',
-    text: 'STM walks to enemies and fights them, for every race and every class, so your character levels while your hands rest. Questing is coming soon.',
+    text: 'STM walks to enemies and fights them, for every race and every class on WoW Forever, so your character levels while your hands rest. It spends the next talent point on level-up. STM quests a level band when it has a route for it, and grinds when that band has none. Fishing is still coming soon.',
   },
   {
     id: 'rotation',
@@ -30,7 +30,7 @@ export const FEATURES: readonly Feature[] = [
     id: 'crafting',
     icon: 'pick',
     title: 'Gathering and crafting (GO / Founder)',
-    text: 'On GO and Founder, mining, blacksmithing, cooking and first aid run along the way. FLEX is grind-only and does not include professions.',
+    text: 'On GO and Founder, STM pairs a gathering skill with a crafting skill: Mining and Engineering, Herbalism and Alchemy, Skinning and Leatherworking, or Tailoring and Enchanting. FLEX is grind-only and does not include professions. Fishing is still coming soon.',
   },
   {
     id: 'panel',

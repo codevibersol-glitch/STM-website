@@ -10,6 +10,7 @@ import {
   type Prefs,
   type TextSize,
 } from '../lib/prefs';
+import { setSoundEnabled, soundEnabled } from '../lib/sound';
 import { Icon } from './Icon';
 
 const SIZES: { value: TextSize; label: string; name: string }[] = [
@@ -24,6 +25,7 @@ export function A11yToolbar() {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [system, setSystem] = useState(false);
   const [ready, setReady] = useState(false);
+  const [sound, setSound] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
@@ -32,6 +34,7 @@ export function A11yToolbar() {
   useEffect(() => {
     setPrefs(readPrefs());
     setSystem(systemReducesMotion());
+    setSound(soundEnabled());
     setReady(true);
     let query: MediaQueryList | null = null;
     try {
@@ -128,7 +131,28 @@ export function A11yToolbar() {
           <span className="a11y-switch-track" aria-hidden="true" />
           <span>Dyslexia-friendly font</span>
         </label>
-        <button type="button" className="a11y-reset" onClick={() => setPrefs({ ...DEFAULT_PREFS })}>
+        <label className="a11y-switch">
+          <input
+            type="checkbox"
+            role="switch"
+            checked={sound}
+            onChange={(e) => {
+              setSound(e.target.checked);
+              setSoundEnabled(e.target.checked);
+            }}
+          />
+          <span className="a11y-switch-track" aria-hidden="true" />
+          <span>Interface sounds</span>
+        </label>
+        <button
+          type="button"
+          className="a11y-reset"
+          onClick={() => {
+            setPrefs({ ...DEFAULT_PREFS });
+            setSound(false);
+            setSoundEnabled(false);
+          }}
+        >
           <Icon name="reset" />
           Reset to default
         </button>
