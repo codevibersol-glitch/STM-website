@@ -43,8 +43,11 @@ const pricingPage = renderApp('/pricing');
 const faqPage = renderApp('/faq');
 const builderPage = renderApp('/builder');
 const charactersPage = renderApp('/characters');
+const talentsPage = renderApp('/talents');
+const newPage = renderApp('/new');
+const installPage = renderApp('/install');
 /** Every shipped page, so a claim has to be true somewhere on the site, not only on the home scroll. */
-const html = [home, play, guide, resultsPage, pricingPage, faqPage, builderPage, charactersPage].join('\n');
+const html = [home, play, guide, resultsPage, pricingPage, faqPage, builderPage, charactersPage, talentsPage, newPage, installPage].join('\n');
 const head = headTags(DEFAULT_SITE_URL);
 const notFound = renderNotFound();
 
@@ -99,7 +102,7 @@ describe('Telegram is the only channel', () => {
   const hrefs = anchors.map((a) => /href="([^"]*)"/.exec(a)?.[1] ?? '');
 
   it('links only to the page itself, Telegram or Discord', () => {
-    const internalHrefs = ['/', '/play', '/builder', '/characters', '/pricing', '/account', '/faq', '/results', '/guide'];
+    const internalHrefs = ['/', '/play', '/talents', '/new', '/builder', '/characters', '/install', '/pricing', '/account', '/faq', '/results', '/guide'];
     for (const href of hrefs) {
       const internal = href.startsWith('#') || internalHrefs.includes(href);
       expect(internal || href === TELEGRAM_URL || href === DISCORD_URL, `unexpected link ${href}`).toBe(true);
@@ -348,9 +351,11 @@ describe('one app, every version, in beta', () => {
     expect(text).not.toMatch(/free beta|beta (is |for )?free|free early access|limited (spots|seats|copies|access|beta)/i);
   });
 
-  it('claims no questing while it is coming soon', () => {
-    expect(text).not.toMatch(/quest guides|and questing(?! are coming soon)|leveling, questing|questing, gathering/i);
-    expect(text).toContain('Questing is coming soon');
+  it('says quest routes exist, some bands grind, and fishing is still coming soon', () => {
+    expect(text).toContain('STM quests a level band when it has a route for it, and grinds when that band has none');
+    expect(text).toContain('Fishing is still coming soon');
+    expect(text).not.toMatch(/completes every quest|quest guides/i);
+    expect(text).not.toContain('Questing is coming soon');
   });
 
   it('shows a picture only with alt text, a size, lazy loading and a file of its own', () => {

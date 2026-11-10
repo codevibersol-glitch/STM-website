@@ -31,7 +31,7 @@ export const PRIMARY_KEYWORD = 'WoW accessibility addon';
 
 export const SITE_TITLE = 'STM – WoW Accessibility Addon and Leveling Tool';
 export const SITE_DESCRIPTION =
-  'STM is a WoW accessibility addon and leveling tool, in beta, to max level. For limited mobility or little time. Every version. Pay on the site.';
+  'STM is a WoW accessibility addon and leveling tool for WoW Forever, in beta, to max level. Horde and Alliance. Pay on the site.';
 
 /**
  * STM is one app, in beta: it plays from the first level up to max level. One status for the whole app, never per

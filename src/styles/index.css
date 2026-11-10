@@ -5,24 +5,14 @@
 @source "../App.tsx";
 @source "../NotFound.tsx";
 
-/* A local sans sized to Space Grotesk (measured on the headings' words at weight 600 against Arial Bold),
-   so the headings keep their size when the web font arrives: no layout shift, no late "largest paint". */
+/* A local serif sized near Cinzel, so headings keep their size before the web font arrives. */
 @font-face {
-  font-family: "Space Grotesk Fallback";
-  font-weight: 500 700;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Neue Bold"), local("Helvetica Bold");
-  size-adjust: 101.4%;
-  ascent-override: 96.6%;
-  descent-override: 28.6%;
-  line-gap-override: 0%;
-}
-@font-face {
-  font-family: "Space Grotesk Fallback";
-  font-weight: 300 499;
-  src: local("Arial"), local("ArialMT"), local("Helvetica Neue"), local("Helvetica");
-  size-adjust: 108.8%;
-  ascent-override: 90%;
-  descent-override: 26.7%;
+  font-family: "Cinzel Fallback";
+  font-weight: 800 900;
+  src: local("Palatino Linotype"), local("Palatino"), local("Georgia");
+  size-adjust: 95%;
+  ascent-override: 100%;
+  descent-override: 22%;
   line-gap-override: 0%;
 }
 
@@ -42,8 +32,8 @@
   --c-text: #f2f4f6;
   --c-muted: #a3abb6;
   --c-faint: #8a939f;
-  --c-accent: #c6ff3a;
-  --c-accent-ink: #0b0f02;
+  --c-accent: #e8c46a;
+  --c-accent-ink: #1c1406;
   --c-danger: #ff6b5e;
   --c-calm: #7cc4ff;
   /* The older names follow the one accent, so every section takes the new look. */
@@ -51,11 +41,12 @@
   --c-violet: var(--c-calm);
   --c-violet-text: #9fd8ff;
   --c-gold: var(--c-accent);
-  --c-gold-2: #e2ff9a;
+  --c-gold-2: #f3e2a8;
   --c-on-gold: var(--c-accent-ink);
   --c-focus: var(--c-accent);
   --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --f-display: "Space Grotesk Variable", "Space Grotesk Fallback", "Segoe UI", system-ui, sans-serif;
+  --f-display: "Cinzel", "Cinzel Fallback", Palatino, Georgia, serif;
+  --f-logo: "Cinzel Decorative", "Cinzel", "Cinzel Fallback", Palatino, Georgia, serif;
   --f-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, monospace;
   --f-rune: var(--f-mono);
   --header-h: 4.25rem;
@@ -84,6 +75,7 @@ html[data-contrast="high"] {
 html[data-font="dyslexic"] {
   --f-body: "OpenDyslexic", "Atkinson Hyperlegible", sans-serif;
   --f-display: "OpenDyslexic", "Atkinson Hyperlegible", sans-serif;
+  --f-logo: "OpenDyslexic", "Atkinson Hyperlegible", sans-serif;
   --f-rune: "OpenDyslexic", "Atkinson Hyperlegible", sans-serif;
 }
 
@@ -140,8 +132,9 @@ html[data-font="dyslexic"] {
     line-height: 1.6;
     overflow-x: clip;
     background:
-      radial-gradient(72rem 36rem at 88% -8%, rgb(198 255 58 / 0.07), transparent 58%),
-      radial-gradient(48rem 28rem at -8% 18%, rgb(124 196 255 / 0.05), transparent 55%),
+      radial-gradient(72rem 36rem at 88% -8%, rgb(232 196 106 / 0.1), transparent 58%),
+      radial-gradient(40rem 24rem at -6% 30%, rgb(120 36 14 / 0.22), transparent 55%),
+      repeating-linear-gradient(0deg, rgb(255 236 196 / 0.018) 0 1px, transparent 1px 4px),
       var(--c-ink);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -160,8 +153,8 @@ html[data-font="dyslexic"] {
   h3,
   h4 {
     font-family: var(--f-display);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    letter-spacing: 0.02em;
     color: var(--c-text);
     text-wrap: balance;
   }
@@ -278,28 +271,28 @@ html[data-font="dyslexic"] {
     color: var(--c-accent-ink);
     background: var(--c-accent);
     box-shadow:
-      0 0 0 1px rgb(198 255 58 / 0.6),
-      0 10px 34px -12px rgb(198 255 58 / 0.5);
+      0 0 0 1px rgb(232 196 106 / 0.6),
+      0 10px 34px -12px rgb(232 196 106 / 0.5);
   }
   .btn-gold:hover {
     color: var(--c-accent-ink);
     box-shadow:
-      0 0 0 1px rgb(198 255 58 / 0.8),
-      0 14px 40px -12px rgb(198 255 58 / 0.7);
+      0 0 0 1px rgb(232 196 106 / 0.8),
+      0 14px 40px -12px rgb(232 196 106 / 0.7);
   }
   .btn-ghost {
     color: var(--c-text);
     background: rgb(255 255 255 / 0.04);
-    border-color: rgb(198 255 58 / 0.6);
+    border-color: rgb(232 196 106 / 0.6);
   }
   .btn-ghost:hover {
     color: var(--c-text);
-    background: rgb(198 255 58 / 0.12);
+    background: rgb(232 196 106 / 0.12);
     border-color: var(--c-teal);
   }
   .btn-ghost[data-state="copied"] {
     border-color: var(--c-teal);
-    background: rgb(198 255 58 / 0.16);
+    background: rgb(232 196 106 / 0.16);
   }
   html[data-contrast="high"] .btn-gold {
     background: #ffe14d;
@@ -325,7 +318,7 @@ html[data-font="dyslexic"] {
   }
   .tab[aria-selected='true'],
   .choice[aria-pressed='true'] {
-    background: rgb(198 255 58 / 0.16);
+    background: rgb(232 196 106 / 0.16);
     border-color: var(--c-accent);
   }
   .choice:disabled {
@@ -360,7 +353,7 @@ html[data-font="dyslexic"] {
   }
   .icon-btn[aria-expanded="true"] {
     border-color: var(--c-teal);
-    background: rgb(198 255 58 / 0.14);
+    background: rgb(232 196 106 / 0.14);
   }
   @media (max-width: 39.99rem) {
     .icon-btn-text {
@@ -433,7 +426,7 @@ html[data-font="dyslexic"] {
   }
   .site-nav a[aria-current='location'] {
     color: var(--c-text);
-    background: rgb(198 255 58 / 0.12);
+    background: rgb(232 196 106 / 0.12);
     box-shadow: inset 0 -2px 0 var(--c-accent);
   }
   html[data-contrast="high"] .site-nav a[aria-current='location'] {
@@ -668,7 +661,7 @@ html[data-font="dyslexic"] {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(40% 50% at 70% 45%, rgb(198 255 58 / 0.08), transparent 70%),
+      radial-gradient(40% 50% at 70% 45%, rgb(232 196 106 / 0.08), transparent 70%),
       radial-gradient(35% 40% at 20% 30%, rgb(124 196 255 / 0.05), transparent 70%);
   }
   .hero-poster,
@@ -806,7 +799,7 @@ html[data-font="dyslexic"] {
     pointer-events: none;
   }
   .talent-links line {
-    stroke: rgb(198 255 58 / 0.7);
+    stroke: rgb(232 196 106 / 0.7);
     stroke-width: 2px;
     vector-effect: non-scaling-stroke;
   }
@@ -828,7 +821,7 @@ html[data-font="dyslexic"] {
     opacity: 0.55;
   }
   .talent-node[data-state='available'] {
-    border-color: rgb(198 255 58 / 0.7);
+    border-color: rgb(232 196 106 / 0.7);
   }
   .talent-node[data-state='spent'] {
     background: #1c2912;
@@ -882,9 +875,9 @@ html[data-font="dyslexic"] {
     max-width: 100%;
     margin: 0;
     padding: 0.4rem 0.95rem;
-    border: 1px solid rgb(198 255 58 / 0.4);
+    border: 1px solid rgb(232 196 106 / 0.4);
     border-radius: 999px;
-    background: rgb(198 255 58 / 0.07);
+    background: rgb(232 196 106 / 0.07);
     color: var(--c-text);
     font-size: 0.9rem;
     font-weight: 700;
@@ -907,9 +900,10 @@ html[data-font="dyslexic"] {
   }
   .hero-title {
     margin: 1.4rem 0 1.4rem;
-    font-size: clamp(2.3rem, 1.4rem + 3.3vw, 3.9rem);
-    line-height: 1.04;
-    letter-spacing: -0.035em;
+    font-size: clamp(2rem, 1.2rem + 2.4vw, 3.4rem);
+    font-weight: 900;
+    line-height: 1.12;
+    letter-spacing: 0.01em;
   }
   .gradient-text {
     color: var(--c-accent);
@@ -933,7 +927,8 @@ html[data-font="dyslexic"] {
     .hero-title {
       order: 2;
       margin: 0.4rem 0;
-      font-size: 1.5rem;
+      font-size: 1.28rem;
+      line-height: 1.16;
     }
     #updates {
       order: 3;
@@ -957,6 +952,7 @@ html[data-font="dyslexic"] {
       order: 8;
     }
     .hero-caption {
+      order: 9;
       margin-top: 1.1rem;
       text-align: left;
     }
@@ -1046,9 +1042,9 @@ html[data-font="dyslexic"] {
     max-width: 100%;
     margin: 1.1rem 0 0;
     padding: 0.55rem 1rem;
-    border: 1px solid rgb(198 255 58 / 0.45);
+    border: 1px solid rgb(232 196 106 / 0.45);
     border-radius: 1rem;
-    background: rgb(198 255 58 / 0.07);
+    background: rgb(232 196 106 / 0.07);
     font-size: 0.95rem;
   }
   .proof .icon {
@@ -1087,7 +1083,7 @@ html[data-font="dyslexic"] {
   }
   .section:nth-child(even) {
     background:
-      radial-gradient(42rem 16rem at 50% 0, rgb(198 255 58 / 0.045), transparent 70%),
+      radial-gradient(42rem 16rem at 50% 0, rgb(232 196 106 / 0.045), transparent 70%),
       linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 14rem);
   }
   html[data-contrast="high"] .section:nth-child(even) {
@@ -1194,7 +1190,7 @@ html[data-font="dyslexic"] {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgb(198 255 58 / 0.14), transparent 50%);
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgb(232 196 106 / 0.14), transparent 50%);
     opacity: 0;
     transition: opacity 0.35s ease;
     pointer-events: none;
@@ -1205,7 +1201,7 @@ html[data-font="dyslexic"] {
   .card:hover {
     background:
       linear-gradient(180deg, #161b20, #0c0f13) padding-box,
-      linear-gradient(180deg, rgb(198 255 58 / 0.55), rgb(255 255 255 / 0.08)) border-box;
+      linear-gradient(180deg, rgb(232 196 106 / 0.55), rgb(255 255 255 / 0.08)) border-box;
   }
   .card h3 {
     margin: 1.05rem 0 0.5rem;
@@ -1224,9 +1220,9 @@ html[data-font="dyslexic"] {
     place-items: center;
     width: 3.1rem;
     height: 3.1rem;
-    border: 1px solid rgb(198 255 58 / 0.4);
+    border: 1px solid rgb(232 196 106 / 0.4);
     border-radius: 0.95rem;
-    background: radial-gradient(circle at 30% 25%, rgb(198 255 58 / 0.24), rgb(124 196 255 / 0.16));
+    background: radial-gradient(circle at 30% 25%, rgb(232 196 106 / 0.24), rgb(124 196 255 / 0.16));
     color: var(--c-teal);
   }
   .card-icon .icon {
@@ -1296,8 +1292,8 @@ html[data-font="dyslexic"] {
       box-shadow 0.25s ease;
   }
   .loop-step:hover {
-    border-color: rgb(198 255 58 / 0.45);
-    box-shadow: 0 18px 40px -30px rgb(198 255 58 / 0.55);
+    border-color: rgb(232 196 106 / 0.45);
+    box-shadow: 0 18px 40px -30px rgb(232 196 106 / 0.55);
   }
   .loop-step::after {
     content: "0" counter(loop);
@@ -1429,7 +1425,7 @@ html[data-font="dyslexic"] {
   }
   .hood-list div {
     padding-left: 1rem;
-    border-left: 2px solid rgb(198 255 58 / 0.5);
+    border-left: 2px solid rgb(232 196 106 / 0.5);
   }
   .hood-list dt {
     color: var(--c-text);
@@ -1465,14 +1461,14 @@ html[data-font="dyslexic"] {
     white-space: nowrap;
   }
   .chip-beta {
-    border-color: rgb(198 255 58 / 0.55);
-    background: rgb(198 255 58 / 0.09);
+    border-color: rgb(232 196 106 / 0.55);
+    background: rgb(232 196 106 / 0.09);
     color: var(--c-teal);
   }
   .chip-soon {
     border-style: dashed;
-    border-color: rgb(198 255 58 / 0.65);
-    background: rgb(198 255 58 / 0.07);
+    border-color: rgb(232 196 106 / 0.65);
+    background: rgb(232 196 106 / 0.07);
     color: var(--c-gold-2);
   }
   html[data-contrast="high"] .chip {
@@ -1624,8 +1620,8 @@ html[data-font="dyslexic"] {
       box-shadow 0.25s ease;
   }
   .step:hover {
-    border-color: rgb(198 255 58 / 0.5);
-    box-shadow: 0 22px 48px -32px rgb(198 255 58 / 0.45);
+    border-color: rgb(232 196 106 / 0.5);
+    box-shadow: 0 22px 48px -32px rgb(232 196 106 / 0.45);
   }
   .step::before {
     content: counter(step, upper-roman);
@@ -1642,8 +1638,8 @@ html[data-font="dyslexic"] {
     font-size: 1.25rem;
     font-weight: 400;
     box-shadow:
-      0 0 0 6px rgb(198 255 58 / 0.08),
-      0 0 32px rgb(198 255 58 / 0.28);
+      0 0 0 6px rgb(232 196 106 / 0.08),
+      0 0 32px rgb(232 196 106 / 0.28);
   }
   @media (min-width: 56rem) {
     .step:not(:last-child)::after {
@@ -1652,7 +1648,7 @@ html[data-font="dyslexic"] {
       top: 3.95rem;
       left: calc(50% + 2.6rem);
       width: calc(100% - 5.2rem + 1.5rem);
-      border-top: 1px dashed rgb(198 255 58 / 0.5);
+      border-top: 1px dashed rgb(232 196 106 / 0.5);
     }
   }
   .step h3 {
@@ -1675,9 +1671,9 @@ html[data-font="dyslexic"] {
     max-width: 100%;
     margin: -1.5rem auto 2.5rem;
     padding: 0.55rem 1.1rem;
-    border: 1px solid rgb(198 255 58 / 0.45);
+    border: 1px solid rgb(232 196 106 / 0.45);
     border-radius: 1rem;
-    background: rgb(198 255 58 / 0.07);
+    background: rgb(232 196 106 / 0.07);
     color: var(--c-gold-2);
     font-size: 0.92rem;
     font-weight: 700;
@@ -1718,18 +1714,18 @@ html[data-font="dyslexic"] {
     padding: 1.7rem 1.5rem;
     border: 1px solid var(--c-line);
     border-radius: var(--radius);
-    background: linear-gradient(170deg, rgb(198 255 58 / 0.08), var(--c-panel) 55%);
+    background: linear-gradient(170deg, rgb(232 196 106 / 0.08), var(--c-panel) 55%);
     transition:
       border-color 0.25s ease,
       box-shadow 0.25s ease;
   }
   .stats > li:first-child .stat {
-    border-color: rgb(198 255 58 / 0.4);
-    background: linear-gradient(165deg, rgb(198 255 58 / 0.16), var(--c-panel) 58%);
+    border-color: rgb(232 196 106 / 0.4);
+    background: linear-gradient(165deg, rgb(232 196 106 / 0.16), var(--c-panel) 58%);
   }
   .stat:hover {
-    border-color: rgb(198 255 58 / 0.55);
-    box-shadow: 0 20px 44px -30px rgb(198 255 58 / 0.5);
+    border-color: rgb(232 196 106 / 0.55);
+    box-shadow: 0 20px 44px -30px rgb(232 196 106 / 0.5);
   }
   html[data-contrast="high"] .stats > li:first-child .stat,
   html[data-contrast="high"] .stat:hover {
@@ -1787,7 +1783,7 @@ html[data-font="dyslexic"] {
     border-radius: 0.4rem;
   }
   .sources li:target {
-    background: rgb(198 255 58 / 0.12);
+    background: rgb(232 196 106 / 0.12);
     color: var(--c-text);
   }
 
@@ -1803,8 +1799,8 @@ html[data-font="dyslexic"] {
     border: 1px solid var(--c-line);
     border-radius: calc(var(--radius) * 1.4);
     background:
-      radial-gradient(circle at 20% 30%, rgb(198 255 58 / 0.1), transparent 55%),
-      linear-gradient(160deg, rgb(124 196 255 / 0.1), rgb(198 255 58 / 0.04));
+      radial-gradient(circle at 20% 30%, rgb(232 196 106 / 0.1), transparent 55%),
+      linear-gradient(160deg, rgb(124 196 255 / 0.1), rgb(232 196 106 / 0.04));
   }
   @media (min-width: 56rem) {
     .timeback {
@@ -1843,7 +1839,7 @@ html[data-font="dyslexic"] {
   }
   .pip {
     aspect-ratio: 1;
-    border: 1px solid rgb(198 255 58 / 0.45);
+    border: 1px solid rgb(232 196 106 / 0.45);
     border-radius: 50%;
     transition:
       background-color 0.3s ease,
@@ -1890,17 +1886,17 @@ html[data-font="dyslexic"] {
       box-shadow 0.25s ease;
   }
   .plan:hover {
-    border-color: rgb(198 255 58 / 0.45);
+    border-color: rgb(232 196 106 / 0.45);
   }
   .plan-highlight:hover {
-    box-shadow: 0 36px 80px -36px rgb(198 255 58 / 0.72);
+    box-shadow: 0 36px 80px -36px rgb(232 196 106 / 0.72);
   }
   .plan-highlight {
     border-color: transparent;
     background:
       linear-gradient(var(--c-panel), var(--c-panel)) padding-box,
-      linear-gradient(145deg, #e2ff9a, rgb(198 255 58 / 0.35) 45%, var(--c-teal)) border-box;
-    box-shadow: 0 34px 80px -46px rgb(198 255 58 / 0.6);
+      linear-gradient(145deg, #f3e2a8, rgb(232 196 106 / 0.35) 45%, var(--c-teal)) border-box;
+    box-shadow: 0 34px 80px -46px rgb(232 196 106 / 0.6);
   }
   .plan-ribbon {
     position: absolute;
@@ -1909,7 +1905,7 @@ html[data-font="dyslexic"] {
     margin: 0;
     padding: 0.3rem 0.9rem;
     border-radius: 999px;
-    background: linear-gradient(135deg, #e2ff9a, #c6ff3a);
+    background: linear-gradient(135deg, #f3e2a8, #e8c46a);
     color: var(--c-on-gold);
     font-size: 0.85rem;
     font-weight: 700;
@@ -2018,10 +2014,10 @@ html[data-font="dyslexic"] {
     gap: 2.5rem;
     align-items: center;
     padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
-    border: 1px solid rgb(198 255 58 / 0.35);
+    border: 1px solid rgb(232 196 106 / 0.35);
     border-radius: calc(var(--radius) * 1.4);
     background:
-      radial-gradient(circle at 90% 10%, rgb(198 255 58 / 0.12), transparent 50%),
+      radial-gradient(circle at 90% 10%, rgb(232 196 106 / 0.12), transparent 50%),
       linear-gradient(160deg, var(--c-panel-2), var(--c-panel));
   }
   @media (min-width: 64rem) {
@@ -2054,8 +2050,8 @@ html[data-font="dyslexic"] {
   }
   .checklist li:hover,
   .soon-list li:hover {
-    border-color: rgb(198 255 58 / 0.5);
-    background: rgb(198 255 58 / 0.06);
+    border-color: rgb(232 196 106 / 0.5);
+    background: rgb(232 196 106 / 0.06);
   }
   .checklist li {
     display: flex;
@@ -2190,11 +2186,11 @@ html[data-font="dyslexic"] {
     transition: border-color 0.25s ease;
   }
   .faq details[open] {
-    border-color: rgb(198 255 58 / 0.55);
+    border-color: rgb(232 196 106 / 0.55);
   }
   .faq details.risk {
-    border-color: rgb(198 255 58 / 0.6);
-    background: linear-gradient(160deg, rgb(198 255 58 / 0.08), var(--c-panel) 60%);
+    border-color: rgb(232 196 106 / 0.6);
+    background: linear-gradient(160deg, rgb(232 196 106 / 0.08), var(--c-panel) 60%);
   }
   .faq summary {
     display: flex;
@@ -2302,7 +2298,7 @@ html[data-font="dyslexic"] {
     border-radius: calc(var(--radius) * 1.2);
     background:
       linear-gradient(180deg, #111418, #0b0d10) padding-box,
-      linear-gradient(180deg, rgb(198 255 58 / 0.6), rgb(255 255 255 / 0.06)) border-box;
+      linear-gradient(180deg, rgb(232 196 106 / 0.6), rgb(255 255 255 / 0.06)) border-box;
   }
   .template-label {
     margin: 0;
@@ -2312,7 +2308,7 @@ html[data-font="dyslexic"] {
   .template-text {
     margin: 0.8rem 0 1.3rem;
     padding: 1rem 1.2rem;
-    border: 1px dashed rgb(198 255 58 / 0.5);
+    border: 1px dashed rgb(232 196 106 / 0.5);
     border-radius: 0.85rem;
     background: rgb(0 0 0 / 0.35);
     color: var(--c-text);
@@ -2515,7 +2511,7 @@ html[data-font="dyslexic"] {
     border-radius: calc(var(--radius) * 1.05);
     background:
       linear-gradient(180deg, #111418, #0b0d10) padding-box,
-      linear-gradient(180deg, rgb(198 255 58 / 0.45), rgb(255 255 255 / 0.08)) border-box;
+      linear-gradient(180deg, rgb(232 196 106 / 0.45), rgb(255 255 255 / 0.08)) border-box;
   }
   .signup-title {
     margin: 0.2rem 0 0.25rem;
@@ -2828,5 +2824,235 @@ html[data-motion="reduce"] *::after {
   html:not([data-motion="full"]) *::after {
     animation: none !important;
     transition: none !important;
+  }
+  .embers {
+    display: none;
+  }
+}
+
+html[data-motion="reduce"] .embers {
+  display: none;
+}
+
+/* Forever calculator, quest log, trailer controls. Unlayered so these beat the older tree grid. */
+.embers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.hero {
+  position: relative;
+}
+.ember {
+  position: absolute;
+  bottom: -8%;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: #f0c36a;
+  opacity: 0.7;
+  animation: ember-rise 9s linear infinite;
+}
+.ember-1 { left: 12%; animation-duration: 8s; }
+.ember-2 { left: 28%; animation-duration: 11s; animation-delay: 1s; }
+.ember-3 { left: 46%; animation-duration: 7.5s; animation-delay: 2s; }
+.ember-4 { left: 63%; animation-duration: 10s; animation-delay: 0.5s; }
+.ember-5 { left: 78%; animation-duration: 9s; animation-delay: 1.6s; }
+.ember-6 { left: 88%; animation-duration: 12s; animation-delay: 0.2s; }
+.ember-7 { left: 8%; animation-duration: 13s; animation-delay: 3s; }
+.ember-8 { left: 54%; animation-duration: 8.5s; animation-delay: 2.4s; }
+@keyframes ember-rise {
+  from { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.8; }
+  to { transform: translateY(-70vh); opacity: 0; }
+}
+@media (max-width: 47.99rem) {
+  .embers { display: none; }
+}
+
+.hero-film-frame {
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgb(232 196 106 / 0.45);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4), 0 18px 40px -28px rgb(232 196 106 / 0.45);
+}
+.hero-film-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+.hero-film-play {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgb(232 196 106 / 0.55);
+  border-radius: 999px;
+  background: #14110c;
+  color: var(--c-text);
+}
+.film-label {
+  margin: 0.45rem 0 0;
+  color: var(--c-muted);
+  font-size: 0.82rem;
+}
+
+.talent-board {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  max-width: none;
+}
+@media (min-width: 90rem) {
+  .talent-board {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+.talent-tree h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.05rem;
+}
+.talent-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(7, minmax(3.2rem, auto));
+  gap: 0.35rem;
+}
+.talent-node {
+  min-width: 0;
+  min-height: 3.2rem;
+  padding: 0.2rem 0.15rem;
+}
+.talent-node-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.talent-node-rank {
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  color: var(--c-gold-2);
+}
+.talent-node.is-spent {
+  background: #2a2112;
+  border-color: var(--c-accent);
+}
+.talent-node[aria-pressed='true'] {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.wow-tip {
+  border: 1px solid #e8c46a;
+  border-radius: 0.35rem;
+  background: #14110c;
+  box-shadow: 0 12px 30px -18px rgb(0 0 0 / 0.8);
+}
+.wow-tip .tip-name {
+  margin: 0 0 0.2rem;
+  color: #f3e2a8;
+  font-family: var(--f-display);
+  font-weight: 800;
+}
+.wow-tip .tip-rank {
+  color: #f3e2a8;
+}
+.quest-track {
+  flex: 1 1 8rem;
+  height: 0.45rem;
+  border: 1px solid rgb(232 196 106 / 0.45);
+  border-radius: 999px;
+  background: #1a140c;
+  overflow: hidden;
+}
+.quest-track span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #8d5e16, #f3e2a8);
+}
+.order-shares {
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+  color: var(--c-muted);
+  font-size: 0.92rem;
+}
+.quest-log {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.quest-log li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgb(232 196 106 / 0.4);
+  border-radius: 0.7rem;
+  background: #120f0c;
+}
+.quest-log h3 {
+  margin: 0 0 0.3rem;
+}
+.quest-log p {
+  margin: 0;
+  color: var(--c-muted);
+}
+.quest-mark {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-top: 0.35rem;
+  border: 2px solid #e8c46a;
+  border-radius: 0.15rem;
+  background: transparent;
+}
+.quest-log li[data-state='done'] .quest-mark,
+.quest-log li[data-state='current'] .quest-mark {
+  background: #e8c46a;
+}
+.quest-log li[data-state='soon'] {
+  opacity: 0.85;
+}
+.install-steps {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+}
+.install-steps li {
+  padding: 0.7rem 0.8rem;
+  border-left: 2px solid #e8c46a;
+}
+.race-banner {
+  margin: 0 0 1.4rem;
+}
+.race-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgb(232 196 106 / 0.45);
+  border-radius: 0.8rem;
+}
+.race-banner figcaption,
+.page-new .section-title {
+  font-family: var(--f-display);
+}
+.race-banner figcaption {
+  margin-top: 0.4rem;
+  color: var(--c-muted);
+  font-family: var(--f-body);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@media (min-width: 64rem) {
+  .page-new .section-title {
+    font-family: var(--f-logo);
+    font-weight: 900;
   }
 }

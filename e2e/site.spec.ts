@@ -118,6 +118,9 @@ test('is readable without JavaScript', async ({ browser }) => {
   await expect(page.locator('#pricing')).toHaveCount(0);
   const pages = [
     ['/play', '#how-it-works'],
+    ['/talents', '#talents'],
+    ['/new', '#whats-new'],
+    ['/install', '#install'],
     ['/guide', '#versions'],
     ['/guide', '#who'],
     ['/guide', '#features'],
@@ -168,6 +171,20 @@ test('has no axe violations in high contrast, with the dyslexia font and the lar
   await context.close();
 });
 
+for (const width of [360, 390]) {
+  test(`talents and what's new stay on screen at ${width}px`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width, height: 700 } });
+    const page = await context.newPage();
+    for (const path of ['/talents', '/new', '/install']) {
+      await page.goto(path);
+      await scrollThrough(page);
+      const [scroll, inner] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+      expect(scroll, path).toBeLessThanOrEqual(inner);
+    }
+    await context.close();
+  });
+}
+
 for (const width of [320, 390, 640, 768, 1024, 1440]) {
   test(`never scrolls sideways at ${width}px`, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width, height: 800 } });
@@ -201,8 +218,13 @@ test('with reduced motion: no 3D scene, no hidden reveals, the still map instead
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
   await expect(page.locator('.hero-map')).not.toHaveClass(/is-live/);
   await expect(page.locator('.hero-film video')).toHaveCount(0);
-  await expect(page.locator('.hero-film-play')).toHaveCount(0);
-  await expect(page.locator('.hero-poster')).toBeVisible();
+  await expect(page.locator('svg.hero-poster')).toBeVisible();
+  await expect(page.locator('.film-still')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Play trailer' })).toBeVisible();
+  await expect(page.locator('.film-label')).toContainText('Trailer made with AI (Grok Imagine). Not gameplay.');
+  await page.getByRole('button', { name: 'Play trailer' }).click();
+  await expect(page.locator('.hero-film video')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: 'Unmute' })).toBeVisible();
   const hidden = await page.evaluate(
     () => [...document.querySelectorAll('[data-reveal]')].filter((el) => getComputedStyle(el).opacity !== '1').length,
   );
@@ -282,7 +304,9 @@ test('every link off the site is Telegram or Discord, in a new tab, without the 
   const links = await page.locator('a[href^="http"]').evaluateAll((as) =>
     as.map((a) => ({ href: a.getAttribute('href'), target: a.getAttribute('target'), rel: a.getAttribute('rel') })),
   );
-  expect(links.length).toBeGreaterThan(4);
+  expect(links.length).toBeGreaterThanOrEqual(3);
+  expect(links.filter((l) => l.href === TELEGRAM).length).toBeGreaterThanOrEqual(2);
+  expect(links.filter((l) => l.href === DISCORD_URL).length).toBeGreaterThanOrEqual(1);
   for (const l of links) {
     expect([TELEGRAM, DISCORD_URL]).toContain(l.href);
     expect(l.target).toBe('_blank');
@@ -373,22 +397,23 @@ test('the pictures load, fit the screen and cause no CSP errors', async ({ brows
   await context.close();
 });
 
-test('the pricing section offers the plans, bought on Telegram', async ({ page }) => {
+test('the pricing section offers the plans and sends each one to the account page', async ({ page }) => {
   await page.goto('/pricing');
   await expect(page.locator('#pricing .plan')).toHaveCount(PRICING.plans.length);
   const links = page.locator('#pricing .plan a');
   await expect(links).toHaveCount(PRICING.plans.length);
   for (const link of await links.all()) {
-    await expect(link).toHaveAttribute('href', TELEGRAM);
-    await expect(link).toHaveAttribute('target', '_blank');
-    await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(link).toHaveAttribute('href', '/account');
   }
-  await expect(page.locator('#pricing')).toContainText('There is no card form on this site');
+  await expect(page.locator('#pricing')).toContainText('There is no free version.');
 });
 
 test('the section pages stay themselves after JavaScript loads', async ({ page }) => {
   const cases = [
     ['/play', '#how-it-works'],
+    ['/talents', '#talents'],
+    ['/new', '#whats-new'],
+    ['/install', '#install'],
     ['/builder', '#fighter'],
     ['/characters', '#characters'],
     ['/pricing', '#pricing'],
@@ -406,16 +431,23 @@ test('the section pages stay themselves after JavaScript loads', async ({ page }
   }
 });
 
-test('the talent planner spends a vanilla point and blocks a tauren rogue', async ({ page }) => {
-  await page.goto('/builder');
-  await page.getByRole('tab', { name: 'Talents' }).click();
-  await page.getByRole('button', { name: /^Improved Heroic Strike,/ }).click();
-  await page.getByRole('button', { name: 'Add a point to Improved Heroic Strike' }).click();
+test('the talent calculator spends a Forever point and blocks a tauren warlock', async ({ page }) => {
+  await page.goto('/talents');
+  await expect(page.locator('#root')).toHaveAttribute('data-ready', 'true', { timeout: 10000 });
+  const strike = page.getByRole('button', { name: /^Improved Heroic Strike,/ });
+  await strike.focus();
+  await page.keyboard.press('Enter');
+  const add = page.getByRole('button', { name: 'Add a point to Improved Heroic Strike' });
+  await add.focus();
+  await page.keyboard.press('Enter');
   await expect(page.locator('[data-planner]')).toContainText('1 spent');
-  await page.getByRole('tab', { name: 'Class' }).click();
-  await page.getByRole('button', { name: 'Rogue', exact: true }).click();
+  await page.getByRole('button', { name: 'Warlock', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Tauren' })).toBeDisabled();
-  await expect(page.locator('.planner-scope').first()).toContainText('not in it yet');
+  await expect(page.getByRole('button', { name: 'Gnome' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Gnome' }).click();
+  await expect(page.getByRole('button', { name: 'Gnome' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Affliction', exact: true }).click();
+  await expect(page.locator('[data-planner]')).toContainText('51 spent');
 });
 
 test('the phone menu opens, closes with Escape and gives focus back', async ({ browser }) => {

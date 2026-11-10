@@ -2,24 +2,24 @@
 // no per-version cards and no per-version status. Delete a name here to drop it from the page, the FAQ and
 // the copy deck. No digits in these words (the page may show only numbers from stats.json and pricing.ts).
 
-export const VERSIONS: readonly string[] = ['WoW Classic', 'WoW Anniversary', 'WoW: Forever', 'WoW Retail'];
+export const VERSIONS: readonly string[] = ['WoW: Forever'];
 
 export interface ComingSoon {
-  id: 'hardcore' | 'questing';
+  id: 'hardcore' | 'fishing';
   name: string;
 }
 
 /** Shown as "Coming soon", with no dates. */
 export const COMING_SOON: readonly ComingSoon[] = [
   { id: 'hardcore', name: 'Hardcore' },
-  { id: 'questing', name: 'Questing' },
+  { id: 'fishing', name: 'Fishing' },
 ];
 
 export const VERSIONS_COPY = {
-  eyebrow: 'Every version',
-  title: 'One app for every version of the game',
-  intro: 'STM controls them all from one app, so you never look for a different tool for a different version of World of Warcraft.',
-  ready: 'It is ready for the launch, for every race and every class.',
+  eyebrow: 'WoW Forever',
+  title: 'One app for WoW Forever',
+  intro: 'STM plays WoW Forever, for Horde and Alliance, from one app on your Windows PC.',
+  ready: 'It is in beta and plays every race and every class on WoW Forever.',
   listLabel: 'Versions STM controls',
   soonLabel: 'Coming soon',
 };

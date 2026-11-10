@@ -13,7 +13,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'what',
     q: 'What is STM?',
-    a: 'STM is one app that is both a leveling tool and an accessibility tool for World of Warcraft: a WoW accessibility addon and desktop companion that takes your character up the levels. While it runs, it plays the repetitive parts of the game for you: walking to enemies, the combat rotation, retreating from a fight it is losing, resting and eating, looting, selling junk, repairing gear and training new spells. Gathering and crafting are included on GO and Founder (not FLEX). Questing is coming soon.',
+    a: 'STM is one app that is both a leveling tool and an accessibility tool for World of Warcraft: a WoW accessibility addon and desktop companion that takes your character up the levels on WoW Forever. While it runs, it plays the repetitive parts of the game for you: walking to enemies, the combat rotation, retreating from a fight it is losing, resting and eating, looting, selling junk, repairing gear and training new spells. It spends talent points as you level. Gathering and crafting are included on GO and Founder (not FLEX). STM quests a level band when it has a route for it, and grinds when that band has none. Fishing is still coming soon.',
   },
   {
     id: 'plays',
@@ -23,7 +23,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     id: 'game',
     q: 'Which games does it work with?',
-    a: `STM is one app that controls every version: ${versionList()}. ${comingSoonList().replace(/^./, (c) => c.toUpperCase())} are coming soon. STM runs on a Windows PC next to the game.`,
+    a: `STM plays ${versionList()}, for Horde and Alliance. ${comingSoonList().replace(/^./, (c) => c.toUpperCase())} are coming soon. STM runs on a Windows PC next to the game.`,
   },
   {
     id: 'beta',

@@ -9,8 +9,8 @@ import { BETA_LABEL, BETA_REACH } from './site';
 // Each one is its own page. The home page is the short door into them, not a long scroll of every section.
 const NAV_ITEMS = [
   { href: '/play', label: 'Play' },
-  { href: '/builder', label: 'Builder' },
-  { href: '/characters', label: 'Characters' },
+  { href: '/talents', label: 'Talents' },
+  { href: '/new', label: 'New' },
   { href: '/results', label: 'Results' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/faq', label: 'FAQ' },
@@ -29,12 +29,15 @@ export const DOORS = {
   intro: 'Each part of STM is its own page. Pick one and stay there.',
   items: [
     { href: '/play', title: 'Play', text: 'Six sample demos: the route, the score, the map, the dashboard, the post-mortem and Telegram.' },
-    { href: '/builder', title: 'Builder', text: 'A vanilla talent planner for warrior and rogue, and an armour name for that class.' },
+    { href: '/talents', title: 'Talents', text: 'The WoW Forever calculator for all nine classes, with the leveling orders people saved most often.' },
+    { href: '/new', title: "What's new", text: 'Auto talents, the plan builder, the installer, quest routes and profession pairs.' },
+    { href: '/builder', title: 'Builder', text: 'A free figure you can turn, and a vanilla armour name. Not a World of Warcraft model.' },
     { href: '/characters', title: 'Characters', text: 'Gear, talents and spells, the way the dashboard shows them.' },
+    { href: '/install', title: 'Install', text: 'STM-Setup.exe on Windows, including the unsigned-publisher warning.' },
     { href: '/results', title: 'Results', text: 'The measured hours, XP and kills. Nothing promised.' },
     { href: '/pricing', title: 'Pricing', text: 'Three plans. Create an account to pay; the build still comes on Telegram.' },
     { href: '/faq', title: 'Questions', text: 'What STM does, the account risk, and how buying works.' },
-    { href: '/guide', title: 'Guide', text: 'Who it is for, every version it plays, and how to send feedback.' },
+    { href: '/guide', title: 'Guide', text: 'Who it is for, WoW Forever, how to install, and how to send feedback.' },
   ],
 } as const;
 
@@ -46,10 +49,10 @@ export const HERO = {
   titleKeyword: 'WoW accessibility addon',
   titleAfter: ' and leveling tool that plays the grind for you',
   lead:
-    'STM is a WoW accessibility addon and leveling tool that takes over the repetitive parts of World of Warcraft, so players with limited mobility, pain or little time can enjoy the whole adventure, all the way to max level.',
+    'STM is a WoW accessibility addon and leveling tool for WoW Forever. It takes over the repetitive parts, for Horde and Alliance, so players with limited mobility, pain or little time can enjoy the adventure, all the way to max level.',
   primaryCta: 'Buy STM',
   secondaryCta: 'See how it works',
-  trust: ['Every WoW version', 'Every race and class', 'Plays to max level', 'Telegram updates'],
+  trust: ['WoW Forever', 'Horde and Alliance', 'Plays to max level', 'Telegram updates'],
   // The proof line under it takes its number and words from stats.json ("xp-median").
   proofLead: 'Measured:',
   proofLink: 'See the numbers',
@@ -95,7 +98,7 @@ export const HOW = {
     },
     {
       title: "Choose your character's plan",
-      text: 'Pick any race and any class. FLEX covers grind leveling; GO and Founder also run gathering and crafting. Questing is coming soon.',
+      text: 'Pick a race and class that WoW Forever allows. FLEX covers grind leveling. GO and Founder also run a gathering and crafting pair. STM quests a level band when it has a route for it, and grinds when that band has none. Fishing is still coming soon.',
     },
     {
       title: 'Watch, take over, or check from your phone',
@@ -198,7 +201,7 @@ export const FEEDBACK = {
 export const FIGHTER = {
   eyebrow: 'Fighter',
   title: 'Build your fighter',
-  intro: 'Choose a warrior or a rogue, spend vanilla talent points, and name a vanilla armour set. The figure is not that set.',
+  intro: 'Turn a free warrior or rogue figure and name a vanilla armour set. The Forever talent calculator is its own page. The figure is not that set.',
   spec: 'Class',
   armour: 'Armour set',
   talents: 'Talents',

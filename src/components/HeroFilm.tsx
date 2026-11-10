@@ -3,28 +3,35 @@ import { PREFS_EVENT, motionReduced } from '../lib/prefs';
 
 const FILM = '/media/hero-film.mp4';
 const POSTER = '/media/hero-film-poster.jpg';
+const LABEL = 'Trailer made with AI (Grok Imagine). Not gameplay. STM is not affiliated with Blizzard Entertainment.';
 
 function savesData(): boolean {
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   return connection?.saveData === true;
 }
 
+function shouldHold(): boolean {
+  const wide = window.matchMedia('(min-width: 64rem)').matches;
+  return motionReduced() || savesData() || !wide;
+}
+
 /**
- * The film sits in its own frame. The figure in the picture is left of centre, so no text is laid on top of it.
- * The file has no audio. It is not requested when motion is reduced or data saver is on.
+ * The trailer stays a poster until it is allowed to play.
+ * Phones, reduced motion and data saver do not request the file until the visitor taps play.
+ * It starts muted. Sound waits for the unmute button.
  */
 export function HeroFilm() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hold, setHold] = useState(true);
-  const [playing, setPlaying] = useState(false);
+  const [showFilm, setShowFilm] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const decide = () => {
-      const wide = window.matchMedia('(min-width: 64rem)').matches;
-      const blocked = motionReduced() || savesData() || !wide;
-      setHold(blocked);
-      if (blocked) setPlaying(false);
-      else setPlaying(true);
+      if (shouldHold()) return;
+      setShowFilm(true);
+      setPaused(false);
+      setMuted(true);
     };
     decide();
     window.addEventListener(PREFS_EVENT, decide);
@@ -32,40 +39,67 @@ export function HeroFilm() {
   }, []);
 
   const play = () => {
-    if (motionReduced() || savesData()) return;
-    setPlaying(true);
+    setShowFilm(true);
+    setPaused(false);
     const video = videoRef.current;
-    if (video) void video.play();
+    if (video) {
+      video.muted = muted;
+      void video.play();
+    }
   };
+
   const pause = () => {
     videoRef.current?.pause();
-    setPlaying(false);
+    setPaused(true);
+  };
+
+  const toggleSound = () => {
+    const video = videoRef.current;
+    const next = !muted;
+    setMuted(next);
+    if (video) {
+      video.muted = next;
+      if (!next) video.loop = false;
+    }
   };
 
   return (
     <figure className="hero-film">
-      {playing ? (
+      {showFilm ? (
         <video
           ref={videoRef}
           className="hero-film-frame"
           poster={POSTER}
-          muted
+          muted={muted}
           playsInline
           autoPlay
-          loop
+          loop={muted}
           preload="none"
-          onPlay={() => setPlaying(true)}
+          onPlay={() => setPaused(false)}
+          onPause={() => setPaused(true)}
         >
           <source src={FILM} type="video/mp4" />
         </video>
       ) : (
-        <img className="hero-film-frame" src={POSTER} width={848} height={480} alt="A cloaked figure on a forest path" />
+        <img className="hero-film-frame film-still" src={POSTER} width={960} height={540} alt="AI trailer still: a host under the STM wordmark. Not gameplay." />
       )}
-      {hold ? null : (
-        <button type="button" className="hero-film-play" onClick={playing ? pause : play}>
-          {playing ? 'Pause' : 'Play'}
-        </button>
-      )}
+      <div className="hero-film-controls">
+        {showFilm && !paused ? (
+          <button type="button" className="hero-film-play" onClick={pause}>
+            Pause
+          </button>
+        ) : (
+          <button type="button" className="hero-film-play" onClick={play}>
+            Play trailer
+          </button>
+        )}
+        {showFilm ? (
+          <button type="button" className="hero-film-play" onClick={toggleSound}>
+            {muted ? 'Unmute' : 'Mute'}
+          </button>
+        ) : null}
+      </div>
+      <figcaption className="film-label">{LABEL}</figcaption>
     </figure>
   );
 }

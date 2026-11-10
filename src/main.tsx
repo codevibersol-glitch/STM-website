@@ -1,8 +1,10 @@
 // Fonts are self-hosted (bundled from @fontsource) and only the Latin subsets are shipped.
 import '@fontsource/atkinson-hyperlegible/latin-400.css';
 import '@fontsource/atkinson-hyperlegible/latin-700.css';
-// Headings. The variable font covers every weight in one file; the browser fetches only the Latin part here.
-import '@fontsource-variable/space-grotesk/wght.css';
+// Cinematic headings. Latin only, weights 800 and 900. Decorative black is for the wordmark on wide screens.
+import '@fontsource/cinzel/latin-800.css';
+import '@fontsource/cinzel/latin-900.css';
+import '@fontsource/cinzel-decorative/latin-900.css';
 // Declared for the toolbar's dyslexia-friendly font; the browser only downloads it once it is chosen.
 import '@fontsource/opendyslexic/latin-400.css';
 import '@fontsource/opendyslexic/latin-700.css';

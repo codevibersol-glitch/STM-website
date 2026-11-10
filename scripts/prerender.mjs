@@ -28,7 +28,7 @@ for (const marker of ['<!--app-html-->', `<script>${ssr.PREFS_SCRIPT}</script>`]
 // Preload the two faces of the first screen's text (headline and body), so it settles quickly.
 // Bold body text follows on its own; on slow phones it would only compete.
 const assets = await readdir(join(dist, 'assets'));
-const fontPatterns = [/^space-grotesk-latin-wght-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-700-normal-[\w-]+\.woff2$/];
+const fontPatterns = [/^cinzel-latin-900-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-400-normal-[\w-]+\.woff2$/, /^atkinson-hyperlegible-latin-700-normal-[\w-]+\.woff2$/];
 const preloads = fontPatterns
   .map((re) => assets.find((a) => re.test(a)))
   .filter(Boolean)
@@ -61,10 +61,21 @@ const pageMeta = {
     title: 'Play · STM',
     description: 'Working models of how STM plays: the route, the score, the map, the dashboard, the fight review and Telegram.',
   },
+  '/talents': {
+    title: 'Talents · STM',
+    description: 'WoW Forever talent calculator for all nine classes. Share a build. Leveling orders are planner popularity, not a measured route.',
+  },
+  '/new': {
+    title: "What's new · STM",
+    description: 'The STM update for WoW Forever: auto talents, a plan builder, the Windows installer, quest routes and profession pairs.',
+  },
+  '/install': {
+    title: 'Install · STM',
+    description: 'How to run STM-Setup.exe on Windows, including the unsigned-publisher warning, administrator rights and the first launch.',
+  },
   '/builder': {
     title: 'Builder · STM',
-    description:
-      'Build your fighter in STM, the WoW accessibility addon and leveling tool: pick a spec, take the armour set you trust, hold the fight with the talents you choose.',
+    description: 'Turn a free warrior or rogue figure and name a vanilla armour set. The figure is not a World of Warcraft model.',
   },
   '/characters': { title: 'Characters · STM', description: 'Character models in STM: gear, talents and spells, shown live on the dashboard of the WoW accessibility addon and leveling tool.' },
   '/pricing': { title: 'Pricing · STM', description: 'The STM plans: FLEX, GO and Founder, from the basic bot features to full access. Pay with card or crypto.' },
@@ -73,7 +84,7 @@ const pageMeta = {
   '/results': { title: 'Results · STM', description: 'The measured results of STM: XP per hour, hours of play, kills and analysed deaths in WoW.' },
   '/guide': {
     title: 'Guide · STM',
-    description: 'Who STM is for, every WoW version it plays, and how the accessibility addon and leveling tool helps.',
+    description: 'Who STM is for, how it plays WoW Forever, how to install it, and how the accessibility addon and leveling tool helps.',
   },
 };
 const withHead = (html, meta, path) =>

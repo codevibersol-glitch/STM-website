@@ -27,7 +27,7 @@ import { BETA_LABEL, BETA_REACH, CREDITS, DISCORD_HANDLE, EMAIL_SIGNUP, KLAVIYO_
 import type { NavItem } from '../data/copy';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
-import { setsFor } from '../data/talents';
+import { setsFor, type FighterClassId } from '../data/talents';
 import { DashboardDemo } from '../demos/DashboardDemo';
 import { CopyTemplate } from './CopyTemplate';
 import { Icon } from './Icon';
@@ -35,9 +35,9 @@ import { MapHero } from './MapHero';
 import { TiltCard, useCountUp } from './Motion';
 import { TelegramLink } from './TelegramLink';
 import { DiscordLink } from './DiscordLink';
+import { Embers } from './Embers';
 import { FighterScene } from './FighterScene';
 import { HeroFilm } from './HeroFilm';
-import { ClassChoices, PlanSummary, TalentTrees, useFighterPlan } from './TalentPlanner';
 import { Wordmark } from './Wordmark';
 
 interface SectionHeadProps {
@@ -89,6 +89,7 @@ export function Hero() {
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
       <MapHero />
+      <Embers />
       <div className="wrap hero-inner">
         <div className="hero-copy">
           <p className="kicker">
@@ -446,12 +447,12 @@ export function Pricing() {
  * this build into the duel; for now the builder holds the state in the browser and shows the hold.
  */
 export function Fighter() {
-  const [plan, setPlan] = useFighterPlan();
-  const [tierSetId, setTierSetId] = useState(setsFor(plan.classId)[0]!.id);
+  const [classId, setClassId] = useState<FighterClassId>('warrior');
+  const [tierSetId, setTierSetId] = useState(setsFor('warrior')[0]!.id);
   const [tab, setTab] = useState<FighterTabId>('armour');
-  const classSets = setsFor(plan.classId);
+  const classSets = setsFor(classId);
   const tierSet = classSets.find((set) => set.id === tierSetId) ?? classSets[0]!;
-  const specId = plan.classId === 'rogue' ? 'rogue-subtlety' : 'warrior-protection';
+  const specId = classId === 'rogue' ? 'rogue-subtlety' : 'warrior-protection';
 
   useEffect(() => {
     if (!classSets.some((set) => set.id === tierSetId)) setTierSetId(classSets[0]!.id);
@@ -498,14 +499,27 @@ export function Fighter() {
                 ))}
               </div>
             ) : null}
-            {tab === 'spec' ? <ClassChoices plan={plan} onChange={setPlan} /> : null}
-            {tab === 'talents' ? <TalentTrees plan={plan} onChange={setPlan} /> : null}
+            {tab === 'spec' ? (
+              <div className="planner-actions">
+                <button type="button" className="choice" aria-pressed={classId === 'warrior'} onClick={() => setClassId('warrior')}>
+                  Warrior
+                </button>
+                <button type="button" className="choice" aria-pressed={classId === 'rogue'} onClick={() => setClassId('rogue')}>
+                  Rogue
+                </button>
+              </div>
+            ) : null}
+            {tab === 'talents' ? (
+              <p>
+                The Forever trees for all nine classes are on the Talents page. This figure does not spend them.{' '}
+                <a href="/talents">Open the talent calculator</a>
+              </p>
+            ) : null}
             {tab === 'build' ? (
               <div className="fighter-summary">
                 <p>
                   {tierSet.name} is the armour name on this build. The figure is a free model for the class, not that set, and not a World of Warcraft model.
                 </p>
-                <PlanSummary plan={plan} />
               </div>
             ) : null}
           </div>
@@ -527,7 +541,7 @@ export function Characters() {
           id="characters-title"
           eyebrow="Characters"
           title="Your character on the dashboard"
-          intro="The figure is a free knight or rogue, not a World of Warcraft model. The name under it is the vanilla set the build holds. The dashboard below is a sample leveling run."
+          intro="The figure is a free knight or rogue, not a World of Warcraft model. The name under it is a vanilla armour name for that shape. The dashboard below is a sample leveling run."
         />
         <div className="characters" data-reveal>
           <FighterScene specId="warrior-protection" tierSetId="valor" />
