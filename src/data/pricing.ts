@@ -1,4 +1,5 @@
-// What STM costs, and how to buy it. STM is paid: there is no free version.
+// What STM costs, and how to buy it. Paid plans are FLEX, GO and Founder.
+// A separate grind-only try lasts trialDays and is not one of those plans.
 // Every price on the site comes from here. While a price is null the card says "Price on Telegram";
 // a price is never invented and never 0. To publish prices, set `currency` (e.g. 'USD') and the plans'
 // prices.
@@ -121,7 +122,8 @@ export function costAnswer(): string {
   const founder = formatPrice(plan('founder').price);
   const how = `You create an account on this site, pay with card (Stripe) or crypto to our BTC/ETH/BNB/SOL wallets (include the payment reference), then message ${TELEGRAM_HANDLE} on Telegram to receive the build. The license key on your account page unlocks the running bot.`;
   if (flex && go && founder) {
-    return `STM is paid. FLEX is ${flex} (a month) for grind only: walking, combat, loot, sell and repair — no professions. GO is ${go} (a month) for full access including professions, gathering and crafting. FOUNDER is ${founder} (one-time) for the same full access plus future access. ${how} There is no free version.`;
+    const trial = `A ${PRICING.trialDays}-day grind-only try is on the pricing page. It includes talents and stops after those days. It does not include questing, professions, or the auction.`;
+    return `STM is paid. FLEX is ${flex} (a month) for grind only: walking, combat, loot, sell and repair — no professions. GO is ${go} (a month) for full access including professions, gathering and crafting. FOUNDER is ${founder} (one-time) for the same full access plus future access. ${how} ${trial}`;
   }
-  return `STM is paid, with three plans from launch day. Create an account on this site to pay; message ${TELEGRAM_HANDLE} for the build. There is no free version.`;
+  return `STM is paid, with three plans from launch day. A ${PRICING.trialDays}-day grind-only try is on the pricing page. Create an account on this site to pay; message ${TELEGRAM_HANDLE} for the build.`;
 }

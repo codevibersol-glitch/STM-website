@@ -2,9 +2,9 @@
 
 export const BRAND = 'STM';
 
-/** The only contact the site itself writes, and the only outbound link in its own markup. */
-export const TELEGRAM_HANDLE = '@stm_addon';
-export const TELEGRAM_URL = 'https://t.me/stm_addon';
+/** Support, delivery and questions. The only contact the site itself writes. */
+export const TELEGRAM_HANDLE = '@HugeKush';
+export const TELEGRAM_URL = 'https://t.me/HugeKush';
 
 /** The same person, on Discord: this nickname is how people reach him for messages. */
 export const DISCORD_HANDLE = '@hugekush0222';

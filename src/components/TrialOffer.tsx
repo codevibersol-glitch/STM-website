@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from 'react';
 import { PRICING } from '../data/pricing';
+import { TELEGRAM_HANDLE } from '../data/site';
 import { api } from '../lib/api';
 
 const ERRORS: Record<string, string> = {
@@ -62,7 +63,7 @@ export function TrialOffer() {
         <p className="section-intro">
           Grinding only. Talents included. No questing, professions, or auction.
         </p>
-        <p>Message @HugeKush on Telegram for the download link.</p>
+        <p>{`Message ${TELEGRAM_HANDLE} on Telegram for the download link.`}</p>
         <div className="account-form">
           <label>
             Email

@@ -192,8 +192,9 @@ describe('honest claims', () => {
     }
     if (!published.length) expect(text).toContain('Price on Telegram');
     expect(PRICING.plans.every((p) => p.price === null || p.price > 0)).toBe(true);
-    expect(text).not.toMatch(/free early access|is it free|for free|free (plan|tier|trial|download)/i);
-    expect(text).toContain('There is no free version.');
+    expect(text).not.toMatch(/free early access|is it free|for free|free (plan|tier|download)/i);
+    expect(text).not.toContain('There is no free version.');
+    expect(text).toContain(`A ${PRICING.trialDays}-day grind-only try`);
   });
 
   it('makes no fake urgency: a plain end date, no countdown or scarcity', () => {
@@ -215,7 +216,7 @@ describe('honest claims', () => {
     expect(pricingPage).toContain('Message @HugeKush on Telegram for the download link.');
     expect(pricingPage).toContain('No questing, professions, or auction.');
     expect(pricingPage).not.toMatch(/href="[^"]*download/i);
-    expect(pricingPage).toContain('There is no free version.');
+    expect(pricingPage).not.toContain('There is no free version.');
   });
 
   it('takes every number on the page from stats.json (outside the sample-data models)', () => {

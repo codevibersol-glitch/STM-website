@@ -3,7 +3,7 @@
 
 import type { IconName } from '../components/Icon';
 import { PRICING } from './pricing';
-import { BETA_LABEL, BETA_REACH } from './site';
+import { BETA_LABEL, BETA_REACH, TELEGRAM_HANDLE } from './site';
 
 // Seven links at most: at the largest text size an eighth makes the header wrap to three rows, and the
 // accessibility menu then no longer fits on a laptop screen (a guardrail test checks the count).
@@ -132,7 +132,7 @@ export const TIME_BACK = {
 export const PRICING_COPY = {
   eyebrow: 'Pricing',
   title: 'Get STM: three plans, launch day',
-  intro: 'STM is paid software. FLEX is grind-only; GO and Founder unlock professions and the rest. Create an account, pay with card or crypto, then receive the build on Telegram with your license key. There is no free version.',
+  intro: `STM is paid software. FLEX is grind-only; GO and Founder unlock professions and the rest. A ${PRICING.trialDays}-day grind-only try is on this page. Create an account, pay with card or crypto, then receive the build on Telegram with your license key.`,
   ribbon: 'Grind + professions',
   priceOnTelegram: 'Price on Telegram',
   includesTitle: 'What you get',
@@ -171,7 +171,7 @@ export const FEEDBACK = {
   eyebrow: 'Feedback',
   title: 'Tell us what would help, on Telegram',
   intro:
-    'Questions before you buy, or ideas once you play? Feedback decides what STM builds next. Answer three short questions in your own words and send them to @stm_addon on Telegram.',
+    `Questions before you buy, or ideas once you play? Feedback decides what STM builds next. Answer three short questions in your own words and send them to ${TELEGRAM_HANDLE} on Telegram.`,
   prompts: [
     { title: 'Your situation', hint: 'How you play today, and what gets in the way.' },
     { title: "What's hard in WoW for you", hint: 'The moments that cost you the most effort, pain or time.' },

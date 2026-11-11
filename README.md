@@ -3,7 +3,7 @@
 The one-page site for **STM, the WoW accessibility addon and leveling tool**: one app that is both, for every version of
 the game (WoW Classic, Anniversary, Forever and Retail; Hardcore and Questing are coming soon), in beta, from the first
 level to max level. It presents and sells STM: paid, with a pre-sale until WoW: Forever launches on 4 November 2026.
-Buying, questions and feedback all go **through Telegram** ([@stm_addon](https://t.me/stm_addon)); the email sign-up for
+Buying, questions and feedback all go **through Telegram** ([@HugeKush](https://t.me/HugeKush)); the email sign-up for
 launch news is optional.
 It is built from [PROMPT.md](PROMPT.md); the rules for changing it are in [CLAUDE.md](CLAUDE.md).
 

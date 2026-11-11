@@ -25,7 +25,7 @@ import { GALLERY_COPY } from '../data/gallery';
 import { HOW_COPY, LOOP, MODELS, UNDER_THE_HOOD } from '../data/how';
 import { PRICING, billingWords, formatPrice } from '../data/pricing';
 import { SHOTS } from '../data/shots';
-import { CREDITS, EMAIL_SIGNUP, SITE_DESCRIPTION, SITE_TITLE, TELEGRAM_URL, TRADEMARK_NOTICE } from '../data/site';
+import { CREDITS, EMAIL_SIGNUP, SITE_DESCRIPTION, SITE_TITLE, TELEGRAM_HANDLE, TELEGRAM_URL, TRADEMARK_NOTICE } from '../data/site';
 import { RESULTS_LABEL, STATS, stat } from '../data/stats';
 import { COMING_SOON, VERSIONS, VERSIONS_COPY } from '../data/versions';
 
@@ -187,7 +187,7 @@ export function copyDeck(): string {
     '## Footer',
     '',
     `- ${FOOTER.tagline}`,
-    `- ${FOOTER.contact} @stm_addon`,
+    `- ${FOOTER.contact} ${TELEGRAM_HANDLE}`,
     `- ${FOOTER.privacy}`,
     `- ${TRADEMARK_NOTICE}`,
     `- ${CREDITS}`,
