@@ -17,11 +17,13 @@ import {
   normalizeTelegram,
   parseMajorAmount,
   parsePaidAt,
-  type CrmSource,
 } from '../lib/crm.ts';
+import { recordAudit } from '../lib/audit.ts';
+import { CrmEditError, updateBuyer } from '../lib/crmEdit.ts';
 import { activateEntitlement } from '../lib/entitlement.ts';
 import { hashPassword, id } from '../lib/ids.ts';
 import { isPlanId } from '../lib/plans.ts';
+import { mountCrmMutations } from './adminMutations.ts';
 
 const KNOWN = new Set([
   'invalid_telegram',
@@ -107,11 +109,9 @@ crmRoutes.get('/buyers/:userId', async (c) => {
 
 crmRoutes.patch('/buyers/:userId', async (c) => {
   const userId = c.req.param('userId');
-  const user = await db.select().from(users).where(eq(users.id, userId)).get();
-  if (!user) return c.json({ error: 'not_found' }, 404);
-
   const body = z
     .object({
+      email: z.string().email().max(200).optional(),
       telegramHandle: z.string().max(64).nullable().optional(),
       notes: z.string().max(4000).nullable().optional(),
       tags: z.union([z.string().max(700), z.array(z.string().max(32)).max(20)]).nullable().optional(),
@@ -121,27 +121,9 @@ crmRoutes.patch('/buyers/:userId', async (c) => {
   if (!body.success) return c.json({ error: 'invalid_body' }, 400);
 
   try {
-    const patch: {
-      telegramHandle?: string | null;
-      notes?: string | null;
-      tags?: string | null;
-      source?: CrmSource | null;
-    } = {};
-    if (body.data.telegramHandle !== undefined) {
-      patch.telegramHandle = normalizeTelegram(body.data.telegramHandle);
-    }
-    if (body.data.notes !== undefined) {
-      const notes = body.data.notes?.trim() ?? '';
-      patch.notes = notes ? notes : null;
-    }
-    if (body.data.tags !== undefined) {
-      patch.tags = body.data.tags == null ? null : normalizeTags(body.data.tags);
-    }
-    if (body.data.source !== undefined) {
-      patch.source = body.data.source;
-    }
-    await saveProfile(userId, patch);
+    await updateBuyer(userId, body.data, c.get('user').email, 'patch');
   } catch (err) {
+    if (err instanceof CrmEditError) return c.json({ error: err.message }, err.status);
     const code = err instanceof Error ? err.message : '';
     if (KNOWN.has(code)) return c.json({ error: code }, 400);
     throw err;
@@ -220,6 +202,22 @@ crmRoutes.post('/manual-sale', async (c) => {
   });
 
   const licenseKey = result.duplicate ? null : result.license.key;
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'buyer.manual_sale',
+    entityType: 'user',
+    entityId: user.id,
+    userId: user.id,
+    oldValue: { createdUser },
+    newValue: {
+      email: user.email,
+      plan: body.data.plan,
+      amountCents,
+      currency: body.data.currency.trim().toLowerCase(),
+      paidAt: paidAt.toISOString(),
+      licenseKey,
+    },
+  });
   return c.json({
     ok: true,
     createdUser,
@@ -234,3 +232,5 @@ crmRoutes.post('/manual-sale', async (c) => {
     licenseKey,
   });
 });
+
+mountCrmMutations(crmRoutes);

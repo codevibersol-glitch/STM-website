@@ -111,6 +111,7 @@ describe('crm stats', () => {
         createdAt: at('2026-10-20T00:00:00.000Z'),
       },
     ],
+    auditLogs: [],
   };
 
   const { stats, buyers } = computeCrm(snapshot, NOW);
@@ -293,6 +294,7 @@ describe('migration', () => {
     assert.doesNotMatch(src, /DROP\s+(TABLE|COLUMN)/i);
     assert.match(src, /CREATE TABLE IF NOT EXISTS customer_profiles/);
     assert.match(src, /CREATE TABLE IF NOT EXISTS subscription_events/);
+    assert.match(src, /CREATE TABLE IF NOT EXISTS audit_log/);
     assert.match(src, /INSERT INTO subscription_events/);
   });
 });

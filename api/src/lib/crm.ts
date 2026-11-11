@@ -1,5 +1,6 @@
 import { db } from '../db/index.ts';
 import {
+  auditLog,
   cryptoPayments,
   customerProfiles,
   licenses,
@@ -105,8 +106,20 @@ export type CrmSnapshot = {
     amountCents: number;
     currency: string;
     reference: string;
+    preferredAsset?: string | null;
     createdAt: Date;
     confirmedAt: Date | null;
+  }[];
+  auditLogs: {
+    id: string;
+    actorEmail: string;
+    action: string;
+    entityType: string;
+    entityId: string | null;
+    userId: string | null;
+    oldJson: string | null;
+    newJson: string | null;
+    createdAt: Date;
   }[];
   profiles: {
     userId: string;
@@ -146,6 +159,29 @@ export function maskLicenseKey(key: string | null | undefined): string | null {
   }
   if (key.length <= 8) return '********';
   return `${key.slice(0, 4)}…${key.slice(-4)}`;
+}
+
+const SECRET_FIELDS = new Set(['password', 'passwordHash', 'sessionToken', 'session']);
+const LICENSE_KEY = /STM-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}/g;
+
+/** Strip secrets and replace any STM license key with its masked form. */
+export function redactSecrets(value: unknown): unknown {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === 'string') return value.replace(LICENSE_KEY, (key) => maskLicenseKey(key) ?? key);
+  if (Array.isArray(value)) return value.map((item) => redactSecrets(item));
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+      if (SECRET_FIELDS.has(key)) continue;
+      if (key === 'key' || key === 'licenseKey') {
+        out[key === 'key' ? 'keyMasked' : 'licenseKeyMasked'] = maskLicenseKey(typeof item === 'string' ? item : null);
+        continue;
+      }
+      out[key] = redactSecrets(item);
+    }
+    return out;
+  }
+  return value;
 }
 
 export function isCrmSource(value: string): value is CrmSource {
@@ -675,7 +711,7 @@ function csvCell(value: string): string {
 }
 
 export async function loadCrmSnapshot(): Promise<CrmSnapshot> {
-  const [userRows, subscriptionRows, licenseRows, paymentRows, cryptoRows, profileRows, trialRows, eventRows] =
+  const [userRows, subscriptionRows, licenseRows, paymentRows, cryptoRows, profileRows, trialRows, eventRows, auditRows] =
     await Promise.all([
       db.select().from(users).all(),
       db.select().from(subscriptions).all(),
@@ -685,6 +721,7 @@ export async function loadCrmSnapshot(): Promise<CrmSnapshot> {
       db.select().from(customerProfiles).all(),
       db.select().from(trialRequests).all(),
       db.select().from(subscriptionEvents).all(),
+      db.select().from(auditLog).all(),
     ]);
 
   return {
@@ -727,6 +764,7 @@ export async function loadCrmSnapshot(): Promise<CrmSnapshot> {
       amountCents: row.amountCents,
       currency: row.currency,
       reference: row.reference,
+      preferredAsset: row.preferredAsset,
       createdAt: row.createdAt,
       confirmedAt: row.confirmedAt,
     })),
@@ -749,6 +787,17 @@ export async function loadCrmSnapshot(): Promise<CrmSnapshot> {
       source: row.source,
       createdAt: row.createdAt,
     })),
+    auditLogs: auditRows.map((row) => ({
+      id: row.id,
+      actorEmail: row.actorEmail,
+      action: row.action,
+      entityType: row.entityType,
+      entityId: row.entityId,
+      userId: row.userId,
+      oldJson: row.oldJson,
+      newJson: row.newJson,
+      createdAt: row.createdAt,
+    })),
   };
 }
 
@@ -765,6 +814,7 @@ export function snapshotForUsers(snapshot: CrmSnapshot, userIds: Set<string>): C
     profiles: snapshot.profiles.filter((row) => userIds.has(row.userId)),
     trialRequests: snapshot.trialRequests.filter((row) => emails.has(row.email.trim().toLowerCase())),
     events: snapshot.events.filter((row) => userIds.has(row.userId)),
+    auditLogs: (snapshot.auditLogs ?? []).filter((row) => row.userId != null && userIds.has(row.userId)),
   };
 }
 
@@ -804,6 +854,7 @@ export function buyerDetail(snapshot: CrmSnapshot, userId: string, now = new Dat
       amountCents: payment.amountCents,
       currency: payment.currency,
       reference: payment.reference,
+      preferredAsset: payment.preferredAsset ?? null,
       createdAt: payment.createdAt.toISOString(),
       confirmedAt: iso(payment.confirmedAt),
     })),
@@ -829,5 +880,27 @@ export function buyerDetail(snapshot: CrmSnapshot, userId: string, now = new Dat
         source: event.source,
         createdAt: event.createdAt.toISOString(),
       })),
+    audit: (scoped.auditLogs ?? [])
+      .slice()
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((row) => ({
+        id: row.id,
+        actorEmail: row.actorEmail,
+        action: row.action,
+        entityType: row.entityType,
+        entityId: row.entityId,
+        old: unpackAudit(row.oldJson),
+        new: unpackAudit(row.newJson),
+        createdAt: row.createdAt.toISOString(),
+      })),
   };
+}
+
+function unpackAudit(value: string | null): unknown {
+  if (!value) return null;
+  try {
+    return redactSecrets(JSON.parse(value) as unknown);
+  } catch {
+    return redactSecrets(value);
+  }
 }

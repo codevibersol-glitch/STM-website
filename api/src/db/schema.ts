@@ -107,7 +107,23 @@ export const subscriptionEvents = sqliteTable('subscription_events', {
   plan: text('plan').notNull(),
   status: text('status').notNull(),
   provider: text('provider').notNull(),
-  /** activate | trial | trial_start | status | revoke | set_period | snapshot */
+  /** activate | trial | trial_start | status | revoke | set_period | snapshot | edit | extend | cancel | reactivate */
   source: text('source').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/**
+ * Append-only admin audit. No foreign key, so a row survives buyer deletion.
+ * old_json / new_json never store a full license key.
+ */
+export const auditLog = sqliteTable('audit_log', {
+  id: text('id').primaryKey(),
+  actorEmail: text('actor_email').notNull(),
+  action: text('action').notNull(),
+  entityType: text('entity_type').notNull(),
+  entityId: text('entity_id'),
+  userId: text('user_id'),
+  oldJson: text('old_json'),
+  newJson: text('new_json'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });

@@ -148,6 +148,8 @@
       .wrap { overflow-x: auto; }
       .notes { min-height: 5rem; font-family: inherit; }
       .pill { border-color: var(--accent); color: var(--accent); }
+      h3 { margin: 1.15rem 0 0.4rem; font-size: 1.02rem; }
+      .mini { min-height: 2.15rem; padding: 0.3rem 0.45rem; }
     </style>
   </head>
   <body>
@@ -211,6 +213,33 @@
             <button class="btn-ghost" type="button" id="refresh-crm">Refresh</button>
           </div>
         </div>
+        <form id="create-buyer" class="filters" style="margin-top: 0.9rem;">
+          <label>New buyer email
+            <input id="new-email" type="email" autocomplete="off" />
+          </label>
+          <label>Telegram
+            <input id="new-telegram" placeholder="@handle" autocomplete="off" />
+          </label>
+          <label>Source
+            <select id="new-source">
+              <option value="">—</option>
+              <option value="telegram">Telegram</option>
+              <option value="website">Website</option>
+              <option value="reddit">Reddit</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>Tags
+            <input id="new-tags" placeholder="vip, eu" autocomplete="off" />
+          </label>
+          <label>Notes
+            <input id="new-notes" autocomplete="off" />
+          </label>
+        </form>
+        <div class="row">
+          <button class="btn-gold" type="button" id="new-buyer">Create buyer</button>
+          <p id="new-buyer-msg" class="ok hidden"></p>
+        </div>
         <form id="buyer-filters" class="filters" style="margin-top: 0.9rem;">
           <label>Search
             <input id="filter-q" type="search" placeholder="email, telegram, notes, tags" />
@@ -272,6 +301,9 @@
         </div>
         <p class="muted" id="detail-key"></p>
         <form id="profile-form" class="filters">
+          <label>Email
+            <input id="profile-email" type="email" autocomplete="off" required />
+          </label>
           <label>Telegram
             <input id="profile-telegram" autocomplete="off" placeholder="@handle" />
           </label>
@@ -313,6 +345,120 @@
           <button class="btn-ghost" type="button" id="detail-unbind">Unbind PC</button>
           <button class="btn-danger" type="button" id="detail-revoke">Revoke</button>
         </div>
+        <h3>Subscription</h3>
+        <p id="sub-empty" class="muted hidden">No subscription yet.</p>
+        <form id="sub-form" class="filters">
+          <label>Plan
+            <select id="sub-plan">
+              <option value="trial">Trial</option>
+              <option value="flex">FLEX</option>
+              <option value="go">GO</option>
+              <option value="founder">Founder</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="sub-status">
+              <option value="active">Active</option>
+              <option value="past_due">Past due</option>
+              <option value="canceled">Canceled</option>
+              <option value="expired">Expired</option>
+            </select>
+          </label>
+          <label>Provider
+            <select id="sub-provider">
+              <option value="manual">Manual</option>
+              <option value="stripe">Stripe</option>
+              <option value="crypto">Crypto</option>
+              <option value="nowpayments">NOWPayments</option>
+              <option value="trial">Trial</option>
+            </select>
+          </label>
+          <label>Period end
+            <input id="sub-end" type="datetime-local" />
+          </label>
+          <label>Days
+            <input id="sub-days" type="number" min="1" max="3660" value="7" />
+          </label>
+          <label>Convert trial to
+            <select id="convert-plan">
+              <option value="flex">FLEX</option>
+              <option value="go" selected>GO</option>
+              <option value="founder">Founder</option>
+            </select>
+          </label>
+        </form>
+        <div class="row">
+          <button class="btn-gold" type="button" id="sub-save">Save subscription</button>
+          <button class="btn-ghost" type="button" id="sub-create">Create subscription</button>
+          <button class="btn-ghost" type="button" id="sub-extend">Extend by days</button>
+          <button class="btn-ghost" type="button" id="sub-cancel">Cancel</button>
+          <button class="btn-ghost" type="button" id="sub-reactivate">Reactivate</button>
+          <button class="btn-gold" type="button" id="sub-convert">Convert trial to paid</button>
+        </div>
+        <h3>Add payment</h3>
+        <p class="muted">Ledger row only. It does not activate a plan. Use manual sale or convert trial for that.</p>
+        <form id="pay-form" class="filters">
+          <label>Amount
+            <input id="pay-amount" inputmode="decimal" placeholder="45.00" />
+          </label>
+          <label>Currency
+            <input id="pay-currency" value="eur" maxlength="8" />
+          </label>
+          <label>Plan
+            <select id="pay-plan">
+              <option value="flex">FLEX</option>
+              <option value="go" selected>GO</option>
+              <option value="founder">Founder</option>
+              <option value="trial">Trial</option>
+            </select>
+          </label>
+          <label>Provider
+            <select id="pay-provider">
+              <option value="manual" selected>Manual</option>
+              <option value="stripe">Stripe</option>
+              <option value="crypto">Crypto</option>
+              <option value="nowpayments">NOWPayments</option>
+            </select>
+          </label>
+          <label>Date
+            <input id="pay-date" type="date" />
+          </label>
+        </form>
+        <button class="btn-gold" type="button" id="pay-add">Add payment</button>
+        <h3>Add crypto payment</h3>
+        <form id="crypto-form" class="filters">
+          <label>Amount
+            <input id="crypto-amount" inputmode="decimal" placeholder="45.00" />
+          </label>
+          <label>Currency
+            <input id="crypto-currency" value="eur" maxlength="8" />
+          </label>
+          <label>Plan
+            <select id="crypto-plan">
+              <option value="flex">FLEX</option>
+              <option value="go" selected>GO</option>
+              <option value="founder">Founder</option>
+            </select>
+          </label>
+          <label>Asset
+            <select id="crypto-asset">
+              <option value="btc">BTC</option>
+              <option value="eth">ETH</option>
+              <option value="bnb">BNB</option>
+              <option value="sol">SOL</option>
+            </select>
+          </label>
+          <label>Date
+            <input id="crypto-date" type="date" />
+          </label>
+        </form>
+        <button class="btn-gold" type="button" id="crypto-add">Add pending crypto</button>
+        <h3>Delete buyer</h3>
+        <p class="muted">Type the email exactly, then delete. This removes the account, licenses, subscriptions, and payments.</p>
+        <label>Confirm email
+          <input id="delete-email" autocomplete="off" />
+        </label>
+        <button class="btn-danger" type="button" id="delete-buyer">Delete buyer</button>
         <div id="detail-panels"></div>
       </section>
 
@@ -575,7 +721,24 @@
               btn.disabled = false;
             }
           };
+          const reject = document.createElement('button');
+          reject.type = 'button';
+          reject.className = 'btn-danger';
+          reject.textContent = 'Reject';
+          reject.onclick = async () => {
+            if (!confirm(`Reject crypto payment for ${p.email || p.userId}? This does not activate a plan.`)) return;
+            reject.disabled = true;
+            try {
+              await api('/admin/crm/crypto-payments/' + p.id + '/reject', { method: 'POST', body: '{}' });
+              await Promise.all([loadCrypto(), refreshCrm()]);
+            } catch (err) {
+              alert(err.message || String(err));
+              reject.disabled = false;
+            }
+          };
           tr.lastElementChild.appendChild(btn);
+          tr.lastElementChild.appendChild(document.createTextNode(' '));
+          tr.lastElementChild.appendChild(reject);
           body.appendChild(tr);
         }
       }
@@ -659,6 +822,7 @@
         sort: 'createdAt',
         dir: 'desc',
         selected: null,
+        subscriptionId: null,
       };
       const COLUMNS = [
         ['email', 'Email'],
@@ -907,6 +1071,279 @@
         return wrap;
       }
 
+      function planSelect(value, includeTrial) {
+        const select = document.createElement('select');
+        select.className = 'mini';
+        const options = includeTrial ? ['trial', 'flex', 'go', 'founder'] : ['flex', 'go', 'founder'];
+        for (const plan of options) {
+          const option = document.createElement('option');
+          option.value = plan;
+          option.textContent = plan;
+          if (plan === value) option.selected = true;
+          select.appendChild(option);
+        }
+        return select;
+      }
+
+      function statusSelect(value) {
+        const select = document.createElement('select');
+        select.className = 'mini';
+        for (const status of ['active', 'revoked']) {
+          const option = document.createElement('option');
+          option.value = status;
+          option.textContent = status;
+          if (status === value) option.selected = true;
+          select.appendChild(option);
+        }
+        return select;
+      }
+
+      function brief(value) {
+        if (value == null) return '';
+        const text = typeof value === 'string' ? value : JSON.stringify(value);
+        return text.length > 180 ? text.slice(0, 177) + '…' : text;
+      }
+
+      function periodValue() {
+        const raw = $('sub-end').value;
+        return raw ? new Date(raw).toISOString() : null;
+      }
+
+      function dateOrEmpty(id) {
+        const raw = $(id).value;
+        return raw ? new Date(raw + 'T12:00:00.000Z').toISOString() : undefined;
+      }
+
+      async function reloadBuyer() {
+        if (!crmState.selected) return;
+        await Promise.all([loadUsers(), refreshCrm(), openBuyer(crmState.selected)]);
+      }
+
+      function renderLicenses(rows) {
+        const wrap = document.createElement('div');
+        const h = document.createElement('h3');
+        h.textContent = 'Licenses';
+        wrap.appendChild(h);
+        if (!rows.length) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'None';
+          wrap.appendChild(p);
+          return wrap;
+        }
+        for (const row of rows) {
+          const line = document.createElement('div');
+          line.className = 'filters';
+          line.style.marginTop = '0.45rem';
+          const key = document.createElement('div');
+          key.innerHTML = '<code>' + esc(row.keyMasked || '—') + '</code><div class="muted">machine ' + (row.machineBound ? 'yes' : 'no') + ' · ' + esc(relTime(row.lastSeenAt)) + '</div>';
+          const plan = planSelect(row.plan, true);
+          const status = statusSelect(row.status);
+          line.appendChild(key);
+          line.appendChild(plan);
+          line.appendChild(status);
+          const actions = document.createElement('div');
+          actions.className = 'row';
+          const save = document.createElement('button');
+          save.type = 'button';
+          save.className = 'btn-ghost';
+          save.textContent = 'Save license';
+          save.onclick = async () => {
+            await api('/admin/crm/licenses/' + row.id, {
+              method: 'PATCH',
+              body: JSON.stringify({ status: status.value, plan: plan.value }),
+            });
+            await reloadBuyer();
+          };
+          const unbind = document.createElement('button');
+          unbind.type = 'button';
+          unbind.className = 'btn-ghost';
+          unbind.textContent = 'Unbind';
+          unbind.onclick = async () => {
+            if (!confirm('Unbind this license from its PC?')) return;
+            await api('/admin/crm/licenses/' + row.id + '/unbind', { method: 'POST', body: '{}' });
+            await reloadBuyer();
+          };
+          const revoke = document.createElement('button');
+          revoke.type = 'button';
+          revoke.className = 'btn-danger';
+          revoke.textContent = 'Revoke';
+          revoke.onclick = async () => {
+            if (!confirm('Revoke this key? It stops working.')) return;
+            await api('/admin/crm/licenses/' + row.id + '/revoke', { method: 'POST', body: '{}' });
+            await reloadBuyer();
+          };
+          const reissue = document.createElement('button');
+          reissue.type = 'button';
+          reissue.className = 'btn-gold';
+          reissue.textContent = 'Reissue key';
+          reissue.onclick = async () => {
+            if (!confirm('Issue a new key? The old key stops working. Copy the new key from the box above.')) return;
+            const data = await api('/admin/crm/licenses/' + row.id + '/reissue', { method: 'POST', body: '{}' });
+            showResult(data.licenseKey, 'New key issued. Lists and the audit log stay masked.');
+            await reloadBuyer();
+          };
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn-danger';
+          remove.textContent = 'Delete';
+          remove.onclick = async () => {
+            if (!confirm('Delete this license row?')) return;
+            await api('/admin/crm/licenses/' + row.id, { method: 'DELETE', body: JSON.stringify({ confirm: 'delete' }) });
+            await reloadBuyer();
+          };
+          for (const button of [save, unbind, revoke, reissue, remove]) actions.appendChild(button);
+          line.appendChild(actions);
+          wrap.appendChild(line);
+        }
+        return wrap;
+      }
+
+      function renderPayments(rows) {
+        const wrap = document.createElement('div');
+        const h = document.createElement('h3');
+        h.textContent = 'Payments';
+        wrap.appendChild(h);
+        if (!rows.length) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'None';
+          wrap.appendChild(p);
+          return wrap;
+        }
+        for (const row of rows) {
+          const line = document.createElement('div');
+          line.className = 'filters';
+          line.style.marginTop = '0.45rem';
+          const amount = document.createElement('input');
+          amount.className = 'mini';
+          amount.value = (row.amountCents / 100).toFixed(2);
+          const currency = document.createElement('input');
+          currency.className = 'mini';
+          currency.value = row.currency;
+          const plan = planSelect(row.plan, true);
+          const provider = document.createElement('input');
+          provider.className = 'mini';
+          provider.value = row.provider;
+          const date = document.createElement('input');
+          date.type = 'date';
+          date.className = 'mini';
+          date.value = String(row.createdAt).slice(0, 10);
+          const save = document.createElement('button');
+          save.type = 'button';
+          save.className = 'btn-ghost';
+          save.textContent = 'Save';
+          save.onclick = async () => {
+            await api('/admin/crm/payments/' + row.id, {
+              method: 'PUT',
+              body: JSON.stringify({
+                amount: amount.value,
+                currency: currency.value,
+                plan: plan.value,
+                provider: provider.value,
+                createdAt: new Date(date.value + 'T12:00:00.000Z').toISOString(),
+              }),
+            });
+            await reloadBuyer();
+          };
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn-danger';
+          remove.textContent = 'Delete';
+          remove.onclick = async () => {
+            if (!confirm('Delete this payment row? This does not change the license.')) return;
+            await api('/admin/crm/payments/' + row.id, { method: 'DELETE', body: JSON.stringify({ confirm: 'delete' }) });
+            await reloadBuyer();
+          };
+          for (const node of [amount, currency, plan, provider, date, save, remove]) line.appendChild(node);
+          wrap.appendChild(line);
+        }
+        return wrap;
+      }
+
+      function renderCrypto(rows) {
+        const wrap = document.createElement('div');
+        const h = document.createElement('h3');
+        h.textContent = 'Crypto payments';
+        wrap.appendChild(h);
+        if (!rows.length) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'None';
+          wrap.appendChild(p);
+          return wrap;
+        }
+        for (const row of rows) {
+          const line = document.createElement('div');
+          line.className = 'filters';
+          line.style.marginTop = '0.45rem';
+          const amount = document.createElement('input');
+          amount.className = 'mini';
+          amount.value = (row.amountCents / 100).toFixed(2);
+          const currency = document.createElement('input');
+          currency.className = 'mini';
+          currency.value = row.currency;
+          const plan = planSelect(row.plan, false);
+          const date = document.createElement('input');
+          date.type = 'date';
+          date.className = 'mini';
+          date.value = String(row.createdAt).slice(0, 10);
+          const label = document.createElement('div');
+          label.className = 'muted';
+          label.textContent = row.status + ' · ' + row.reference;
+          const save = document.createElement('button');
+          save.type = 'button';
+          save.className = 'btn-ghost';
+          save.textContent = 'Save';
+          save.onclick = async () => {
+            await api('/admin/crm/crypto-payments/' + row.id, {
+              method: 'PUT',
+              body: JSON.stringify({
+                amount: amount.value,
+                currency: currency.value,
+                plan: plan.value,
+                provider: 'crypto',
+                createdAt: new Date(date.value + 'T12:00:00.000Z').toISOString(),
+              }),
+            });
+            await reloadBuyer();
+          };
+          const confirmBtn = document.createElement('button');
+          confirmBtn.type = 'button';
+          confirmBtn.className = 'btn-gold';
+          confirmBtn.textContent = 'Confirm';
+          confirmBtn.disabled = row.status !== 'pending';
+          confirmBtn.onclick = async () => {
+            if (!confirm('Confirm this crypto payment and activate the plan?')) return;
+            const data = await api('/admin/crm/crypto-payments/' + row.id + '/confirm', { method: 'POST', body: '{}' });
+            if (data.licenseKey) showResult(data.licenseKey, 'Crypto confirmed. Copy the key now; the audit log stores it masked.');
+            await Promise.all([loadCrypto(), reloadBuyer()]);
+          };
+          const reject = document.createElement('button');
+          reject.type = 'button';
+          reject.className = 'btn-danger';
+          reject.textContent = 'Reject';
+          reject.disabled = row.status !== 'pending';
+          reject.onclick = async () => {
+            if (!confirm('Reject this pending crypto payment?')) return;
+            await api('/admin/crm/crypto-payments/' + row.id + '/reject', { method: 'POST', body: '{}' });
+            await Promise.all([loadCrypto(), reloadBuyer()]);
+          };
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'btn-danger';
+          remove.textContent = 'Delete';
+          remove.onclick = async () => {
+            if (!confirm('Delete this crypto row? A confirmed payment stays entitled until you revoke it.')) return;
+            await api('/admin/crm/crypto-payments/' + row.id, { method: 'DELETE', body: JSON.stringify({ confirm: 'delete' }) });
+            await Promise.all([loadCrypto(), reloadBuyer()]);
+          };
+          for (const node of [label, amount, currency, plan, date, save, confirmBtn, reject, remove]) line.appendChild(node);
+          wrap.appendChild(line);
+        }
+        return wrap;
+      }
+
       async function openBuyer(userId) {
         crmState.selected = userId;
         const data = await api('/admin/crm/buyers/' + userId);
@@ -914,21 +1351,32 @@
         show($('detail-card'), true);
         $('detail-title').textContent = buyer.email;
         $('detail-key').textContent = 'License ' + (buyer.licenseKeyMasked || '—') + ' · masked in this view';
+        $('profile-email').value = buyer.email;
         $('profile-telegram').value = buyer.telegramHandle ? '@' + buyer.telegramHandle : '';
         $('profile-source').value = buyer.source || '';
         $('profile-tags').value = (buyer.tags || []).join(', ');
         $('profile-notes').value = buyer.notes || '';
+        $('delete-email').value = '';
         $('detail-plan').value = buyer.plan === 'flex' || buyer.plan === 'go' || buyer.plan === 'founder' ? buyer.plan : 'go';
+        const sub = data.subscription;
+        crmState.subscriptionId = sub?.id || null;
+        show($('sub-empty'), !sub);
+        show($('sub-save'), !!sub);
+        show($('sub-create'), !sub);
+        $('sub-plan').value = sub?.plan || 'go';
+        $('sub-status').value = sub?.status || 'active';
+        $('sub-provider').value = sub?.provider || 'manual';
+        $('sub-end').value = sub?.currentPeriodEnd ? String(sub.currentPeriodEnd).slice(0, 16) : '';
         const panels = $('detail-panels');
         panels.innerHTML = '';
-        panels.appendChild(panelTable('Licenses', ['Key', 'Plan', 'Status', 'Machine', 'Last bot'], (data.licenses || []).map((row) => [
-          row.keyMasked, row.plan, row.status, row.machineBound ? 'yes' : 'no', relTime(row.lastSeenAt),
-        ])));
-        panels.appendChild(panelTable('Payments', ['When', 'Provider', 'Plan', 'Amount'], (data.payments || []).map((row) => [
-          when(row.createdAt), row.provider, row.plan, (row.amountCents / 100).toFixed(2) + ' ' + String(row.currency).toUpperCase(),
-        ])));
+        panels.appendChild(renderLicenses(data.licenses || []));
+        panels.appendChild(renderPayments(data.payments || []));
+        panels.appendChild(renderCrypto(data.cryptoPayments || []));
         panels.appendChild(panelTable('Subscription history', ['When', 'Source', 'Plan', 'Status', 'Provider'], (data.history || []).map((row) => [
           when(row.createdAt), row.source, row.plan, row.status, row.provider,
+        ])));
+        panels.appendChild(panelTable('Audit log', ['When', 'Who', 'What', 'Old', 'New'], (data.audit || []).map((row) => [
+          when(row.createdAt), row.actorEmail, row.action, brief(row.old), brief(row.new),
         ])));
         $('detail-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
         loadBuyers().catch(() => {});
@@ -969,6 +1417,7 @@
         await api('/admin/crm/buyers/' + crmState.selected, {
           method: 'PATCH',
           body: JSON.stringify({
+            email: $('profile-email').value,
             telegramHandle: $('profile-telegram').value,
             notes: $('profile-notes').value,
             tags: $('profile-tags').value,
@@ -1031,6 +1480,172 @@
         } catch (err) {
           $('sale-error').textContent = err.message || String(err);
           show($('sale-error'), true);
+        }
+      });
+
+      for (const id of ['create-buyer', 'profile-form', 'sub-form', 'pay-form', 'crypto-form']) {
+        $(id).addEventListener('submit', (event) => event.preventDefault());
+      }
+      $('pay-date').value = new Date().toISOString().slice(0, 10);
+      $('crypto-date').value = new Date().toISOString().slice(0, 10);
+
+      $('new-buyer').addEventListener('click', async () => {
+        show($('new-buyer-msg'), false);
+        try {
+          const data = await api('/admin/crm/buyers', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: $('new-email').value,
+              telegramHandle: $('new-telegram').value || null,
+              source: $('new-source').value || null,
+              tags: $('new-tags').value || null,
+              notes: $('new-notes').value || null,
+            }),
+          });
+          $('new-buyer-msg').textContent = 'Created ' + data.email;
+          show($('new-buyer-msg'), true);
+          $('create-buyer').reset();
+          await refreshCrm();
+          await openBuyer(data.userId);
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+
+      async function subBody() {
+        return {
+          plan: $('sub-plan').value,
+          status: $('sub-status').value,
+          provider: $('sub-provider').value,
+          currentPeriodEnd: periodValue(),
+        };
+      }
+
+      $('sub-save').addEventListener('click', async () => {
+        if (!crmState.subscriptionId) return;
+        try {
+          await api('/admin/crm/subscriptions/' + crmState.subscriptionId, {
+            method: 'PUT',
+            body: JSON.stringify(await subBody()),
+          });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('sub-create').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        try {
+          await api('/admin/crm/subscriptions', {
+            method: 'POST',
+            body: JSON.stringify({ userId: crmState.selected, ...(await subBody()) }),
+          });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('sub-extend').addEventListener('click', async () => {
+        if (!crmState.subscriptionId) return;
+        const days = Number($('sub-days').value);
+        if (!confirm('Extend this subscription by ' + days + ' days?')) return;
+        try {
+          await api('/admin/crm/subscriptions/' + crmState.subscriptionId + '/extend', {
+            method: 'POST',
+            body: JSON.stringify({ days }),
+          });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('sub-cancel').addEventListener('click', async () => {
+        if (!crmState.subscriptionId || !confirm('Cancel this subscription? The bot stops until you reactivate.')) return;
+        try {
+          await api('/admin/crm/subscriptions/' + crmState.subscriptionId + '/cancel', { method: 'POST', body: '{}' });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('sub-reactivate').addEventListener('click', async () => {
+        if (!crmState.subscriptionId || !confirm('Reactivate this subscription?')) return;
+        try {
+          await api('/admin/crm/subscriptions/' + crmState.subscriptionId + '/reactivate', {
+            method: 'POST',
+            body: JSON.stringify({ days: Number($('sub-days').value) }),
+          });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('sub-convert').addEventListener('click', async () => {
+        if (!crmState.subscriptionId || !confirm('Convert this trial to a paid plan and record a manual payment?')) return;
+        try {
+          const data = await api('/admin/crm/subscriptions/' + crmState.subscriptionId + '/convert-trial', {
+            method: 'POST',
+            body: JSON.stringify({ plan: $('convert-plan').value }),
+          });
+          if (data.licenseKey) showResult(data.licenseKey, 'Trial converted. Copy the key now; the audit log stores it masked.');
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('pay-add').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        try {
+          await api('/admin/crm/payments', {
+            method: 'POST',
+            body: JSON.stringify({
+              userId: crmState.selected,
+              amount: $('pay-amount').value,
+              currency: $('pay-currency').value,
+              plan: $('pay-plan').value,
+              provider: $('pay-provider').value,
+              createdAt: dateOrEmpty('pay-date'),
+            }),
+          });
+          await reloadBuyer();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('crypto-add').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        try {
+          await api('/admin/crm/crypto-payments', {
+            method: 'POST',
+            body: JSON.stringify({
+              userId: crmState.selected,
+              amount: $('crypto-amount').value,
+              currency: $('crypto-currency').value,
+              plan: $('crypto-plan').value,
+              provider: 'crypto',
+              preferredAsset: $('crypto-asset').value,
+              createdAt: dateOrEmpty('crypto-date'),
+            }),
+          });
+          await Promise.all([loadCrypto(), reloadBuyer()]);
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('delete-buyer').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        const email = $('delete-email').value.trim();
+        if (!email || !confirm('Delete ' + email + ' and their licenses and payments?')) return;
+        try {
+          await api('/admin/crm/buyers/' + crmState.selected, {
+            method: 'DELETE',
+            body: JSON.stringify({ confirmEmail: email }),
+          });
+          crmState.selected = null;
+          show($('detail-card'), false);
+          await Promise.all([loadUsers(), loadCrypto(), refreshCrm()]);
+        } catch (err) {
+          alert(err.message || String(err));
         }
       });
 

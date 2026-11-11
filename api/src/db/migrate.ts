@@ -94,6 +94,20 @@ CREATE TABLE IF NOT EXISTS subscription_events (
 
 CREATE INDEX IF NOT EXISTS subscription_events_user ON subscription_events (user_id, created_at);
 CREATE INDEX IF NOT EXISTS customer_profiles_source ON customer_profiles (source);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id TEXT PRIMARY KEY,
+  actor_email TEXT NOT NULL,
+  action TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT,
+  user_id TEXT,
+  old_json TEXT,
+  new_json TEXT,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS audit_log_user ON audit_log (user_id, created_at);
 `;
 
 /**

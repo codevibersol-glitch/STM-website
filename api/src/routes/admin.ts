@@ -4,11 +4,13 @@ import { z } from 'zod';
 import { db } from '../db/index.ts';
 import { cryptoPayments, licenses, subscriptions, users } from '../db/schema.ts';
 import { requireAdmin } from '../lib/auth.ts';
-import { CRYPTO_PENDING_TTL_MS, isPendingExpired } from '../lib/cryptoPay.ts';
+import { CRYPTO_PENDING_TTL_MS } from '../lib/cryptoPay.ts';
+import { recordAudit } from '../lib/audit.ts';
 import { maskLicenseKey } from '../lib/crm.ts';
+import { confirmPendingCrypto } from '../lib/cryptoAdmin.ts';
 import { activateEntitlement, entitlementForUser } from '../lib/entitlement.ts';
 import { hashPassword, id } from '../lib/ids.ts';
-import { isPlanId, PLANS } from '../lib/plans.ts';
+import { isPlanId } from '../lib/plans.ts';
 import { recordSubscriptionEvent } from '../lib/subscriptionEvents.ts';
 import { crmRoutes } from './adminCrm.ts';
 
@@ -64,6 +66,7 @@ adminRoutes.post('/entitle', async (c) => {
     await db.insert(users).values(user).run();
   }
 
+  const beforeEnt = await entitlementForUser(user.id);
   const result = await activateEntitlement({
     userId: user.id,
     plan: body.data.plan,
@@ -73,6 +76,15 @@ adminRoutes.post('/entitle', async (c) => {
   });
 
   const ent = await entitlementForUser(user.id);
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'buyer.entitle',
+    entityType: 'user',
+    entityId: user.id,
+    userId: user.id,
+    oldValue: beforeEnt,
+    newValue: { plan: body.data.plan, licenseKey: ent.licenseKey, duplicate: result.duplicate },
+  });
   return c.json({
     email: user.email,
     userId: user.id,
@@ -95,6 +107,18 @@ adminRoutes.post('/extend', async (c) => {
     provider: 'manual',
     providerEventId: `admin_${id()}`,
     amountCents: 0,
+  });
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'subscription.extend_plan',
+    entityType: 'user',
+    entityId: body.data.userId,
+    userId: body.data.userId,
+    newValue: {
+      plan: body.data.plan,
+      duplicate: result.duplicate,
+      licenseKey: result.duplicate ? null : result.license.key,
+    },
   });
   return c.json(result);
 });
@@ -122,6 +146,16 @@ adminRoutes.post('/revoke', async (c) => {
       createdAt: revokedAt,
     });
   }
+
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'buyer.revoke',
+    entityType: 'user',
+    entityId: body.data.userId,
+    userId: body.data.userId,
+    oldValue: { subscriptions: subs.map((sub) => ({ id: sub.id, plan: sub.plan, status: sub.status })) },
+    newValue: { status: 'canceled', licenses: 'revoked' },
+  });
 
   return c.json({ ok: true });
 });
@@ -151,6 +185,14 @@ adminRoutes.post('/set-period', async (c) => {
       createdAt: updatedAt,
     });
   }
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'subscription.set_period',
+    entityType: 'user',
+    entityId: body.data.userId,
+    userId: body.data.userId,
+    newValue: { days: body.data.days, currentPeriodEnd: custom.toISOString() },
+  });
   return c.json({ currentPeriodEnd: custom });
 });
 
@@ -169,6 +211,15 @@ adminRoutes.post('/unbind-machine', async (c) => {
     })
     .where(and(eq(licenses.userId, body.data.userId), eq(licenses.status, 'active')))
     .run();
+
+  await recordAudit({
+    actorEmail: c.get('user').email,
+    action: 'license.unbind_user',
+    entityType: 'user',
+    entityId: body.data.userId,
+    userId: body.data.userId,
+    newValue: { machineBound: false },
+  });
 
   return c.json({ ok: true });
 });
@@ -218,68 +269,8 @@ adminRoutes.post('/crypto-confirm', async (c) => {
     .object({ paymentId: z.string().min(4) })
     .safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json({ error: 'invalid_body' }, 400);
-
-  await expireStaleCryptoPendings();
-
-  const payment = await db
-    .select()
-    .from(cryptoPayments)
-    .where(eq(cryptoPayments.id, body.data.paymentId))
-    .get();
-  if (!payment) return c.json({ error: 'not_found' }, 404);
-
-  const entExisting = await entitlementForUser(payment.userId);
-  if (payment.status === 'confirmed') {
-    return c.json({
-      ok: true,
-      duplicate: true,
-      plan: payment.plan,
-      periodDays: isPlanId(payment.plan) ? PLANS[payment.plan].periodDays : null,
-      licenseKey: entExisting.licenseKey,
-      entitlement: entExisting,
-    });
-  }
-  if (payment.status === 'expired' || isPendingExpired(payment.createdAt)) {
-    if (payment.status === 'pending') {
-      await db.update(cryptoPayments).set({ status: 'expired' }).where(eq(cryptoPayments.id, payment.id)).run();
-    }
-    return c.json({ error: 'expired', message: 'Pending crypto payment expired (72h). Ask the customer to create a new one.' }, 409);
-  }
-  if (payment.status !== 'pending') {
-    return c.json({ error: 'not_pending', status: payment.status }, 409);
-  }
-  if (!isPlanId(payment.plan)) return c.json({ error: 'invalid_plan' }, 400);
-
-  const admin = c.get('user');
-  const result = await activateEntitlement({
-    userId: payment.userId,
-    plan: payment.plan,
-    provider: 'crypto',
-    providerRef: payment.reference,
-    providerEventId: `crypto_${payment.id}`,
-    amountCents: payment.amountCents,
-    currency: payment.currency,
-  });
-
-  await db
-    .update(cryptoPayments)
-    .set({
-      status: 'confirmed',
-      confirmedAt: new Date(),
-      confirmedBy: admin.email,
-    })
-    .where(eq(cryptoPayments.id, payment.id))
-    .run();
-
-  const ent = await entitlementForUser(payment.userId);
-  return c.json({
-    ok: true,
-    duplicate: result.duplicate,
-    plan: payment.plan,
-    periodDays: PLANS[payment.plan].periodDays,
-    licenseKey: ent.licenseKey,
-    entitlement: ent,
-  });
+  const result = await confirmPendingCrypto(body.data.paymentId, c.get('user').email);
+  return c.json(result.body, result.http);
 });
 
 adminRoutes.route('/crm', crmRoutes);
