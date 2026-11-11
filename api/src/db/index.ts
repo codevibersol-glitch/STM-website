@@ -19,6 +19,21 @@ function resolveDatabaseUrl(): string {
 }
 
 const url = resolveDatabaseUrl();
+
+function runningAsTest(): boolean {
+  if (process.env.NODE_TEST_CONTEXT) return true;
+  return [...process.execArgv, ...process.argv].some((arg) => arg.includes('.test.ts') || arg === '--test');
+}
+
+if (runningAsTest()) {
+  const lower = url.toLowerCase();
+  if (!lower.startsWith('file:') || lower.includes('stm.sqlite')) {
+    throw new Error(
+      'stm-api tests refuse this database. Set DATABASE_URL to a file: sqlite path that is not data/stm.sqlite.',
+    );
+  }
+}
+
 const authToken = process.env.DATABASE_AUTH_TOKEN?.trim() || undefined;
 
 export const client: Client = createClient({

@@ -71,6 +71,42 @@ CREATE TABLE IF NOT EXISTS trial_requests (
 );
 
 CREATE INDEX IF NOT EXISTS trial_requests_ip_created ON trial_requests (ip, created_at);
+
+CREATE TABLE IF NOT EXISTS customer_profiles (
+  user_id TEXT PRIMARY KEY REFERENCES users(id),
+  telegram_handle TEXT,
+  notes TEXT,
+  tags TEXT,
+  source TEXT,
+  updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS subscription_events (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  subscription_id TEXT,
+  plan TEXT NOT NULL,
+  status TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  source TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS subscription_events_user ON subscription_events (user_id, created_at);
+CREATE INDEX IF NOT EXISTS customer_profiles_source ON customer_profiles (source);
+`;
+
+/**
+ * One snapshot row per subscription that has no history yet.
+ * Inserts into the new table only — does not update or delete existing rows.
+ */
+const SNAPSHOT_SQL = `
+INSERT INTO subscription_events (id, user_id, subscription_id, plan, status, provider, source, created_at)
+SELECT 'snap_' || id, user_id, id, plan, status, provider, 'snapshot', updated_at
+FROM subscriptions
+WHERE NOT EXISTS (
+  SELECT 1 FROM subscription_events e WHERE e.subscription_id = subscriptions.id
+)
 `;
 
 const ALTERS = [
@@ -92,8 +128,10 @@ async function addColumnIfMissing(statement: string): Promise<void> {
 
 export async function migrate(): Promise<void> {
   if (migrated) return;
+  await client.execute('PRAGMA busy_timeout = 15000');
   await client.executeMultiple(SQL);
   for (const alter of ALTERS) await addColumnIfMissing(alter);
+  await client.execute(SNAPSHOT_SQL);
   migrated = true;
   console.log('stm-api schema ready');
 }

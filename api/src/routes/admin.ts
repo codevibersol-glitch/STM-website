@@ -5,9 +5,12 @@ import { db } from '../db/index.ts';
 import { cryptoPayments, licenses, subscriptions, users } from '../db/schema.ts';
 import { requireAdmin } from '../lib/auth.ts';
 import { CRYPTO_PENDING_TTL_MS, isPendingExpired } from '../lib/cryptoPay.ts';
+import { maskLicenseKey } from '../lib/crm.ts';
 import { activateEntitlement, entitlementForUser } from '../lib/entitlement.ts';
 import { hashPassword, id } from '../lib/ids.ts';
 import { isPlanId, PLANS } from '../lib/plans.ts';
+import { recordSubscriptionEvent } from '../lib/subscriptionEvents.ts';
+import { crmRoutes } from './adminCrm.ts';
 
 async function expireStaleCryptoPendings(now = new Date()) {
   const cutoff = new Date(now.getTime() - CRYPTO_PENDING_TTL_MS);
@@ -29,7 +32,10 @@ adminRoutes.get('/users', async (c) => {
       id: u.id,
       email: u.email,
       createdAt: u.createdAt,
-      entitlement: await entitlementForUser(u.id),
+      entitlement: await entitlementForUser(u.id).then((ent) => ({
+        ...ent,
+        licenseKey: maskLicenseKey(ent.licenseKey),
+      })),
     })),
   );
   return c.json({ users: withEnt });
@@ -97,12 +103,25 @@ adminRoutes.post('/revoke', async (c) => {
   const body = z.object({ userId: z.string() }).safeParse(await c.req.json().catch(() => null));
   if (!body.success) return c.json({ error: 'invalid_body' }, 400);
 
+  const subs = await db.select().from(subscriptions).where(eq(subscriptions.userId, body.data.userId)).all();
+  const revokedAt = new Date();
   await db.update(licenses).set({ status: 'revoked' }).where(eq(licenses.userId, body.data.userId)).run();
   await db
     .update(subscriptions)
-    .set({ status: 'canceled', updatedAt: new Date(), currentPeriodEnd: new Date() })
+    .set({ status: 'canceled', updatedAt: revokedAt, currentPeriodEnd: revokedAt })
     .where(eq(subscriptions.userId, body.data.userId))
     .run();
+  for (const sub of subs) {
+    await recordSubscriptionEvent({
+      userId: sub.userId,
+      subscriptionId: sub.id,
+      plan: sub.plan,
+      status: 'canceled',
+      provider: sub.provider,
+      source: 'revoke',
+      createdAt: revokedAt,
+    });
+  }
 
   return c.json({ ok: true });
 });
@@ -114,11 +133,24 @@ adminRoutes.post('/set-period', async (c) => {
   if (!body.success) return c.json({ error: 'invalid_body' }, 400);
 
   const custom = new Date(Date.now() + body.data.days * 86_400_000);
+  const subs = await db.select().from(subscriptions).where(eq(subscriptions.userId, body.data.userId)).all();
+  const updatedAt = new Date();
   await db
     .update(subscriptions)
-    .set({ status: 'active', currentPeriodEnd: custom, updatedAt: new Date() })
+    .set({ status: 'active', currentPeriodEnd: custom, updatedAt })
     .where(eq(subscriptions.userId, body.data.userId))
     .run();
+  for (const sub of subs) {
+    await recordSubscriptionEvent({
+      userId: sub.userId,
+      subscriptionId: sub.id,
+      plan: sub.plan,
+      status: 'active',
+      provider: sub.provider,
+      source: 'set_period',
+      createdAt: updatedAt,
+    });
+  }
   return c.json({ currentPeriodEnd: custom });
 });
 
@@ -249,3 +281,5 @@ adminRoutes.post('/crypto-confirm', async (c) => {
     entitlement: ent,
   });
 });
+
+adminRoutes.route('/crm', crmRoutes);

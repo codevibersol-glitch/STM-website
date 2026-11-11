@@ -29,8 +29,8 @@
         color: var(--text);
       }
       main {
-        width: min(100% - 2rem, 48rem);
-        margin: 2.5rem auto 3rem;
+        width: min(100% - 1.5rem, 96rem);
+        margin: 2rem auto 3rem;
       }
       h1 { margin: 0 0 0.35rem; font-size: 1.75rem; }
       .sub { margin: 0 0 1.5rem; color: var(--muted); }
@@ -115,12 +115,45 @@
       .muted { color: var(--muted); }
       .hidden { display: none !important; }
       code { font-family: ui-monospace, Consolas, monospace; }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+        gap: 0.75rem;
+      }
+      .stat {
+        background: #0b0d10;
+        border: 1px solid var(--line);
+        border-radius: 0.8rem;
+        padding: 0.75rem 0.85rem;
+      }
+      .stat span { display: block; color: var(--muted); font-size: 0.78rem; margin-bottom: 0.3rem; }
+      .stat strong { font-size: 1.15rem; line-height: 1.3; }
+      .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 0.75rem; }
+      .chart-box { background: #0b0d10; border: 1px solid var(--line); border-radius: 0.8rem; padding: 0.75rem; }
+      .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; }
+      .filters label { margin-bottom: 0; }
+      button.sort, button.linkish {
+        background: none;
+        border: none;
+        color: inherit;
+        padding: 0;
+        min-height: 0;
+        border-radius: 0;
+        font-weight: 600;
+      }
+      button.linkish { color: var(--accent); font-weight: 600; }
+      tr.clickable { cursor: pointer; }
+      tr.clickable:hover, tr.selected { background: rgb(198 255 58 / 0.06); }
+      .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+      .wrap { overflow-x: auto; }
+      .notes { min-height: 5rem; font-family: inherit; }
+      .pill { border-color: var(--accent); color: var(--accent); }
     </style>
   </head>
   <body>
     <main>
       <h1>STM admin</h1>
-      <p class="sub">Entitle customers · confirm crypto payments · same-origin session on this API</p>
+      <p class="sub">Buyer CRM · entitle customers · confirm crypto payments · same-origin session on this API</p>
 
       <section id="login-card" class="card">
         <h2>Admin sign-in</h2>
@@ -138,6 +171,197 @@
           </div>
           <p id="login-error" class="error hidden"></p>
         </form>
+      </section>
+
+      <section id="crm-card" class="card hidden">
+        <h2>Overview</h2>
+        <div class="cards" id="stat-cards">
+          <div class="stat"><span>Total buyers</span><strong id="stat-buyers">—</strong></div>
+          <div class="stat"><span>Active paid</span><strong id="stat-paid">—</strong></div>
+          <div class="stat"><span>Active trials</span><strong id="stat-trials">—</strong></div>
+          <div class="stat"><span>Trial → paid</span><strong id="stat-conversion">—</strong></div>
+          <div class="stat"><span>Revenue this month</span><strong id="stat-rev-now">—</strong></div>
+          <div class="stat"><span>Revenue last month</span><strong id="stat-rev-last">—</strong></div>
+          <div class="stat"><span>Revenue all time</span><strong id="stat-rev-all">—</strong></div>
+          <div class="stat"><span>Bots active 24h</span><strong id="stat-bots-24">—</strong></div>
+          <div class="stat"><span>Bots active 7d</span><strong id="stat-bots-7">—</strong></div>
+          <div class="stat"><span>Expiring in 7 days</span><strong id="stat-expiring">—</strong></div>
+          <div class="stat"><span>Churned this month</span><strong id="stat-churn">—</strong></div>
+        </div>
+        <p class="muted">Revenue is payments plus confirmed crypto that has no matching payment row, split by currency. Churned means the subscription was set to canceled or expired this month. Keys in the table are masked.</p>
+        <div class="charts">
+          <div class="chart-box">
+            <strong>New buyers per week</strong>
+            <div id="chart-buyers"></div>
+          </div>
+          <div class="chart-box">
+            <strong>Revenue per month</strong>
+            <p class="muted" id="chart-revenue-note" style="margin: 0.25rem 0;"></p>
+            <div id="chart-revenue"></div>
+          </div>
+        </div>
+        <div class="row" id="list-buttons" style="margin-top: 0.9rem;"></div>
+      </section>
+
+      <section id="buyers-card" class="card hidden">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin: 0;">Buyers</h2>
+          <div class="row">
+            <button class="btn-ghost" type="button" id="export-csv">Export CSV</button>
+            <button class="btn-ghost" type="button" id="refresh-crm">Refresh</button>
+          </div>
+        </div>
+        <form id="buyer-filters" class="filters" style="margin-top: 0.9rem;">
+          <label>Search
+            <input id="filter-q" type="search" placeholder="email, telegram, notes, tags" />
+          </label>
+          <label>Plan
+            <select id="filter-plan">
+              <option value="">Any</option>
+              <option value="flex">FLEX</option>
+              <option value="go">GO</option>
+              <option value="founder">Founder</option>
+              <option value="trial">Trial</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="filter-status">
+              <option value="">Any</option>
+              <option value="active">Active</option>
+              <option value="past_due">Past due</option>
+              <option value="canceled">Canceled</option>
+              <option value="expired">Expired</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label>Bot
+            <select id="filter-bot">
+              <option value="any">Any</option>
+              <option value="active">Active in 7 days</option>
+              <option value="inactive">Inactive 7+ days</option>
+            </select>
+          </label>
+          <label>Expiring soon
+            <select id="filter-expiring">
+              <option value="">Any</option>
+              <option value="1">Next 7 days</option>
+            </select>
+          </label>
+          <label>Trial
+            <select id="filter-trial">
+              <option value="">Any</option>
+              <option value="1">Trials only</option>
+            </select>
+          </label>
+        </form>
+        <p class="muted" id="buyer-count"></p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr id="buyer-head"></tr>
+            </thead>
+            <tbody id="buyer-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="detail-card" class="card hidden">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin: 0;" id="detail-title">Buyer</h2>
+          <button class="btn-ghost" type="button" id="detail-close">Close</button>
+        </div>
+        <p class="muted" id="detail-key"></p>
+        <form id="profile-form" class="filters">
+          <label>Telegram
+            <input id="profile-telegram" autocomplete="off" placeholder="@handle" />
+          </label>
+          <label>Source
+            <select id="profile-source">
+              <option value="">—</option>
+              <option value="telegram">Telegram</option>
+              <option value="website">Website</option>
+              <option value="reddit">Reddit</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>Tags
+            <input id="profile-tags" placeholder="vip, eu" />
+          </label>
+          <label>Notes
+            <textarea id="profile-notes" class="notes"></textarea>
+          </label>
+        </form>
+        <div class="row">
+          <button class="btn-gold" type="button" id="profile-save">Save CRM fields</button>
+          <p id="profile-msg" class="ok hidden"></p>
+        </div>
+        <h3>Actions</h3>
+        <div class="filters">
+          <label>Plan for entitle
+            <select id="detail-plan">
+              <option value="flex">FLEX</option>
+              <option value="go" selected>GO</option>
+              <option value="founder">Founder</option>
+            </select>
+          </label>
+          <label>Password <span class="muted">(only used if this email is new)</span>
+            <input id="detail-password" type="password" minlength="8" autocomplete="new-password" />
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn-gold" type="button" id="detail-entitle">Entitle</button>
+          <button class="btn-ghost" type="button" id="detail-unbind">Unbind PC</button>
+          <button class="btn-danger" type="button" id="detail-revoke">Revoke</button>
+        </div>
+        <div id="detail-panels"></div>
+      </section>
+
+      <section id="sale-card" class="card hidden">
+        <h2>Add manual sale</h2>
+        <p class="muted">Telegram (or other off-site) sale. Creates the customer if needed, records a manual payment on the date you enter, and activates the plan.</p>
+        <form id="sale-form" class="filters">
+          <label>Email
+            <input id="sale-email" type="email" required autocomplete="off" />
+          </label>
+          <label>Telegram
+            <input id="sale-telegram" placeholder="@handle" autocomplete="off" />
+          </label>
+          <label>Plan
+            <select id="sale-plan" required>
+              <option value="flex">FLEX</option>
+              <option value="go" selected>GO</option>
+              <option value="founder">Founder</option>
+            </select>
+          </label>
+          <label>Amount
+            <input id="sale-amount" inputmode="decimal" required placeholder="45.00" />
+          </label>
+          <label>Currency
+            <select id="sale-currency">
+              <option value="eur" selected>EUR</option>
+              <option value="usd">USD</option>
+              <option value="usdt">USDT</option>
+            </select>
+          </label>
+          <label>Date paid
+            <input id="sale-date" type="date" required />
+          </label>
+          <label>Source
+            <select id="sale-source">
+              <option value="telegram" selected>Telegram</option>
+              <option value="website">Website</option>
+              <option value="reddit">Reddit</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>Notes
+            <input id="sale-notes" autocomplete="off" />
+          </label>
+        </form>
+        <div class="row">
+          <button class="btn-gold" type="button" id="sale-submit">Record sale</button>
+          <p id="sale-error" class="error hidden"></p>
+        </div>
       </section>
 
       <section id="app-card" class="card hidden">
@@ -262,17 +486,15 @@
         const me = await api('/auth/me');
         if (!me.user?.admin) {
           show($('login-card'), true);
-          show($('app-card'), false);
-          show($('users-card'), false);
-          show($('crypto-card'), false);
+          for (const id of ['app-card', 'users-card', 'crypto-card', 'crm-card', 'buyers-card', 'sale-card', 'detail-card']) {
+            show($(id), false);
+          }
           return false;
         }
         $('who').textContent = me.user.email;
         show($('login-card'), false);
-        show($('app-card'), true);
-        show($('users-card'), true);
-        show($('crypto-card'), true);
-        await Promise.all([loadUsers(), loadCrypto()]);
+        for (const id of ['crm-card', 'buyers-card', 'sale-card', 'app-card', 'users-card', 'crypto-card']) show($(id), true);
+        await Promise.all([loadUsers(), loadCrypto(), refreshCrm()]);
         return true;
       }
 
@@ -287,19 +509,9 @@
           tr.innerHTML = `
             <td>${u.email}<div class="muted">${u.id}</div></td>
             <td>${plan}${u.entitlement?.currentPeriodEnd ? `<div class="muted">${new Date(u.entitlement.currentPeriodEnd).toLocaleString()}</div>` : ''}</td>
-            <td><code>${key ? key.slice(0, 18) + '…' : '—'}</code></td>
+            <td><code>${key || '—'}</code></td>
             <td></td>`;
-          if (key) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn-ghost';
-            btn.textContent = 'Show';
-            btn.onclick = () => {
-              $('cust-email').value = u.email;
-              showResult(key, `Loaded ${u.email}`);
-            };
-            tr.lastElementChild.appendChild(btn);
-
+          if (u.id) {
             const unbind = document.createElement('button');
             unbind.type = 'button';
             unbind.className = 'btn-ghost';
@@ -357,7 +569,7 @@
                 (res.licenseKey ? ` · ${res.licenseKey}` : '');
               show($('crypto-msg'), true);
               if (res.licenseKey) showResult(res.licenseKey, `Crypto activated ${p.plan}`);
-              await Promise.all([loadCrypto(), loadUsers()]);
+              await Promise.all([loadCrypto(), loadUsers(), refreshCrm()]);
             } catch (err) {
               alert(err.message || String(err));
               btn.disabled = false;
@@ -428,11 +640,397 @@
               plan: $('cust-plan').value,
             }),
           });
-          showResult(data.licenseKey, `Activated ${data.email} on ${data.plan}`);
-          await loadUsers();
+          showResult(data.licenseKey, `Activated ${data.email} on ${data.plan}. The full key is shown here only; the buyers table stays masked.`);
+          await Promise.all([loadUsers(), refreshCrm()]);
         } catch (err) {
           $('entitle-error').textContent = err.message || String(err);
           show($('entitle-error'), true);
+        }
+      });
+
+      const crmState = {
+        q: '',
+        plan: '',
+        status: '',
+        bot: 'any',
+        expiring: false,
+        trial: false,
+        list: '',
+        sort: 'createdAt',
+        dir: 'desc',
+        selected: null,
+      };
+      const COLUMNS = [
+        ['email', 'Email'],
+        ['telegramHandle', 'Telegram'],
+        ['plan', 'Plan'],
+        ['status', 'Status'],
+        ['provider', 'Provider'],
+        ['createdAt', 'Created'],
+        ['currentPeriodEnd', 'Period end'],
+        ['daysLeft', 'Days left'],
+        ['lastSeenAt', 'Last bot'],
+        ['machineBound', 'Machine'],
+        ['totalPaidCents', 'Total paid'],
+        ['notes', 'Notes'],
+        ['tags', 'Tags'],
+      ];
+
+      function esc(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+
+      function moneyList(rows) {
+        if (!rows || !rows.length) return '0';
+        return rows
+          .map((row) => {
+            const total = (row.totalCents / 100).toFixed(2) + ' ' + row.currency.toUpperCase();
+            const parts = ['stripe', 'crypto', 'manual', 'nowpayments', 'other']
+              .filter((name) => row.byProvider?.[name])
+              .map((name) => name + ' ' + (row.byProvider[name] / 100).toFixed(2));
+            return parts.length ? total + ' (' + parts.join(', ') + ')' : total;
+          })
+          .join(' · ');
+      }
+
+      function paidText(rows) {
+        if (!rows || !rows.length) return '0';
+        return rows.map((row) => (row.amountCents / 100).toFixed(2) + ' ' + row.currency.toUpperCase()).join(' + ');
+      }
+
+      function relTime(iso) {
+        if (!iso) return 'never';
+        const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+        if (min < 1) return 'just now';
+        if (min < 60) return min + 'm ago';
+        const hr = Math.round(min / 60);
+        if (hr < 48) return hr + 'h ago';
+        return Math.round(hr / 24) + 'd ago';
+      }
+
+      function when(iso) {
+        return iso ? new Date(iso).toLocaleString() : '—';
+      }
+
+      function daysText(buyer) {
+        if (buyer.lifetime) return 'lifetime';
+        if (buyer.daysLeft == null) return '—';
+        return buyer.daysLeft + 'd';
+      }
+
+      function queryString() {
+        const params = new URLSearchParams();
+        if (crmState.q) params.set('q', crmState.q);
+        if (crmState.list) params.set('list', crmState.list);
+        else {
+          if (crmState.plan) params.set('plan', crmState.plan);
+          if (crmState.status) params.set('status', crmState.status);
+          if (crmState.bot && crmState.bot !== 'any') params.set('bot', crmState.bot);
+          if (crmState.expiring) params.set('expiring', '1');
+          if (crmState.trial) params.set('trial', '1');
+        }
+        params.set('sort', crmState.sort);
+        params.set('dir', crmState.dir);
+        return params.toString();
+      }
+
+      function svgBars(points, valueOf, labelOf) {
+        const w = 640;
+        const h = 168;
+        const padL = 28;
+        const padB = 32;
+        const padT = 8;
+        const max = Math.max(1, ...points.map(valueOf));
+        const innerW = w - padL - 8;
+        const innerH = h - padB - padT;
+        const barW = innerW / Math.max(points.length, 1);
+        let shapes = '';
+        points.forEach((point, i) => {
+          const value = valueOf(point);
+          const bh = Math.max(value ? 2 : 0, (value / max) * innerH);
+          const x = padL + i * barW + barW * 0.18;
+          const y = padT + innerH - bh;
+          shapes += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW * 0.64).toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="#c6ff3a"><title>${esc(labelOf(point))}: ${value}</title></rect>`;
+          if (points.length <= 8 || i % 2 === 0) {
+            shapes += `<text x="${(x + barW * 0.32).toFixed(1)}" y="${h - 10}" text-anchor="middle" fill="#9aa3b2" font-size="10">${esc(labelOf(point))}</text>`;
+          }
+        });
+        return `<svg viewBox="0 0 ${w} ${h}" role="img" width="100%" height="168">${shapes}</svg>`;
+      }
+
+      async function loadStats() {
+        const stats = await api('/admin/crm/stats');
+        $('stat-buyers').textContent = String(stats.totalBuyers);
+        $('stat-paid').textContent = String(stats.activePaid);
+        $('stat-trials').textContent = String(stats.activeTrials);
+        const conv = stats.trialToPaid || {};
+        $('stat-conversion').textContent = conv.percent == null ? '—' : conv.percent + '% (' + conv.converted + '/' + conv.trials + ')';
+        $('stat-rev-now').textContent = moneyList(stats.revenue?.thisMonth);
+        $('stat-rev-last').textContent = moneyList(stats.revenue?.lastMonth);
+        $('stat-rev-all').textContent = moneyList(stats.revenue?.allTime);
+        $('stat-bots-24').textContent = String(stats.activeBots?.h24 ?? 0);
+        $('stat-bots-7').textContent = String(stats.activeBots?.d7 ?? 0);
+        $('stat-expiring').textContent = String(stats.expiring7d);
+        $('stat-churn').textContent = String(stats.churnedThisMonth);
+        const lists = [
+          ['expiring7d', 'Expiring in 7 days', stats.lists?.expiring7d],
+          ['trials-ending', 'Trials ending soon', stats.lists?.trialsEnding],
+          ['paid-inactive', 'Paid, bot inactive 7+ days', stats.lists?.paidInactive],
+          ['trials-never-ran', 'Trials that never ran the bot', stats.lists?.trialsNeverRan],
+        ];
+        const box = $('list-buttons');
+        box.innerHTML = '';
+        for (const [id, label, count] of lists) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = crmState.list === id ? 'btn-ghost pill' : 'btn-ghost';
+          btn.textContent = label + ' (' + (count ?? 0) + ')';
+          btn.onclick = () => {
+            crmState.list = crmState.list === id ? '' : id;
+            loadBuyers().catch((err) => alert(err.message));
+            loadStats().catch(() => {});
+          };
+          box.appendChild(btn);
+        }
+        const weeks = stats.newBuyersPerWeek || [];
+        $('chart-buyers').innerHTML = svgBars(weeks, (p) => p.count, (p) => String(p.weekStart).slice(5));
+        const months = stats.revenuePerMonth || [];
+        const currencies = new Set();
+        for (const month of months) for (const row of month.currencies || []) currencies.add(row.currency);
+        const primary = currencies.has('eur') ? 'eur' : [...currencies][0] || 'eur';
+        $('chart-revenue-note').textContent = 'Showing ' + primary.toUpperCase() + (currencies.size > 1 ? '. Other currencies stay in the cards above.' : '.');
+        $('chart-revenue').innerHTML = svgBars(
+          months,
+          (month) => (month.currencies || []).find((row) => row.currency === primary)?.totalCents / 100 || 0,
+          (month) => month.month.slice(2),
+        );
+      }
+
+      function renderHead() {
+        const head = $('buyer-head');
+        head.innerHTML = '';
+        for (const [key, label] of COLUMNS) {
+          const th = document.createElement('th');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'sort';
+          const mark = crmState.sort === key ? (crmState.dir === 'asc' ? ' ↑' : ' ↓') : '';
+          btn.textContent = label + mark;
+          btn.onclick = () => {
+            if (crmState.sort === key) crmState.dir = crmState.dir === 'asc' ? 'desc' : 'asc';
+            else {
+              crmState.sort = key;
+              crmState.dir = key === 'createdAt' || key === 'totalPaidCents' || key === 'lastSeenAt' ? 'desc' : 'asc';
+            }
+            loadBuyers().catch((err) => alert(err.message));
+          };
+          th.appendChild(btn);
+          head.appendChild(th);
+        }
+      }
+
+      async function loadBuyers() {
+        renderHead();
+        const data = await api('/admin/crm/buyers?' + queryString());
+        const body = $('buyer-body');
+        body.innerHTML = '';
+        $('buyer-count').textContent = (data.total ?? 0) + (crmState.list ? ' in this list' : ' buyers');
+        for (const buyer of data.buyers || []) {
+          const tr = document.createElement('tr');
+          tr.className = 'clickable' + (crmState.selected === buyer.id ? ' selected' : '');
+          const cells = [
+            buyer.email,
+            buyer.telegramHandle ? '@' + buyer.telegramHandle : '—',
+            buyer.plan || '—',
+            buyer.status,
+            buyer.provider || '—',
+            when(buyer.createdAt),
+            buyer.lifetime ? 'lifetime' : when(buyer.currentPeriodEnd),
+            daysText(buyer),
+            relTime(buyer.lastSeenAt),
+            buyer.machineBound ? 'yes' : 'no',
+            paidText(buyer.totalPaid),
+            buyer.notes || '—',
+            (buyer.tags || []).join(', ') || '—',
+          ];
+          for (const value of cells) {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+          }
+          tr.onclick = () => openBuyer(buyer.id);
+          body.appendChild(tr);
+        }
+      }
+
+      async function refreshCrm() {
+        await Promise.all([loadStats(), loadBuyers()]);
+      }
+
+      function panelTable(title, headers, rows) {
+        const wrap = document.createElement('div');
+        const h = document.createElement('h3');
+        h.textContent = title;
+        wrap.appendChild(h);
+        if (!rows.length) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'None';
+          wrap.appendChild(p);
+          return wrap;
+        }
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const hr = document.createElement('tr');
+        for (const header of headers) {
+          const th = document.createElement('th');
+          th.textContent = header;
+          hr.appendChild(th);
+        }
+        thead.appendChild(hr);
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        for (const row of rows) {
+          const tr = document.createElement('tr');
+          for (const cell of row) {
+            const td = document.createElement('td');
+            td.textContent = cell == null || cell === '' ? '—' : String(cell);
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        return wrap;
+      }
+
+      async function openBuyer(userId) {
+        crmState.selected = userId;
+        const data = await api('/admin/crm/buyers/' + userId);
+        const buyer = data.buyer;
+        show($('detail-card'), true);
+        $('detail-title').textContent = buyer.email;
+        $('detail-key').textContent = 'License ' + (buyer.licenseKeyMasked || '—') + ' · masked in this view';
+        $('profile-telegram').value = buyer.telegramHandle ? '@' + buyer.telegramHandle : '';
+        $('profile-source').value = buyer.source || '';
+        $('profile-tags').value = (buyer.tags || []).join(', ');
+        $('profile-notes').value = buyer.notes || '';
+        $('detail-plan').value = buyer.plan === 'flex' || buyer.plan === 'go' || buyer.plan === 'founder' ? buyer.plan : 'go';
+        const panels = $('detail-panels');
+        panels.innerHTML = '';
+        panels.appendChild(panelTable('Licenses', ['Key', 'Plan', 'Status', 'Machine', 'Last bot'], (data.licenses || []).map((row) => [
+          row.keyMasked, row.plan, row.status, row.machineBound ? 'yes' : 'no', relTime(row.lastSeenAt),
+        ])));
+        panels.appendChild(panelTable('Payments', ['When', 'Provider', 'Plan', 'Amount'], (data.payments || []).map((row) => [
+          when(row.createdAt), row.provider, row.plan, (row.amountCents / 100).toFixed(2) + ' ' + String(row.currency).toUpperCase(),
+        ])));
+        panels.appendChild(panelTable('Subscription history', ['When', 'Source', 'Plan', 'Status', 'Provider'], (data.history || []).map((row) => [
+          when(row.createdAt), row.source, row.plan, row.status, row.provider,
+        ])));
+        $('detail-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        loadBuyers().catch(() => {});
+      }
+
+      function readFilters() {
+        crmState.q = $('filter-q').value.trim();
+        crmState.plan = $('filter-plan').value;
+        crmState.status = $('filter-status').value;
+        crmState.bot = $('filter-bot').value;
+        crmState.expiring = $('filter-expiring').value === '1';
+        crmState.trial = $('filter-trial').value === '1';
+        crmState.list = '';
+      }
+
+      $('buyer-filters').addEventListener('change', () => {
+        readFilters();
+        loadBuyers().catch((err) => alert(err.message));
+        loadStats().catch(() => {});
+      });
+      $('filter-q').addEventListener('input', () => {
+        readFilters();
+        loadBuyers().catch(() => {});
+      });
+      $('refresh-crm').addEventListener('click', () => refreshCrm().catch((err) => alert(err.message)));
+      $('export-csv').addEventListener('click', () => {
+        window.location.href = API_BASE + '/admin/crm/export.csv?' + queryString();
+      });
+      $('detail-close').addEventListener('click', () => {
+        crmState.selected = null;
+        show($('detail-card'), false);
+      });
+      $('profile-save').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        show($('profile-msg'), false);
+        try {
+        const source = $('profile-source').value;
+        await api('/admin/crm/buyers/' + crmState.selected, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            telegramHandle: $('profile-telegram').value,
+            notes: $('profile-notes').value,
+            tags: $('profile-tags').value,
+            source: source || null,
+          }),
+        });
+        $('profile-msg').textContent = 'Saved';
+        show($('profile-msg'), true);
+        await refreshCrm();
+        await openBuyer(crmState.selected);
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      });
+      $('detail-entitle').addEventListener('click', async () => {
+        if (!crmState.selected) return;
+        const email = $('detail-title').textContent;
+        const password = $('detail-password').value || ('Temp' + Math.random().toString(36).slice(2) + '99');
+        const data = await api('/admin/entitle', {
+          method: 'POST',
+          body: JSON.stringify({ email, password, plan: $('detail-plan').value }),
+        });
+        showResult(data.licenseKey, `Entitled ${email}. Copy the full key from the box above; lists stay masked.`);
+        await Promise.all([loadUsers(), refreshCrm(), openBuyer(crmState.selected)]);
+      });
+      $('detail-unbind').addEventListener('click', async () => {
+        if (!crmState.selected || !confirm('Unbind this PC?')) return;
+        await api('/admin/unbind-machine', { method: 'POST', body: JSON.stringify({ userId: crmState.selected }) });
+        await Promise.all([refreshCrm(), openBuyer(crmState.selected)]);
+      });
+      $('detail-revoke').addEventListener('click', async () => {
+        if (!crmState.selected || !confirm('Revoke this buyer? Their key stops working.')) return;
+        await api('/admin/revoke', { method: 'POST', body: JSON.stringify({ userId: crmState.selected }) });
+        await Promise.all([loadUsers(), refreshCrm(), openBuyer(crmState.selected)]);
+      });
+      $('sale-date').value = new Date().toISOString().slice(0, 10);
+      $('sale-submit').addEventListener('click', async () => {
+        show($('sale-error'), false);
+        try {
+          const data = await api('/admin/crm/manual-sale', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: $('sale-email').value,
+              telegramHandle: $('sale-telegram').value,
+              plan: $('sale-plan').value,
+              amount: $('sale-amount').value,
+              currency: $('sale-currency').value,
+              paidAt: $('sale-date').value,
+              source: $('sale-source').value,
+              notes: $('sale-notes').value,
+            }),
+          });
+          showResult(data.licenseKey, `Manual sale recorded for ${data.email}. Copy the full key now; the table shows it masked.`);
+          $('sale-form').reset();
+          $('sale-date').value = new Date().toISOString().slice(0, 10);
+          $('sale-plan').value = 'go';
+          $('sale-currency').value = 'eur';
+          $('sale-source').value = 'telegram';
+          await refreshCrm();
+        } catch (err) {
+          $('sale-error').textContent = err.message || String(err);
+          show($('sale-error'), true);
         }
       });
 
