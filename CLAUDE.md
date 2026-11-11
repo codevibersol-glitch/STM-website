@@ -9,7 +9,7 @@ This folder is the STM website, built from `PROMPT.md`. That brief is the source
   - **One status, Beta:** the app is in beta and plays from the first level to max level. Say it once on the first
     screen and in the FAQ; the Results section says which levels are measured. Never "free beta", "limited spots" or "users".
   - **Hardcore and Questing are "coming soon"**, with no dates. Make no questing claim until the owner says it is ready.
-- **Telegram is the only channel for buying, questions and support:** https://t.me/stm_addon, opened in a new tab with
+- **Telegram is the only channel for buying, questions and support:** https://t.me/HugeKush (@HugeKush), opened in a new tab with
   `rel="noopener noreferrer"`. No card form or checkout on the site, and no third-party embeds or download links.
   The one exception is the **optional email sign-up** (the `#updates` panel, words in `UPDATES`): the Klaviyo onsite
   script (`KLAVIYO_*` in `src/data/site.ts`) draws the form, sets cookies and records visits, so the privacy copy
@@ -18,8 +18,7 @@ This folder is the STM website, built from `PROMPT.md`. That brief is the source
 - **The email sign-up sits first in the hero, above the gold Telegram buy button** (the owner, 2026-11-03). The
   `Updates` panel is the hero's first action and the phone keeps the field and Subscribe above the fold; the gold
   buy button stays the loudest control, so the subscribe control stays an outline button.
-- **STM is paid; there is no free version** (the owner, 2026-10-19). Never write "free early access", "for free" or
-  a free tier ("hands-free" describes play, so it stays).
+- **Paid plans are FLEX, GO and Founder. A 5-day grind-only try is on the pricing page** (the owner, 2026-11-11). Never write "there is no free version", "free early access", "for free" or a free tier ("hands-free" describes play, so it stays). The try is grinding and talents only, and it ends after 5 days.
 - **Prices come only from `src/data/pricing.ts`.** A null price shows "Price on Telegram"; never invent one, never
   show 0. The pre-sale ends at WoW: Forever's launch, `LAUNCH_DATE` 2026-11-04. Show that as a plain date: no
   countdown, no "only N left". The structured-data `offers` exists only once the pre-sale price is published.

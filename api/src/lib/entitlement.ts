@@ -2,7 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/index.ts';
 import { licenses, payments, subscriptions } from '../db/schema.ts';
 import { id, licenseKey } from './ids.ts';
-import { isPlanId, periodEndAfterPayment, type PlanId, PLANS } from './plans.ts';
+import { isPlanId, periodEndAfterPayment, TRIAL_PLAN, type PlanId, PLANS } from './plans.ts';
 
 export function subscriptionActive(status: string, periodEnd: Date | null | undefined, now = new Date()): boolean {
   if (status !== 'active') return false;
@@ -152,12 +152,13 @@ export async function entitlementForUser(userId: string, now = new Date()) {
     .get();
 
   const active = !!sub && subscriptionActive(sub.status, sub.currentPeriodEnd, now);
+  const trial = sub?.plan === TRIAL_PLAN;
   return {
     active,
-    plan: sub && isPlanId(sub.plan) ? sub.plan : null,
+    plan: sub && isPlanId(sub.plan) ? sub.plan : trial ? TRIAL_PLAN : null,
     status: sub?.status ?? 'none',
     currentPeriodEnd: sub?.currentPeriodEnd ?? null,
     licenseKey: lic?.key ?? null,
-    planName: sub && isPlanId(sub.plan) ? PLANS[sub.plan].name : null,
+    planName: sub && isPlanId(sub.plan) ? PLANS[sub.plan].name : trial ? 'Trial' : null,
   };
 }

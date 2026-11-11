@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Account } from './Account';
 import { ForeverPlanner } from './ForeverPlanner';
+import { TrialOffer } from './TrialOffer';
 import { HowItWorks } from './HowItWorks';
 import { InstallGuide } from './InstallGuide';
 import { Characters, Commitment, Faq, Features, Feedback, Fighter, FloatingTelegram, Footer, Gallery, How, Pricing, Results, TimeBack, Versions, Who } from './Sections';
@@ -97,6 +98,7 @@ export function PricingPage({ path }: { path: string }) {
   return (
     <PageShell path={path}>
       <Pricing />
+      <TrialOffer />
     </PageShell>
   );
 }

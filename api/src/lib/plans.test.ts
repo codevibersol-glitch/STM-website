@@ -10,6 +10,7 @@ describe('plans', () => {
     assert.equal(PLANS.founder.billing, 'once');
     assert.equal(isPlanId('go'), true);
     assert.equal(isPlanId('pro'), false);
+    assert.equal(isPlanId('trial'), false);
   });
 
   it('gives founder a lifetime end', () => {

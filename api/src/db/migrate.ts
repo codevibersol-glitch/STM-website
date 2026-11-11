@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS crypto_payments (
   confirmed_at INTEGER,
   confirmed_by TEXT
 );
+
+CREATE TABLE IF NOT EXISTS trial_requests (
+  id TEXT PRIMARY KEY,
+  ip TEXT NOT NULL,
+  email TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS trial_requests_ip_created ON trial_requests (ip, created_at);
 `;
 
 const ALTERS = [

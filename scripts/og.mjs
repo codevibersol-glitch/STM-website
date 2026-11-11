@@ -46,7 +46,7 @@ h1 span { color: #c6ff3a; }
   <div class="mark">${ssr.markMarkup()}</div>
   <div class="kw">The WoW accessibility addon and leveling tool</div>
   <h1>Play the adventure.<br><span>Skip the grind.</span></h1>
-  <div class="foot">In beta · Telegram <b>@stm_addon</b></div>
+  <div class="foot">In beta · Telegram <b>@HugeKush</b></div>
 </div>
 </body></html>`;
 

@@ -104,7 +104,8 @@ describe('Telegram is the only channel', () => {
   it('links only to the page itself, Telegram or Discord', () => {
     const internalHrefs = ['/', '/play', '/talents', '/new', '/builder', '/characters', '/install', '/pricing', '/account', '/faq', '/results', '/guide'];
     for (const href of hrefs) {
-      const internal = href.startsWith('#') || internalHrefs.includes(href);
+      const path = href.split('#')[0] || href;
+      const internal = href.startsWith('#') || internalHrefs.includes(path);
       expect(internal || href === TELEGRAM_URL || href === DISCORD_URL, `unexpected link ${href}`).toBe(true);
     }
     expect(hrefs.filter((h) => h === TELEGRAM_URL).length).toBeGreaterThanOrEqual(5);
@@ -194,8 +195,9 @@ describe('honest claims', () => {
     }
     if (!published.length) expect(text).toContain('Price on Telegram');
     expect(PRICING.plans.every((p) => p.price === null || p.price > 0)).toBe(true);
-    expect(text).not.toMatch(/free early access|is it free|for free|free (plan|tier|trial|download)/i);
-    expect(text).toContain('There is no free version.');
+    expect(text).not.toMatch(/free early access|is it free|for free|free (plan|tier|download)/i);
+    expect(text).not.toContain('There is no free version.');
+    expect(text).toContain(`A ${PRICING.trialDays}-day grind-only try`);
   });
 
   it('makes no fake urgency: a plain end date, no countdown or scarcity', () => {
@@ -211,14 +213,21 @@ describe('honest claims', () => {
     expect(links.length).toBe(PRICING.plans.length);
     for (const href of links) expect(href).toBe('/account');
     expect(section).not.toMatch(/<form|<input/i);
+    expect(section).not.toContain('id="trial"');
     expect(HERO.primaryCta).toBe('Buy STM');
+    expect(pricingPage).toContain(`Try it free for ${PRICING.trialDays} days`);
+    expect(pricingPage).toContain('Message @HugeKush on Telegram for the download link.');
+    expect(pricingPage).toContain('No questing, professions, or auction.');
+    expect(pricingPage).not.toMatch(/href="[^"]*download/i);
+    expect(pricingPage).not.toContain('There is no free version.');
   });
 
   it('takes every number on the page from stats.json (outside the sample-data models)', () => {
     const allowed = new Set<string>([String(__BUILD_YEAR__)]);
     for (const m of JSON.stringify(stats).matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
     // Prices and dates come from pricing.ts (as stored, and as formatted on the page).
-    for (const m of JSON.stringify(PRICING).matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
+    for (const m of JSON.stringify(PRICING).matchAll(/\d[\d,]*/g)) allowed.add(m[0].replace(/,$/, ''));
+    allowed.add(String(PRICING.trialDays));
     for (const p of PRICING.plans) for (const m of (formatPrice(p.price) ?? '').matchAll(/\d[\d,]*/g)) allowed.add(m[0]);
     // Digits inside a word (the credit "Xian55" is a name) are not numbers.
     const found = [...textOutsideDemos.matchAll(/(?<![A-Za-z\d])\d[\d,]*/g)].map((m) => m[0].replace(/,$/, ''));

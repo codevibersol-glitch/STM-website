@@ -4,9 +4,18 @@ export const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.rep
 export type PlanId = 'flex' | 'go' | 'founder';
 export type CryptoAsset = 'btc' | 'eth' | 'bnb' | 'sol';
 
+export type TrialMint = {
+  ok: true;
+  key: string;
+  plan: 'trial';
+  days: number;
+  expiresAt: string | null;
+  expired: boolean;
+};
+
 export type Entitlement = {
   active: boolean;
-  plan: PlanId | null;
+  plan: PlanId | 'trial' | null;
   planName: string | null;
   status: string;
   currentPeriodEnd: string | null;
@@ -71,6 +80,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ plan, asset }),
     }),
+  trial: (email: string) =>
+    req<TrialMint>('/v1/license/trial', { method: 'POST', body: JSON.stringify({ email }) }),
   cryptoPending: () =>
     req<{
       payments: Array<{
