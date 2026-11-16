@@ -29,7 +29,7 @@ npm run preview -- --open     # http://localhost:4173
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Development server with live reload (what `start-site.cmd` runs). |
-| `npm run build` | Builds the upload folder `dist/`, and `copy.md`. Set `SITE_URL` for an address other than `https://stm-addon.netlify.app`. |
+| `npm run build` | Builds the upload folder `dist/`, and `copy.md`. Set `SITE_URL` for an address other than `https://stm-wow.com`. |
 | `npm run preview` | Serves `dist/` like Cloudflare does (`_headers`, 404 page, gzip). |
 | `npm test` | Guardrails: Telegram is the only link, no banned claims, every number from `stats.json`, SEO and structured data. |
 | `npm run test:e2e` | Builds, then 26 browser checks: axe accessibility, no sideways scroll at 320-1440 px and at 200% zoom, reduced motion, CSP errors, the accessibility menu, the copy button, the versions line, the pictures, the 404 page, the JavaScript budgets. |
@@ -110,8 +110,8 @@ Nothing on the page is a placeholder except the prices ("Price on Telegram" unti
 decide or supply:
 
 - **The final address.**
-  - The site is built for `https://stm-addon.netlify.app`.
-  - If Cloudflare gives you a different one, or you buy a domain, rebuild with `SITE_URL` (see DEPLOY.md). For a domain, also change `DEFAULT_SITE_URL` in `src/data/site.ts`.
+  - The site is built for `https://stm-wow.com`. `https://www.stm-wow.com` redirects to that apex. `https://stm-addon.netlify.app` still serves the same Netlify deploy.
+  - A different host needs a rebuild with `SITE_URL` (see DEPLOY.md). To change the fallback, edit `DEFAULT_SITE_URL` in `src/data/site.ts`.
 - **Search Console verification.** Add Google's HTML file to `public/` when you verify the site.
 - **New numbers.** Run `npm run stats`, then copy the figures into `src/data/stats.json` with their date and source.
   The page shows only what is there. The test count comes from the bot's own suite; see CLAUDE.md.
@@ -138,7 +138,7 @@ decide or supply:
 
 stm-api is vendored in `api/` and co-deployed as a Netlify Function (`netlify/functions/api.ts`). Rewrites send `/api/*` there. Edit the sibling `C:\Users\yonat\src\stm-api`, then `npm run sync-api` before pushing.
 
-See **stm-api README** for the Netlify env checklist (exact var names + webhook `https://stm-addon.netlify.app/api/webhooks/stripe`). Paste secrets only in the Netlify UI or gitignored `.env` — never into git. Admin: `/api/admin/ui`. Rotate any exposed `sk_live` / Turso token / `whsec_`.
+See **stm-api README** for the Netlify env checklist (exact var names + webhook `https://stm-wow.com/api/webhooks/stripe`). Paste secrets only in the Netlify UI or gitignored `.env` — never into git. Admin: `/api/admin/ui`. Rotate any exposed `sk_live` / Turso token / `whsec_`.
 
 ## Notes
 

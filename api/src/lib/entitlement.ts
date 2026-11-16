@@ -3,6 +3,7 @@ import { db } from '../db/index.ts';
 import { licenses, payments, subscriptions } from '../db/schema.ts';
 import { id, licenseKey } from './ids.ts';
 import { isPlanId, periodEndAfterPayment, TRIAL_PLAN, type PlanId, PLANS } from './plans.ts';
+import { recordSubscriptionEvent } from './subscriptionEvents.ts';
 
 export function subscriptionActive(status: string, periodEnd: Date | null | undefined, now = new Date()): boolean {
   if (status !== 'active') return false;
@@ -47,8 +48,11 @@ export async function activateEntitlement(opts: {
   extendFrom?: Date;
   /** When set (e.g. Stripe invoice period end), use this instead of stacking +30 days. */
   forcePeriodEnd?: Date;
+  /** Sale date for a backdated manual payment. Defaults to now. */
+  paidAt?: Date;
 }) {
-  const now = new Date();
+  const recordedAt = new Date();
+  const paidAt = opts.paidAt ?? recordedAt;
   const paid = await db.select().from(payments).where(eq(payments.providerEventId, opts.providerEventId)).get();
   if (paid) return { duplicate: true as const };
 
@@ -62,7 +66,7 @@ export async function activateEntitlement(opts: {
       plan: opts.plan,
       amountCents: opts.amountCents,
       currency: opts.currency ?? 'eur',
-      createdAt: now,
+      createdAt: paidAt,
     })
     .run();
 
@@ -77,11 +81,12 @@ export async function activateEntitlement(opts: {
     opts.forcePeriodEnd ??
     periodEndAfterPayment(
       opts.plan,
-      current && subscriptionActive(current.status, current.currentPeriodEnd, now) && current.currentPeriodEnd
+      current && subscriptionActive(current.status, current.currentPeriodEnd, recordedAt) && current.currentPeriodEnd
         ? current.currentPeriodEnd
-        : opts.extendFrom ?? now,
+        : opts.extendFrom ?? paidAt,
     );
 
+  const subscriptionId = current?.id ?? id('sub_');
   if (current) {
     await db
       .update(subscriptions)
@@ -91,7 +96,7 @@ export async function activateEntitlement(opts: {
         provider: opts.provider,
         providerRef: opts.providerRef ?? current.providerRef,
         currentPeriodEnd: periodEnd,
-        updatedAt: now,
+        updatedAt: recordedAt,
       })
       .where(eq(subscriptions.id, current.id))
       .run();
@@ -99,17 +104,27 @@ export async function activateEntitlement(opts: {
     await db
       .insert(subscriptions)
       .values({
-        id: id('sub_'),
+        id: subscriptionId,
         userId: opts.userId,
         plan: opts.plan,
         status: 'active',
         provider: opts.provider,
         providerRef: opts.providerRef ?? null,
         currentPeriodEnd: periodEnd,
-        updatedAt: now,
+        updatedAt: recordedAt,
       })
       .run();
   }
+
+  await recordSubscriptionEvent({
+    userId: opts.userId,
+    subscriptionId,
+    plan: opts.plan,
+    status: 'active',
+    provider: opts.provider,
+    source: 'activate',
+    createdAt: paidAt,
+  });
 
   const license = await ensureLicense(opts.userId, opts.plan);
   return { duplicate: false as const, periodEnd, license };
@@ -127,15 +142,25 @@ export async function markSubscriptionStatus(
     .orderBy(desc(subscriptions.updatedAt))
     .get();
   if (!current) return;
+  const updatedAt = new Date();
   await db
     .update(subscriptions)
     .set({
       status,
       ...(periodEnd !== undefined ? { currentPeriodEnd: periodEnd } : {}),
-      updatedAt: new Date(),
+      updatedAt,
     })
     .where(eq(subscriptions.id, current.id))
     .run();
+  await recordSubscriptionEvent({
+    userId,
+    subscriptionId: current.id,
+    plan: current.plan,
+    status,
+    provider: current.provider,
+    source: 'status',
+    createdAt: updatedAt,
+  });
 }
 
 export async function entitlementForUser(userId: string, now = new Date()) {

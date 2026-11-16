@@ -246,7 +246,7 @@ direct upload of a folder with no Git needed. The build must be ready to drag in
   - a `404.html` in the site's style, with a way back home;
   - `robots.txt` and `sitemap.xml`;
   - the favicon set, the manifest and the OG image.
-- `SITE_URL` (environment variable, default `https://stm-addon.netlify.app`) sets the canonical link, `og:url`, the
+- `SITE_URL` (environment variable, default `https://stm-wow.com`) sets the canonical link, `og:url`, the
   sitemap's addresses and the JSON-LD `url`. A wrong or missing one must not break the build.
 - Add a Cloudflare **`_headers`** file in `dist/`:
   - long cache (`max-age=31536000, immutable`) for the hashed assets, no cache for the HTML;

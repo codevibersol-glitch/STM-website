@@ -79,3 +79,51 @@ export const trialRequests = sqliteTable('trial_requests', {
   email: text('email').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 });
+
+/** CRM fields for a buyer. One row per user; absent until an admin edits them. */
+export const customerProfiles = sqliteTable('customer_profiles', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => users.id),
+  telegramHandle: text('telegram_handle'),
+  notes: text('notes'),
+  /** Comma-separated normalized tags. */
+  tags: text('tags'),
+  /** telegram | website | reddit | other */
+  source: text('source'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/**
+ * Append-only subscription history. Existing subscription rows stay as the live
+ * state; this table only gains new rows.
+ */
+export const subscriptionEvents = sqliteTable('subscription_events', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  subscriptionId: text('subscription_id'),
+  plan: text('plan').notNull(),
+  status: text('status').notNull(),
+  provider: text('provider').notNull(),
+  /** activate | trial | trial_start | status | revoke | set_period | snapshot | edit | extend | cancel | reactivate */
+  source: text('source').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/**
+ * Append-only admin audit. No foreign key, so a row survives buyer deletion.
+ * old_json / new_json never store a full license key.
+ */
+export const auditLog = sqliteTable('audit_log', {
+  id: text('id').primaryKey(),
+  actorEmail: text('actor_email').notNull(),
+  action: text('action').notNull(),
+  entityType: text('entity_type').notNull(),
+  entityId: text('entity_id'),
+  userId: text('user_id'),
+  oldJson: text('old_json'),
+  newJson: text('new_json'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});

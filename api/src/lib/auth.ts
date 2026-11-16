@@ -39,6 +39,7 @@ export async function userFromSession(sessionId: string | undefined): Promise<Au
 }
 
 export function setSessionCookie(c: Context, sessionId: string) {
+  // Host-only (no Domain). stm-wow.com and stm-addon.netlify.app each keep their own session.
   setCookie(c, COOKIE, sessionId, {
     httpOnly: true,
     sameSite: 'Lax',

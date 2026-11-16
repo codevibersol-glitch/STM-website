@@ -158,9 +158,11 @@ describe('honest claims', () => {
     expect(HERO.trust).toContain('Telegram updates');
     expect(HERO.trust.join(' ')).not.toMatch(/tracking|telegram only|email/i);
     expect(COMMITMENT.points).toContain('Buying needs an account; delivery stays on Telegram.');
-    expect(FOOTER.privacy).toBe('Buying needs an account. Delivery stays on Telegram.');
+    expect(FOOTER.privacy).toBe(
+      'Buying needs an account. Delivery stays on Telegram. A running bot reports character, level, zone, quest, and pace. No extra addresses and no passwords.',
+    );
     expect(FAQ.find((f) => f.id === 'data')?.a).toBe(
-      'Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram.',
+      'Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram. A running bot reports character, level, zone, quest, and pace. No extra addresses and no passwords.',
     );
     expect(text).not.toContain(UPDATES.title);
     const hero = /<section id="top"[\s\S]*?<\/section>/.exec(home)?.[0] ?? '';
@@ -309,6 +311,7 @@ describe('search', () => {
     expect(custom).toContain('<link rel="canonical" href="https://example.org/" />');
     expect(custom).toContain('<meta property="og:image" content="https://example.org/og.png" />');
     expect(resolveSiteUrl('https://example.org/').url).toBe('https://example.org');
+    expect(DEFAULT_SITE_URL).toBe('https://stm-wow.com');
     expect(resolveSiteUrl(undefined).url).toBe(DEFAULT_SITE_URL);
     const bad = resolveSiteUrl('not a url');
     expect(bad.url).toBe(DEFAULT_SITE_URL);

@@ -36,7 +36,7 @@ structured data, so search engines see the right one.
 
 ## Updating the site later
 
-1. Build again (as above; `npm run build` alone builds for `https://stm-addon.netlify.app`).
+1. Build again (as above; `npm run build` alone builds for `https://stm-wow.com`).
 2. Cloudflare dashboard ΓåÆ **Workers & Pages** ΓåÆ **stm-addon** ΓåÆ **Create deployment** ΓåÆ drag `dist` in ΓåÆ **Save and deploy**.
 
 Or in one command: **`npm run deploy`**. The first time, it opens Cloudflare in your browser to log in.
@@ -57,8 +57,8 @@ The settings, if a new project is ever needed:
    - **Root directory:** leave empty
 3. **Environment variables** (Production and Preview): `NODE_VERSION` = `22` (the repository's `.node-version` says the
    same), and `SITE_URL` = the final address (it goes into the canonical link, the sitemap, the share image and the
-   structured data). The project is called **`stm-addon`**, so its address is `https://stm-addon.netlify.app`; without
-   `SITE_URL` the site assumes `https://stm-addon.netlify.app`.
+   structured data). The public address is `https://stm-wow.com` (`www` redirects to the apex). Without
+   `SITE_URL` the site assumes `https://stm-wow.com`. `https://stm-addon.netlify.app` still serves the same deploy.
 4. **Save and deploy.** From then on: `git push` ΓåÆ about a minute later the site is updated. Each pull request or other
    branch gets its own preview address.
 
@@ -77,8 +77,8 @@ To change the pictures, run `npm run shots` on the PC with the bot running, chec
 1. Buy the domain anywhere (Cloudflare sells them at cost).
 2. **Workers & Pages** ΓåÆ **stm-addon** ΓåÆ **Custom domains** ΓåÆ **Set up a custom domain** and follow the steps.
 3. Build with the new address and upload again:
-   `$env:SITE_URL="https://your-domain.com"; npm run build`.
-   To make it the default, also change `DEFAULT_SITE_URL` in `src/data/site.ts`.
+   `$env:SITE_URL="https://stm-wow.com"; npm run build`.
+   The default is already `DEFAULT_SITE_URL` in `src/data/site.ts` (`https://stm-wow.com`).
 
 ## Getting found on Google and Bing
 
@@ -115,10 +115,10 @@ The `/account` page talks to **stm-api** under same-origin `/api/*` (Netlify Fun
    - Required: `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (`whsec_…`, not `mk_…`), `ADMIN_EMAILS`, `SESSION_SECRET`, `CORS_ORIGIN`, `PUBLIC_URL`
    - Stripe products/prices (optional if code defaults are fine): `STRIPE_PRODUCT_FLEX`, `STRIPE_PRODUCT_GO`, `STRIPE_PRODUCT_FOUNDER`, `STRIPE_PRICE_FLEX`, `STRIPE_PRICE_GO`, `STRIPE_PRICE_FOUNDER`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`
    - Optional wallets: `CRYPTO_WALLET_BTC`, `CRYPTO_WALLET_ETH`, `CRYPTO_WALLET_BNB`, `CRYPTO_WALLET_SOL`
-   - Stripe webhook endpoint URL: `https://stm-addon.netlify.app/api/webhooks/stripe`
+   - Stripe webhook endpoint URL: `https://stm-wow.com/api/webhooks/stripe` (`https://stm-addon.netlify.app/api/webhooks/stripe` still reaches the same function)
    - Local Netlify Functions: use Netlify UI env, or a gitignored `stm-website/.env` with the same names (`loadEnv` reads website-root `.env`).
 3. `VITE_API_URL=/api` is set in `netlify.toml`.
-4. Admin UI: `https://stm-addon.netlify.app/api/admin/ui`.
+4. Admin UI: `https://stm-wow.com/api/admin/ui`.
 5. **Rotate** any `sk_live_…` / Turso token / `whsec_…` that was exposed outside Netlify/local `.env`.
 
 ## Second choice: GitHub Pages

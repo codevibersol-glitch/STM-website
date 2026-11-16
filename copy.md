@@ -297,7 +297,7 @@ You write and send this message in Telegram. The page does not send the template
 
 - The WoW leveling and accessibility tool. Play the adventure, skip the grind.
 - Talk to us on Telegram or Discord: @HugeKush
-- Buying needs an account. Delivery stays on Telegram.
+- Buying needs an account. Delivery stays on Telegram. A running bot reports character, level, zone, quest, and pace. No extra addresses and no passwords.
 - World of Warcraft, WoW and Blizzard Entertainment are trademarks or registered trademarks of Blizzard Entertainment, Inc. STM is not affiliated with, endorsed by or sponsored by Blizzard Entertainment.
 - Built on the work of julianperrott and Xian55.
 

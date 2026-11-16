@@ -6,6 +6,7 @@ import { db } from '../db/index.ts';
 import { licenses, subscriptions, trialRequests, users } from '../db/schema.ts';
 import { subscriptionActive } from '../lib/entitlement.ts';
 import { hashPassword, id, licenseKey, machineHash } from '../lib/ids.ts';
+import { recordSubscriptionEvent } from '../lib/subscriptionEvents.ts';
 import { isPlanId, TRIAL_DAYS, TRIAL_PLAN } from '../lib/plans.ts';
 
 /** ~2× client heartbeat (15 min) — stale seats can be reclaimed after a crash. */
@@ -102,7 +103,16 @@ licenseRoutes.post('/activate', async (c) => {
           .set({ currentPeriodEnd: periodEnd, status: 'active', updatedAt: now })
           .where(eq(subscriptions.id, sub.id))
           .run();
-        sub = { ...sub, currentPeriodEnd: periodEnd, status: 'active' };
+        sub = { ...sub, currentPeriodEnd: periodEnd, status: 'active', updatedAt: now };
+        await recordSubscriptionEvent({
+          userId: sub.userId,
+          subscriptionId: sub.id,
+          plan: TRIAL_PLAN,
+          status: 'active',
+          provider: sub.provider,
+          source: 'trial_start',
+          createdAt: now,
+        });
       }
     }
   }
@@ -276,10 +286,11 @@ licenseRoutes.post('/trial', async (c) => {
       .run();
   }
 
+  const subscriptionId = id('sub_');
   await db
     .insert(subscriptions)
     .values({
-      id: id('sub_'),
+      id: subscriptionId,
       userId,
       plan: TRIAL_PLAN,
       status: 'active',
@@ -289,6 +300,15 @@ licenseRoutes.post('/trial', async (c) => {
       updatedAt: now,
     })
     .run();
+  await recordSubscriptionEvent({
+    userId,
+    subscriptionId,
+    plan: TRIAL_PLAN,
+    status: 'active',
+    provider: 'trial',
+    source: 'trial',
+    createdAt: now,
+  });
 
   const key = licenseKey();
   if (!KEY_SHAPE.test(key)) return c.json({ error: 'key_shape' }, 500);
