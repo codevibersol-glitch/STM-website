@@ -211,7 +211,7 @@ export const FIGHTER = {
 
 export const FOOTER = {
   tagline: 'The WoW leveling and accessibility tool. Play the adventure, skip the grind.',
-  privacy: 'Buying needs an account. Delivery stays on Telegram.',
+  privacy: 'Buying needs an account. Delivery stays on Telegram. A running bot reports character, level, zone, quest, and pace. No extra addresses and no passwords.',
   contact: 'Talk to us on Telegram or Discord:',
 };
 
