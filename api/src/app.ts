@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { adminUiHtml } from './admin/uiHtml.ts';
 import { migrate } from './db/migrate.ts';
-import { env } from './lib/env.ts';
+import { env, missingDatabaseEnv, publicErrorMessage } from './lib/env.ts';
 import { adminRoutes } from './routes/admin.ts';
 import { authRoutes } from './routes/auth.ts';
 import { checkoutRoutes } from './routes/checkout.ts';
@@ -20,7 +20,17 @@ export function ensureMigrated(): Promise<void> {
 export const app = new Hono();
 
 app.use('*', async (c, next) => {
-  await ensureMigrated();
+  const missing = missingDatabaseEnv();
+  if (missing.length > 0) {
+    return c.json({ error: 'missing_env', missing }, 503);
+  }
+  try {
+    await ensureMigrated();
+  } catch (err) {
+    const message = publicErrorMessage(err);
+    console.error(`stm-api migrate failed: ${message}`);
+    return c.json({ error: 'migrate_failed', message }, 503);
+  }
   await next();
 });
 

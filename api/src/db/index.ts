@@ -7,9 +7,18 @@ import * as schema from './schema.ts';
 
 loadEnv();
 
+function onNetlify(): boolean {
+  return process.env.NETLIFY === 'true' || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+}
+
 function resolveDatabaseUrl(): string {
   const fromEnv = process.env.DATABASE_URL?.trim();
   if (fromEnv) return fromEnv;
+
+  // The function bundle is read-only. Creating data/stm.sqlite here throws while the module
+  // loads, and Netlify turns that into a 500 on every route with no message. The request
+  // handler answers missing_env instead.
+  if (onNetlify()) return 'libsql://missing-database-url.invalid';
 
   // Local/dev fallback: file-backed libSQL (same role as the old better-sqlite3 path).
   const filePath = process.env.DATABASE_PATH ?? path.join(process.cwd(), 'data', 'stm.sqlite');

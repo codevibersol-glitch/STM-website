@@ -48,3 +48,42 @@ export const env = {
 export function isAdmin(email: string): boolean {
   return env.adminEmails.includes(email.trim().toLowerCase());
 }
+
+/**
+ * Names the live site needs in the Netlify UI. The function refuses every route when the
+ * database ones are missing, instead of crashing while the module loads.
+ */
+export const REQUIRED_ENV = [
+  'DATABASE_URL',
+  'DATABASE_AUTH_TOKEN',
+  'SESSION_SECRET',
+  'ADMIN_EMAILS',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'CORS_ORIGIN',
+  'PUBLIC_URL',
+] as const;
+
+/** Build-time only. They do not reach the function. */
+export const BUILD_ENV = ['SITE_URL', 'VITE_API_URL'] as const;
+
+export function missingDatabaseEnv(source: Record<string, string | undefined> = process.env): string[] {
+  const netlify = source.NETLIFY === 'true' || Boolean(source.AWS_LAMBDA_FUNCTION_NAME);
+  if (!netlify) return [];
+  const url = source.DATABASE_URL?.trim() ?? '';
+  const missing: string[] = [];
+  if (!url) missing.push('DATABASE_URL');
+  if (url && !url.toLowerCase().startsWith('file:') && !source.DATABASE_AUTH_TOKEN?.trim()) {
+    missing.push('DATABASE_AUTH_TOKEN');
+  }
+  return missing;
+}
+
+/** A message safe to send to the browser: no database address and no secret. */
+export function publicErrorMessage(err: unknown): string {
+  const message = err instanceof Error ? err.message : 'request failed';
+  return message
+    .replace(/libsql:\/\/\S+/gi, '[database]')
+    .replace(/https?:\/\/\S+/gi, '[url]')
+    .replace(/\b(sk|rk|whsec)_[A-Za-z0-9_]+/g, '[secret]');
+}

@@ -140,9 +140,21 @@ async function addColumnIfMissing(statement: string): Promise<void> {
   }
 }
 
+/**
+ * Turso's HTTP API rejects `PRAGMA busy_timeout` with
+ * `SQL_PARSE_ERROR: SQL not allowed statement`. File sqlite accepts it.
+ * A remote URL must skip the pragma: migrate() runs on every API request.
+ */
+export function databaseAcceptsBusyTimeout(databaseUrl: string | undefined): boolean {
+  const url = databaseUrl?.trim() ?? '';
+  return url === '' || url.startsWith('file:');
+}
+
 export async function migrate(): Promise<void> {
   if (migrated) return;
-  await client.execute('PRAGMA busy_timeout = 15000');
+  if (databaseAcceptsBusyTimeout(process.env.DATABASE_URL)) {
+    await client.execute('PRAGMA busy_timeout = 15000');
+  }
   await client.executeMultiple(SQL);
   for (const alter of ALTERS) await addColumnIfMissing(alter);
   await client.execute(SNAPSHOT_SQL);
