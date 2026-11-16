@@ -25,7 +25,7 @@ export const KLAVIYO_FORM_ID = 'WL7BMB';
 export const KLAVIYO_SCRIPT_SRC = `https://static.klaviyo.com/onsite/js/${KLAVIYO_COMPANY_ID}/klaviyo.js`;
 
 /** Used when SITE_URL is not set (or is not a valid http/https address). */
-export const DEFAULT_SITE_URL = 'https://stm-addon.netlify.app';
+export const DEFAULT_SITE_URL = 'https://stm-wow.com';
 
 export const PRIMARY_KEYWORD = 'WoW accessibility addon';
 

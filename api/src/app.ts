@@ -33,6 +33,8 @@ app.use(
         env.corsOrigin,
         'http://localhost:4321',
         'http://127.0.0.1:4321',
+        'https://stm-wow.com',
+        'https://www.stm-wow.com',
         'https://stm-addon.netlify.app',
       ]);
       if (!origin || allowed.has(origin)) return origin || env.corsOrigin;

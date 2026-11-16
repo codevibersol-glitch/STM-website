@@ -309,6 +309,7 @@ describe('search', () => {
     expect(custom).toContain('<link rel="canonical" href="https://example.org/" />');
     expect(custom).toContain('<meta property="og:image" content="https://example.org/og.png" />');
     expect(resolveSiteUrl('https://example.org/').url).toBe('https://example.org');
+    expect(DEFAULT_SITE_URL).toBe('https://stm-wow.com');
     expect(resolveSiteUrl(undefined).url).toBe(DEFAULT_SITE_URL);
     const bad = resolveSiteUrl('not a url');
     expect(bad.url).toBe(DEFAULT_SITE_URL);

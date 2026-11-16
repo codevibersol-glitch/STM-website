@@ -36,8 +36,8 @@ export const env = {
     founder: process.env.STRIPE_PRICE_FOUNDER ?? '',
   },
   stripeProducts: STRIPE_PRODUCTS,
-  stripeSuccessUrl: process.env.STRIPE_SUCCESS_URL ?? 'https://stm-addon.netlify.app/account?paid=1',
-  stripeCancelUrl: process.env.STRIPE_CANCEL_URL ?? 'https://stm-addon.netlify.app/pricing',
+  stripeSuccessUrl: process.env.STRIPE_SUCCESS_URL ?? 'https://stm-wow.com/account?paid=1',
+  stripeCancelUrl: process.env.STRIPE_CANCEL_URL ?? 'https://stm-wow.com/pricing',
   cryptoWallets: CRYPTO_WALLETS,
   /** Optional legacy NOWPayments — wallet + admin confirm is the v1 path. */
   nowpaymentsKey: process.env.NOWPAYMENTS_API_KEY ?? '',

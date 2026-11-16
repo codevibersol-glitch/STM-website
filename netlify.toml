@@ -15,13 +15,24 @@
   SECRETS_SCAN_OMIT_KEYS = "PUBLIC_URL,STRIPE_SUCCESS_URL,STRIPE_CANCEL_URL,STRIPE_PRODUCT_FLEX,STRIPE_PRODUCT_GO,STRIPE_PRODUCT_FOUNDER,CRYPTO_WALLET_BTC,CRYPTO_WALLET_ETH,CRYPTO_WALLET_BNB,CRYPTO_WALLET_SOL,ADMIN_EMAILS,CORS_ORIGIN"
 
 [context.production.environment]
-  SITE_URL = "https://stm-addon.netlify.app"
+  SITE_URL = "https://stm-wow.com"
+  PUBLIC_URL = "https://stm-wow.com"
+  CORS_ORIGIN = "https://stm-wow.com"
+  STRIPE_SUCCESS_URL = "https://stm-wow.com/account?paid=1"
+  STRIPE_CANCEL_URL = "https://stm-wow.com/pricing"
   VITE_API_URL = "/api"
 
 [functions]
   node_bundler = "esbuild"
   # libsql may ship platform natives; keep external so Netlify can resolve them.
   external_node_modules = ["@libsql/client"]
+
+# www → apex. stm-addon.netlify.app is left in place so the old host still serves this deploy.
+[[redirects]]
+  from = "https://www.stm-wow.com/*"
+  to = "https://stm-wow.com/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
   from = "/api/*"
