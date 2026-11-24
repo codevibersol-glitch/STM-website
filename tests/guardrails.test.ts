@@ -372,12 +372,17 @@ describe('one app, every version, in beta', () => {
 
   it('shows a picture only with alt text, a size, lazy loading and a file of its own', () => {
     const imgs = [...guide.matchAll(/<img\s[^>]*>/g)].map((m) => m[0]);
-    expect(imgs).toHaveLength(SHOTS.length);
-    for (const img of imgs) {
+    const shots = imgs.filter((img) => img.includes('/shots/'));
+    const art = imgs.filter((img) => img.includes('/art/'));
+    expect(shots).toHaveLength(SHOTS.length);
+    expect(art.map((img) => /src="([^"]+)"/.exec(img)?.[1])).toEqual(['/art/grind-960.jpg', '/art/quest-960.jpg']);
+    for (const img of [...shots, ...art]) {
       expect(img).toMatch(/alt="[^"]{12,}"/);
       expect(img).toMatch(/width="\d+"/);
       expect(img).toMatch(/height="\d+"/);
       expect(img).toContain('loading="lazy"');
+    }
+    for (const img of shots) {
       expect(img).toMatch(/src="\/shots\/[\w-]+\.jpg"/);
     }
     if (SHOTS.length > 0) expect(textOf(guide)).toContain(GALLERY_COPY.note);

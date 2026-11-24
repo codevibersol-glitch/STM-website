@@ -125,6 +125,23 @@ export function MapHero() {
 
   return (
     <div ref={boxRef} className={live ? 'hero-map is-live' : 'hero-map'} aria-hidden="true">
+      <picture className="hero-plate">
+        <source
+          type="image/webp"
+          srcSet="/art/hero-640.webp 640w, /art/hero-960.webp 960w, /art/hero-1280.webp 1280w"
+          sizes="100vw"
+        />
+        <img
+          src="/art/hero-960.jpg"
+          srcSet="/art/hero-640.jpg 640w, /art/hero-960.jpg 960w, /art/hero-1280.jpg 1280w"
+          sizes="100vw"
+          width={1280}
+          height={720}
+          alt=""
+          decoding="async"
+          fetchPriority="high"
+        />
+      </picture>
       <div className="hero-aura" />
       <MapPoster idPrefix="hero" className="hero-poster" />
       <canvas ref={canvasRef} className="hero-canvas" />

@@ -136,7 +136,7 @@ export function Doors() {
         <SectionHead id="doors-title" eyebrow={DOORS.eyebrow} title={DOORS.title} intro={DOORS.intro} />
         <ul className="cards cards-4">
           {DOORS.items.map((item) => (
-            <li key={item.href}>
+            <li key={item.href} data-reveal>
               <a className="card door" href={item.href}>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
@@ -277,11 +277,62 @@ export function How() {
   );
 }
 
+const FEATURE_ART = [
+  {
+    id: 'grind',
+    src: '/art/grind',
+    width: 1152,
+    height: 864,
+    widths: [640, 960, 1152],
+    alt: 'Painted scene of a robed figure casting green light at giant turtles beside a mountain lake. Original art, not a game screenshot.',
+    caption: 'Grind: walking, combat, loot, sell and repair.',
+  },
+  {
+    id: 'quest',
+    src: '/art/quest',
+    width: 1152,
+    height: 864,
+    widths: [640, 960, 1152],
+    alt: 'Painted village at dusk, with two figures sharing a glowing scroll outside timber houses. Original art, not a game screenshot.',
+    caption: 'A quest route, when STM has one for that level band.',
+  },
+] as const;
+
+function FeatureArt({ art }: { art: (typeof FEATURE_ART)[number] }) {
+  const sizes = '(min-width: 64rem) 36rem, 92vw';
+  const set = (ext: string) => art.widths.map((w) => `${art.src}-${w}.${ext} ${w}w`).join(', ');
+  return (
+    <figure className="art-frame">
+      <picture>
+        <source type="image/webp" srcSet={set('webp')} sizes={sizes} />
+        <img
+          src={`${art.src}-960.jpg`}
+          srcSet={set('jpg')}
+          sizes={sizes}
+          width={art.width}
+          height={art.height}
+          alt={art.alt}
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
+      <figcaption>{art.caption}</figcaption>
+    </figure>
+  );
+}
+
 export function Features() {
   return (
     <section id="features" className="section" aria-labelledby="features-title">
       <div className="wrap">
         <SectionHead id="features-title" eyebrow={FEATURES_COPY.eyebrow} title={FEATURES_COPY.title} intro={FEATURES_COPY.intro} />
+        <ul className="art-row">
+          {FEATURE_ART.map((art) => (
+            <li key={art.id} data-reveal>
+              <FeatureArt art={art} />
+            </li>
+          ))}
+        </ul>
         <ul className="cards features">
           {FEATURES.map((f) => (
             <li key={f.id} data-reveal>

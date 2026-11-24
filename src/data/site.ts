@@ -49,7 +49,7 @@ export const CREDITS = 'Built on the work of julianperrott and Xian55.';
 export const RISK_ANSWER =
   "STM is third-party software and isn't approved by Blizzard. Automating gameplay may go against the game's terms of use and could put your account at risk. You decide whether to use it.";
 
-export const THEME_COLOR = '#060709';
+export const THEME_COLOR = '#07111c';
 
 export const OG_IMAGE = {
   path: '/og.png',

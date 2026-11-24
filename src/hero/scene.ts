@@ -38,7 +38,7 @@ export interface MapScene {
   dispose(): void;
 }
 
-const ACCENT = 0xc6ff3a;
+const ACCENT = 0xe8c56a;
 const DANGER = 0xff6b5e;
 const BG = 0x060709;
 

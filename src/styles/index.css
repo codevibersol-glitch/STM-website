@@ -17,25 +17,25 @@
 }
 
 /* ------------------------------------------------------------------------------------------------
-   The map look - tokens: near-black ink, one lime accent, danger red, calm blue. The accessibility
+   The map look - tokens: deep-blue ink, gold accent, danger red, calm blue. The accessibility
    menu switches them with attributes on <html>: data-text="2|3", data-contrast="high",
    data-font="dyslexic", data-motion="reduce|full".
    ------------------------------------------------------------------------------------------------ */
 
 :root {
-  --c-ink: #060709;
-  --c-ink-2: #0a0c0f;
-  --c-panel: #0e1115;
-  --c-panel-2: #13171c;
-  --c-line: rgb(255 255 255 / 0.11);
-  --c-line-strong: rgb(220 226 232 / 0.5);
-  --c-text: #f2f4f6;
-  --c-muted: #a3abb6;
-  --c-faint: #8a939f;
-  --c-accent: #e8c46a;
-  --c-accent-ink: #1c1406;
+  --c-ink: #07111c;
+  --c-ink-2: #0a1828;
+  --c-panel: #102033;
+  --c-panel-2: #16304a;
+  --c-line: rgb(232 197 106 / 0.22);
+  --c-line-strong: rgb(232 197 106 / 0.55);
+  --c-text: #f6f1e6;
+  --c-muted: #c5ced8;
+  --c-faint: #9aafc4;
+  --c-accent: #e8c56a;
+  --c-accent-ink: #1a1406;
   --c-danger: #ff6b5e;
-  --c-calm: #7cc4ff;
+  --c-calm: #7eb6e8;
   /* The older names follow the one accent, so every section takes the new look. */
   --c-teal: var(--c-accent);
   --c-violet: var(--c-calm);
@@ -132,10 +132,12 @@ html[data-font="dyslexic"] {
     line-height: 1.6;
     overflow-x: clip;
     background:
-      radial-gradient(72rem 36rem at 88% -8%, rgb(232 196 106 / 0.1), transparent 58%),
-      radial-gradient(40rem 24rem at -6% 30%, rgb(120 36 14 / 0.22), transparent 55%),
-      repeating-linear-gradient(0deg, rgb(255 236 196 / 0.018) 0 1px, transparent 1px 4px),
-      var(--c-ink);
+      radial-gradient(72rem 36rem at 100% -8%, rgb(232 197 106 / 0.14), transparent 52%),
+      radial-gradient(46rem 28rem at -8% 18%, rgb(36 86 140 / 0.38), transparent 58%),
+      radial-gradient(32rem 22rem at 80% 60%, rgb(18 48 86 / 0.35), transparent 60%),
+      repeating-linear-gradient(0deg, rgb(243 226 168 / 0.018) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.015) 0 1px, transparent 1px 7px),
+      linear-gradient(180deg, #0c1c30 0%, var(--c-ink) 28rem);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -269,16 +271,19 @@ html[data-font="dyslexic"] {
   }
   .btn-gold {
     color: var(--c-accent-ink);
-    background: var(--c-accent);
+    background: linear-gradient(180deg, #f8e7b0 0%, #e8c56a 46%, #c9963a 100%);
     box-shadow:
-      0 0 0 1px rgb(232 196 106 / 0.6),
-      0 10px 34px -12px rgb(232 196 106 / 0.5);
+      0 0 0 1px #6e5216,
+      0 0 22px rgb(232 197 106 / 0.55),
+      0 12px 28px -10px rgb(232 197 106 / 0.7);
   }
   .btn-gold:hover {
     color: var(--c-accent-ink);
+    background: linear-gradient(180deg, #fff6d2 0%, #f0d48a 46%, #d4a64a 100%);
     box-shadow:
-      0 0 0 1px rgb(232 196 106 / 0.8),
-      0 14px 40px -12px rgb(232 196 106 / 0.7);
+      0 0 0 1px #f3e2a8,
+      0 0 32px rgb(255 220 140 / 0.8),
+      0 16px 36px -8px rgb(232 197 106 / 0.85);
   }
   .btn-ghost {
     color: var(--c-text);
@@ -682,17 +687,39 @@ html[data-font="dyslexic"] {
   .hero-map.is-live .hero-poster {
     opacity: 0;
   }
+  .hero-plate,
+  .hero-plate img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-plate img {
+    object-fit: cover;
+    object-position: 72% center;
+  }
+  .hero-poster {
+    opacity: 0.4;
+  }
   .hero-vignette {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(90deg, rgb(6 7 9 / 0.94) 0%, rgb(6 7 9 / 0.8) 26%, rgb(6 7 9 / 0.34) 54%, rgb(6 7 9 / 0) 72%),
-      radial-gradient(120% 80% at 50% 0%, transparent 40%, var(--c-ink) 92%),
-      linear-gradient(180deg, rgb(6 7 9 / 0.15) 0%, rgb(6 7 9 / 0) 30%, rgb(6 7 9 / 0.65) 78%, var(--c-ink) 100%);
+      linear-gradient(90deg, rgb(7 17 28 / 0.92) 0%, rgb(7 17 28 / 0.72) 30%, rgb(7 17 28 / 0.22) 54%, rgb(7 17 28 / 0) 72%),
+      linear-gradient(180deg, rgb(7 17 28 / 0.2) 0%, rgb(7 17 28 / 0) 24%, rgb(7 17 28 / 0.45) 78%, var(--c-ink) 100%);
+  }
+  .hero-canvas {
+    mix-blend-mode: screen;
   }
   @media (max-width: 47.99rem) {
+    .hero-plate img {
+      object-position: 70% 40%;
+    }
     .hero-vignette {
-      background: linear-gradient(180deg, rgb(6 7 9 / 0.5) 0%, rgb(6 7 9 / 0.82) 45%, var(--c-ink) 100%);
+      background:
+        linear-gradient(90deg, rgb(7 17 28 / 0.9) 0%, rgb(7 17 28 / 0.62) 48%, rgb(7 17 28 / 0.28) 100%),
+        linear-gradient(180deg, rgb(7 17 28 / 0.15) 0%, rgb(7 17 28 / 0.35) 40%, var(--c-ink) 100%);
     }
   }
   /* High contrast: black behind the words, no picture under them. */
@@ -927,8 +954,8 @@ html[data-font="dyslexic"] {
     .hero-title {
       order: 2;
       margin: 0.4rem 0;
-      font-size: 1.28rem;
-      line-height: 1.16;
+      font-size: 1.42rem;
+      line-height: 1.14;
     }
     #updates {
       order: 3;
@@ -2802,6 +2829,141 @@ html[data-font="dyslexic"] {
   }
 }
 
+/* Gold plate, stone grain and the painted hero. Same layer as the components above, so high-contrast
+   rules earlier in the file still win on specificity. */
+@layer components {
+  .btn {
+    border-radius: 0.3rem;
+  }
+  .site-header {
+    background: rgb(7 17 28 / 0.84);
+    border-bottom: 1px solid rgb(232 197 106 / 0.45);
+    box-shadow: 0 1px 0 rgb(243 226 168 / 0.2), 0 16px 40px rgb(0 0 0 / 0.35);
+  }
+  .eyebrow {
+    font-family: var(--f-display);
+    letter-spacing: 0.16em;
+  }
+  @media (min-width: 64rem) {
+    .hero-inner {
+      min-height: 40rem;
+    }
+    .hero-film {
+      align-self: end;
+      justify-self: end;
+      width: min(100%, 22rem);
+    }
+  }
+  .hero-title {
+    text-shadow: 0 2px 18px rgb(0 0 0 / 0.55);
+  }
+  .gradient-text {
+    color: var(--c-gold-2);
+  }
+  .hero .trust {
+    color: #d7dee6;
+  }
+  .proof {
+    border-color: rgb(232 197 106 / 0.65);
+    background:
+      linear-gradient(180deg, rgb(232 197 106 / 0.12), rgb(16 32 51 / 0.72));
+    box-shadow: inset 0 0 0 1px rgb(243 226 168 / 0.18), 0 0 24px rgb(232 197 106 / 0.12);
+  }
+  .card,
+  .plan,
+  .faq details,
+  .art-frame,
+  #trial .wrap {
+    border: 1px solid rgb(212 175 90 / 0.55);
+    border-radius: 0.35rem;
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgb(243 226 168 / 0.07), transparent 42%),
+      repeating-linear-gradient(0deg, rgb(243 226 168 / 0.025) 0 1px, transparent 1px 4px),
+      linear-gradient(180deg, #13283f, #0c1a2c);
+    box-shadow:
+      inset 0 0 0 1px rgb(243 226 168 / 0.16),
+      inset 0 0 0 5px rgb(8 16 28 / 0.45),
+      inset 0 0 0 6px rgb(201 162 55 / 0.32),
+      0 22px 44px -28px rgb(0 0 0 / 0.85);
+  }
+  .card:hover,
+  .plan:hover {
+    border-color: rgb(243 226 168 / 0.85);
+    box-shadow:
+      inset 0 0 0 1px rgb(243 226 168 / 0.28),
+      inset 0 0 0 5px rgb(8 16 28 / 0.45),
+      inset 0 0 0 6px rgb(232 197 106 / 0.62),
+      0 0 28px rgb(232 197 106 / 0.28);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='reduce']) .card:hover {
+      transform: translateY(-3px);
+    }
+  }
+  .art-row {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 48rem) {
+    .art-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .art-frame {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  .art-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .art-frame figcaption {
+    margin: 0;
+    padding: 0.8rem 1rem 1rem;
+    color: var(--c-muted);
+    font-size: 0.95rem;
+  }
+  @media (min-width: 70rem) {
+    .plans {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-width: none;
+    }
+  }
+  .plan .btn {
+    align-self: stretch;
+    width: 100%;
+  }
+  .plan-highlight {
+    box-shadow:
+      inset 0 0 0 1px rgb(243 226 168 / 0.4),
+      inset 0 0 0 5px rgb(8 16 28 / 0.4),
+      inset 0 0 0 6px rgb(243 226 168 / 0.7),
+      0 0 36px rgb(232 197 106 / 0.28);
+  }
+  .faq details[open] {
+    border-color: rgb(232 197 106 / 0.75);
+  }
+  .faq summary {
+    border-radius: 0.35rem;
+    font-family: var(--f-display);
+    letter-spacing: 0.01em;
+  }
+  #trial .wrap {
+    padding: 1.6rem 1.35rem 1.4rem;
+  }
+  html[data-contrast='high'] .art-frame,
+  html[data-contrast='high'] #trial .wrap {
+    border: 2px solid #fff;
+    background: #000;
+    box-shadow: none;
+  }
+}
+
 /* ------------------------------------------------------------------------------ reduced motion
    The visitor's choice wins: data-motion="reduce" stops everything, and the system setting does
    too unless the visitor has switched motion back on (data-motion="full"). */
@@ -2874,8 +3036,12 @@ html[data-motion="reduce"] .embers {
 
 .hero-film-frame {
   aspect-ratio: 16 / 9;
-  border: 1px solid rgb(232 196 106 / 0.45);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.4), 0 18px 40px -28px rgb(232 196 106 / 0.45);
+  border: 1px solid rgb(232 197 106 / 0.7);
+  box-shadow:
+    inset 0 0 0 1px rgb(243 226 168 / 0.28),
+    0 0 0 4px rgb(7 17 28 / 0.72),
+    0 0 0 5px rgb(201 162 55 / 0.55),
+    0 18px 40px -18px rgb(232 197 106 / 0.45);
 }
 .hero-film-controls {
   display: flex;

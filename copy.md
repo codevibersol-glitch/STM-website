@@ -255,7 +255,7 @@ On Telegram or Discord: send a message to @HugeKush on Telegram, or to @hugekush
 
 **Do you collect any data?**
 
-Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram.
+Buying needs an account (email and password) so we can bill you and issue a license key. Cloudflare Web Analytics counts visits and does not use cookies. The build and support stay on Telegram. A running bot reports character, level, zone, quest, and pace. No extra addresses and no passwords.
 
 **Is it allowed by Blizzard, and can my account be affected?**
 
